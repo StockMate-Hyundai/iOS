@@ -1,0 +1,16 @@
+# Xcode
+*.xcworkspace
+*.xcuserdata
+*.DS_Store
+*.xcodeproj/project.xcworkspace/contents.xcuserdatad
+*.xcodeproj/xcuserdata/
+
+# 빌드 폴더
+build/
+DerivedData/
+
+# CocoaPods
+Pods/
+
+# Swift Package Manager
+Packages/
