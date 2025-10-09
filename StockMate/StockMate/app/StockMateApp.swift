@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct StockMateApp: App {
+    @StateObject private var authViewModel = AuthViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppNavHost()
+                .environmentObject(authViewModel)
         }
     }
 }
