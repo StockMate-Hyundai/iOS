@@ -32,15 +32,50 @@ extension Color {
     static let Dark = Color(hex: "#04150C")
     static let Light = Color(hex: "#F7F7F7")
     
-    // State
-    static let Success   = Color(hex: "#00CB6A")
-    static let Warning  = Color(hex: "#EFBE24")
-    static let Danger  = Color(hex: "#F26666")
+    
 
     // Text
     static let textBlack = Color(hex: "#152C07")
     static let textGray1 = Color(hex: "#5D5C5D")
     static let textGray2 = Color(hex: "#BEBEBE")
+    
+    // State
+    static let Success   = Color(hex: "#00CB6A")
+    static let Incoming = Color(hex: "#5EDE99")
+    static let Danger  = Color(hex: "#F26666")
+    static let Warning  = Color(hex: "#EFBE24")
+    static let Defect = Color(hex: "#FF9E29")
+    static let Transfer = Color(hex: "#4DC2EC")
+    
+    // State Background Color
+    static let SuccessBg   = Color(hex: "#00CB6A")
+    static let IncomingBg = Color(hex: "#E0FFF0")
+    static let DangerBg  = Color(hex: "#FFE0E0")
+    static let WarningBg  = Color(hex: "#FFFCE0")
+    static let DefectBg = Color(hex: "#FFDEB7")
+    static let TransferBg = Color(hex: "#E3F5FC")
+    
+    
+    // Inventory Status
+    static let InvIncoming   = Color(hex: "#7CE12F")
+    static let InvUse = Color(hex: "#F6AD12")
+    static let InvStock  = Color(hex: "#C1ACFF")
+    
+    // Inventory Status Background
+    static let InvIncomingBg   = Color(hex: "#EAFADE")
+    static let InvUseBg = Color(hex: "#FEF2D9")
+    static let InvStockBg  = Color(hex: "#E1D7FF")
+    
+    
+    // Status
+    static let StatusGreen   = Color(hex: "#82E239")
+    static let StatusRed = Color(hex: "#F34838")
+    static let StatusPurple  = Color(hex: "#7562FF")
+    
+    // Status Background
+    static let StatusGreenBg   = Color(hex: "#EAFADE")
+    static let StatusRedBg = Color(hex: "#FDE0DD")
+    static let StatusPurpleBg  = Color(hex: "#E9E6FF")
     
     // 투명도 포함 예시
     static let boxBgWhite = Color(hex: "#40FFFFFF") // 투명도 포함
