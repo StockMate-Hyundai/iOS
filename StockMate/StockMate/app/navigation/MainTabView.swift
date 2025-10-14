@@ -15,11 +15,11 @@ struct MainTabView: View {
             // 메인 화면
             ZStack {
                 switch selectedTab {
-                case 0: HomeView()
-                case 1: OrderView()
-                case 2: InventoryView()
-                case 3: ContentView()
-                default: HomeView()
+                case 0: NavigationStack{ HomeView() }
+                case 1: NavigationStack{ OrderView() }
+                case 2: NavigationStack{ InventoryView() }
+                case 3: NavigationStack{ ContentView() }
+                default: NavigationStack{ HomeView() }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
