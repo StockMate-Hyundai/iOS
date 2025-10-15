@@ -15,7 +15,9 @@ struct MainTabView: View {
             // 메인 화면
             ZStack {
                 switch selectedTab {
-                case 0: NavigationStack{ HomeView() }
+                case 0: NavigationStack{ HomeView()
+//                    UserInfoView()
+                }
                 case 1: NavigationStack{ OrderView() }
                 case 2: NavigationStack{ InventoryView() }
                 case 3: NavigationStack{ ContentView() }

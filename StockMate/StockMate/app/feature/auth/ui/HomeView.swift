@@ -9,25 +9,25 @@ import SwiftUI
 
 
 struct HomeView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @StateObject private var userViewModel = UserViewModel()
+    
     var body: some View {
         ScrollView {
              VStack(alignment: .leading, spacing: 24) {
                  // 상단 프로필
                  HStack(spacing: 16) {
-                     Image("profile_sample") // 샘플 이미지
-                         .resizable()
-                         .frame(width: 50, height: 50)
-                         .clipShape(Circle())
+                     ProfileCircleView(name: userViewModel.userInfo?.owner ?? "사용자", size: 50)
                      
                      VStack(alignment: .leading, spacing: 4) {
                          HStack {
                              Image("location")
                                  .foregroundColor(.gray)
-                             Text("가산점")
+                             Text(userViewModel.userInfo?.storeName ?? "가게명 없음")
                                  .foregroundColor(.gray)
                                  .font(.subheadline)
                          }
-                         Text("Nadila Aulia")
+                         Text(userViewModel.userInfo?.owner ?? "이름 없음")
                              .font(.title3.bold())
                              .foregroundColor(Color(hex: "#2B3A1A"))
                      }
@@ -122,6 +122,17 @@ struct HomeView: View {
              .padding(.vertical)
          }
         .background(Color.Light)
+        .onAppear {
+            Task { await userViewModel.loadUserInfo() }
+        }
+        // 화면 디자인 시 잠시 주석처리
+//        // ✅ 세션 만료 시 자동으로 로그인 뷰로 이동
+//        .onChange(of: userViewModel.shouldGoToLogin) { shouldGo in
+//            if shouldGo {
+//                print("세션 만료됨 → 로그인 화면으로 이동")
+//                authViewModel.logout()
+//            }
+//        }
      }
 }
 

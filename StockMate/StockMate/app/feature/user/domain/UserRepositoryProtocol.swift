@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+protocol UserRepositoryProtocol {
+    func getUserInfo() async -> AppResult<ApiResponse<UserInfo>>
+}

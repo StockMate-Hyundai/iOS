@@ -64,7 +64,7 @@ extension Color {
     // Inventory Status Background
     static let InvIncomingBg   = Color(hex: "#EAFADE")
     static let InvUseBg = Color(hex: "#FEF2D9")
-    static let InvStockBg  = Color(hex: "#E1D7FF")
+    static let InvStockBg  = Color(hex: "#F6F4FF")
     
     
     // Status
