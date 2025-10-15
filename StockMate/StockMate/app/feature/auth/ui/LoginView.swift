@@ -98,6 +98,20 @@ struct LoginView: View {
                         .foregroundColor(Color.Secondary)
                 }
             }
+            
+            // 승인 아이디 받기 전
+            // 홈화면으로 이동
+            HStack {
+                Button(action: {
+                    authViewModel.authState = .authenticated
+                }) {
+                    Text("홈화면으로 이동")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(Color.Secondary)
+                }
+            }
+            .padding(.top, 5)
+            
             Spacer()
         }
         .background(Color.Light)
