@@ -6,165 +6,172 @@
 //
 
 import SwiftUI
-
 struct InventoryView: View {
+    @StateObject private var inventoryViewModel = InventoryViewModel()
+    @State private var showScrollToTopButton = false
+    @Namespace private var topID
+
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 13) {
-                Text("재고 관리")
-                    .font(.title2)
-                    .bold()
-                    .padding(.top, 13)
-                    .frame(maxWidth: .infinity, alignment: .center)
+            ScrollViewReader { proxy in
+                ZStack {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            // ✅ 스크롤 감지용 (맨 위)
+                            GeometryReader { geo in
+                                Color.clear
+                                    .onChange(of: geo.frame(in: .global).minY) { newValue in
+                                        // 👇 스크롤 시 값이 변함
+                                        print("📏 Scroll offsetY:", newValue)   // 테스트용, 화면 안정화 후 제거
+                                        withAnimation(.easeInOut(duration: 0.25)) {
+                                            showScrollToTopButton = newValue < -150
+                                        }
+                                    }
+                            }
+                            .frame(height: 0)
+                            .id(topID)
 
-                // 4개 버튼 영역
-                GridMenuView()
+                            // 타이틀
+                            Text("재고 관리")
+                                .font(.title2)
+                                .bold()
+                                .padding(.top, 13)
+                                .padding(.leading, 25)
+                                .frame(maxWidth: .infinity, alignment: .leading)
 
-                // 섹션 타이틀
-                Text("얼마 남지 않았어요!")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundColor(.black)
-                    .padding(.horizontal, 25)
-                    .padding(.top)
+                            GridMenuView()
 
-                // 공통 컴포넌트 리스트
-                ScrollView {
-                    VStack(spacing: 12) {
-                        // 예시 데이터
-                        let dummyData: [(String, String, Int, Int)] = [
-                            ("브레이크", "현대 아이오닉5", 5, 10),
-                            ("엔진오일", "기아 EV6", 10, 12),
-                            ("에어필터", "현대 코나", 8, 10),
-                        ]
+                            Text("얼마 남지 않았어요!")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 25)
+                                .padding(.top)
+                                .frame(maxWidth: .infinity, alignment: .leading)
 
-                        ForEach(dummyData, id: \.0) { item in
-                            StockShortageCard(
-                                partName: item.0,
-                                carModel: item.1,
-                                currentCount: item.2,
-                                minCount: item.3
-                            )
+                            LazyVStack(spacing: 12) {
+                                ForEach(inventoryViewModel.underLimitItems) { item in
+                                    InventoryCardView(item: item)
+                                        .padding(.horizontal)
+                                        .onAppear {
+                                            if item.id == inventoryViewModel.underLimitItems.last?.id {
+                                                Task {
+                                                    await inventoryViewModel.loadUnderLimitList()
+                                                }
+                                            }
+                                        }
+                                }
+
+                                if inventoryViewModel.isLoading {
+                                    ProgressView()
+                                        .padding(.vertical, 20)
+                                }
+                            }
+                            .padding(.top, 8)
+                            .padding(.bottom, 80)
                         }
                     }
-                    .padding(.horizontal)
+
+                    // 오른쪽 하단 플로팅 버튼
+                    if showScrollToTopButton {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                Button {
+                                    withAnimation(.easeInOut) {
+                                        proxy.scrollTo(topID, anchor: .top)
+                                    }
+                                } label: {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.Secondary) // ✅ 배경색
+                                            .frame(width: 50, height: 50)
+                                        Image(systemName: "arrow.up")
+                                            .font(
+                                                .system(size: 24, weight: .bold)
+                                            )
+                                            .foregroundColor(.white) // ✅ 화살표 색
+                                    }
+                                }
+                                .padding(.trailing, 20)
+                                .padding(.bottom, 20)
+                            }
+                        }
+                        .transition(.opacity)
+                        .animation(.easeInOut(duration: 0.25), value: showScrollToTopButton)
+                    }
+
+
+                }
+                .background(Color.Light)
+                .task {
+                    await inventoryViewModel.loadUnderLimitList(reset: true)
                 }
             }
-            .background(Color.Light)
         }
     }
 }
 
 struct GridMenuView: View {
     let menuItems = [
-        ("재고조회", Color.InvIncoming, Color.InvIncomingBg, AnyView(InventorySearchView())),
-        ("입출고 히스토리", Color.InvUse, Color.InvUseBg, AnyView(IncomingScanView())),
-        ("입고처리", Color.Transfer, Color.TransferBg, AnyView(IncomingScanView())),
-        ("사용처리", Color.InvStock, Color.InvStockBg, AnyView(IncomingScanView())),
+        ("재고 조회", true, "InvStock", AnyView(InventorySearchView())),
+        ("입출고 히스토리", false, "InvTrans", AnyView(IncomingScanView())),
+        ("입고 처리", false, "InvIncoming", AnyView(IncomingScanView())),
+        ("사용 처리", true, "InvUse", AnyView(IncomingScanView())),
     ]
-
+    
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 15) {
             LazyVGrid(
                 columns: [
-                    GridItem(.flexible(), spacing: 15),
-                    GridItem(.flexible(), spacing: 15),
+                    GridItem(.flexible(), spacing: 10),
+                    GridItem(.flexible(), spacing: 10),
                 ],
-                spacing: 15
+                spacing: 10
             ) {
-
                 ForEach(menuItems, id: \.0) { item in
-                    ZStack {
-                        // 그림자 전용 레이어 (NavigationLink 뒤에 위치)
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.white)
-                            .shadow(
-                                color: .black.opacity(0.25),
-                                radius: 4,
-                                x: 0,
-                                y: 4
-                            )
-
-                        // 버튼 본체
-                        NavigationLink(destination: item.3) {
-                            VStack(spacing: 12) {
-                                Image("InvStock")
-                                    .renderingMode(.template)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24)
-                                    .foregroundColor(item.1)
-                                    .padding(.top, 20)
-
-                                Text(item.0)
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundColor(item.1)
-                                    .padding(.bottom, 20)
+                    NavigationLink(destination: item.3) {
+                        VStack(alignment: .leading, spacing: 19) {
+                            HStack {
+                                Spacer()
+                                ZStack {
+                                    // 타원 배경
+                                    Rectangle()
+                                        .fill(item.1 ? Color.white.opacity(0.2) : Color.Secondary)
+                                        .frame(width: 35, height: 26)
+                                        .cornerRadius(80)
+                                    
+                                    // 아이콘
+                                    Image(item.2)
+                                        .renderingMode(.template)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 14, height: 14)
+                                        .foregroundColor(.white)
+                                }
                             }
-                            .frame(maxWidth: .infinity, minHeight: 120)
-                            .background(item.2.opacity(0.5))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(item.1, lineWidth: 1.2)
-                            )
-                            .cornerRadius(16)
+                            
+                            Text(item.0)
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(item.1 ? .white : Color.Secondary)
                         }
-                        .buttonStyle(PlainButtonStyle())
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 20)
+                        .frame(height: 99)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .fill(item.1 ? Color.Secondary : Color.white)
+                                // 카드 그림자 (Figma 스펙: y=4, blur=4, opacity=25%, black)
+                                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 4)
+                        )
                     }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 15)
         }
-        .padding()
-        .background(Color.White)
-        .padding(.horizontal)
-    }
-}
-
-struct StockShortageCard: View {
-    let partName: String
-    let carModel: String
-    let currentCount: Int
-    let minCount: Int
-
-    var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 68, height: 68)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(partName)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                Text(carModel)
-                    .font(.subheadline)
-                    .foregroundColor(.textGray1)
-            }
-            Spacer()
-
-            VStack(alignment: .leading) {
-                Text("수량 부족")
-                    .font(.system(size: 14, weight: .semibold))
-                    .fontWeight(.regular)
-                    .foregroundColor(.StatusRed)
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 12)
-                    .background(Color.StatusRedBg)
-                    .cornerRadius(14)
-
-                Text("현재수량: \(currentCount)개")
-                    .font(.caption)
-                    .foregroundColor(.textGray1)
-
-                Text("최소수량: \(minCount)개")
-                    .font(.caption)
-                    .foregroundColor(.textGray1)
-            }
-        }
-        .padding(12)
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .padding(.vertical, 17)
     }
 }
 

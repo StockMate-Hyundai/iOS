@@ -79,7 +79,7 @@ struct InventorySearchView: View {
                 ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(inventoryViewModel.inventoryItems) { item in
-                            InventoryCard(item: item)
+                            InventoryCardView(item: item)
                                 .padding(.horizontal)
                                 .onAppear {
                                     if item.id == inventoryViewModel.inventoryItems.last?.id,
@@ -89,6 +89,18 @@ struct InventorySearchView: View {
                                         }
                                     }
                                 }
+
+                            
+//                            InventoryCard(item: item)
+//                                .padding(.horizontal)
+//                                .onAppear {
+//                                    if item.id == inventoryViewModel.inventoryItems.last?.id,
+//                                       inventoryViewModel.hasMore {
+//                                        Task {
+//                                            await inventoryViewModel.loadInventoryList()
+//                                        }
+//                                    }
+//                                }
                         }
                         
                         if inventoryViewModel.isLoading && inventoryViewModel.hasMore {

@@ -25,4 +25,13 @@ final class InventoryRepositoryImpl: InventoryRepositoryProtocol {
         )
         return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
     }
+    // 부족 재고 리스트 호출
+    func getUnderLimitList(
+        categoryName: String?,
+        page: Int,
+        size: Int
+    ) async -> AppResult<ApiResponse<InventoryPageData>> {
+        let dataReq = InventoryApi.getUnderLimitList(categoryName: categoryName, page: page, size: size)
+        return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
+    }
 }

@@ -15,4 +15,10 @@ protocol InventoryRepositoryProtocol {
         trims: [String],
         models: [String]
     ) async -> AppResult<ApiResponse<InventoryPageData>>
+    
+    func getUnderLimitList(
+        categoryName: String?,
+        page: Int,
+        size: Int
+    ) async -> AppResult<ApiResponse<InventoryPageData>>
 }

@@ -63,4 +63,13 @@ enum InventoryApi {
 
         return ApiClient.shared.request(url, method: .get)
     }
+    
+    // ✅ 부족 재고 조회 API 추가
+    static func getUnderLimitList(categoryName: String? = nil, page: Int = 0, size: Int = 10) -> DataRequest {
+        var url = ApiClient.baseURL + "api/v1/store/under-limit?page=\(page)&size=\(size)"
+        if let categoryName = categoryName, !categoryName.isEmpty {
+            url += "&categoryName=\(categoryName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        }
+        return ApiClient.shared.request(url, method: .get)
+    }
 }
