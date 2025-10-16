@@ -56,7 +56,7 @@ struct InventoryView: View {
 
 struct GridMenuView: View {
     let menuItems = [
-        ("재고조회", Color.InvIncoming, Color.InvIncomingBg, AnyView(IncomingScanView())),
+        ("재고조회", Color.InvIncoming, Color.InvIncomingBg, AnyView(InventorySearchView())),
         ("입출고 히스토리", Color.InvUse, Color.InvUseBg, AnyView(IncomingScanView())),
         ("입고처리", Color.Transfer, Color.TransferBg, AnyView(IncomingScanView())),
         ("사용처리", Color.InvStock, Color.InvStockBg, AnyView(IncomingScanView())),
