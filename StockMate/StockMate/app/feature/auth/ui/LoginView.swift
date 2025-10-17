@@ -18,7 +18,6 @@ struct LoginView: View {
     @State private var emailError: String? = nil
     @State private var pwError: String? = nil
     
-//    var onLoginSuccess: () -> Void = {}
     var onLogin: (String, String) -> Void = { _, _ in }
     var onClickRegister: () -> Void = {}
     
@@ -121,7 +120,7 @@ struct LoginView: View {
     // MARK: - 유효성 검사 함수
     private func isValidForm() -> Bool {
         emailError = isValidEmail(authViewModel.email) ? nil : "이메일 형식을 확인해주세요"
-        //pwError = authViewModel.password.count >= 8 ? nil : "8자 이상 비밀번호를 입력해주세요"
+        pwError = authViewModel.password.count >= 8 ? nil : "8자 이상 비밀번호를 입력해주세요"
         return emailError == nil //&& pwError == nil
     }
     

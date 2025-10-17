@@ -116,7 +116,8 @@ final class InventoryViewModel: ObservableObject {
     
     // 부족 재고 로드
     func loadUnderLimitList(reset: Bool = false, size: Int = 10) async {
-        guard !isLoading, underLimitHasMore else { return }
+//        guard !isLoading, underLimitHasMore else { return }
+        guard !isLoading, (underLimitHasMore || reset) else { return }
         isLoading = true
         
         if reset {

@@ -22,7 +22,7 @@ struct InventorySearchView: View {
         "대형": ["제네시스BH", "에쿠스"],
         "SUV": ["베뉴", "코나OS", "코나SX2", "투싼IX", "투싼TL", "투싼NX4", "싼타페CM", "싼타페DM", "싼타페TM", "싼타페MX5", "맥스크루즈", "베라크루즈", "팰리세이드LX2", "팰리세이드LX3"],
         "화물/트럭/승합": ["스타렉스", "그랜드스타렉스", "스타리아", "포터2", "쏠라티", "마이티", "메가트럭", "카운티"],
-        "수소/전기자동차": ["아이오닉5", "아이오닉6", "아이오닉9", "넥쏘FE", "넥쏘NH2"]
+        "수소/전기": ["아이오닉5", "아이오닉6", "아이오닉9", "넥쏘FE", "넥쏘NH2"]
     ]
     
     private var filteredModels: [String] {
@@ -132,8 +132,10 @@ struct InventorySearchView: View {
                                 }
                         }
 
-                        
-                        if inventoryViewModel.isLoading && inventoryViewModel.hasMore {
+                        if inventoryViewModel.isLoading &&
+                          (inventoryViewModel.isSearching
+                            ? inventoryViewModel.searchHasMore
+                            : inventoryViewModel.hasMore) {
                             ProgressView()
                                 .padding(.vertical)
                         }

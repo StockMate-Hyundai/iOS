@@ -7,9 +7,14 @@
 
 import SwiftUI
 struct InventoryView: View {
+    @Binding var selectedTab: Int
+    @Binding var tabTappedTrigger: Bool
+    
     @StateObject private var inventoryViewModel = InventoryViewModel()
     @State private var showScrollToTopButton = false
     @Namespace private var topID
+    
+    @State private var lastTabSelection = 0
 
     var body: some View {
         NavigationStack {
@@ -17,12 +22,12 @@ struct InventoryView: View {
                 ZStack {
                     ScrollView {
                         VStack(spacing: 0) {
-                            // ✅ 스크롤 감지용 (맨 위)
+                            // 스크롤 감지용 (맨 위)
                             GeometryReader { geo in
                                 Color.clear
                                     .onChange(of: geo.frame(in: .global).minY) { newValue in
                                         // 👇 스크롤 시 값이 변함
-                                        print("📏 Scroll offsetY:", newValue)   // 테스트용, 화면 안정화 후 제거
+                                        //print("📏 Scroll offsetY:", newValue)   // 테스트용, 화면 안정화 후 제거
                                         withAnimation(.easeInOut(duration: 0.25)) {
                                             showScrollToTopButton = newValue < -150
                                         }
@@ -84,13 +89,13 @@ struct InventoryView: View {
                                 } label: {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.Secondary) // ✅ 배경색
+                                            .fill(Color.Secondary) // 배경색
                                             .frame(width: 50, height: 50)
                                         Image(systemName: "arrow.up")
                                             .font(
                                                 .system(size: 24, weight: .bold)
                                             )
-                                            .foregroundColor(.white) // ✅ 화살표 색
+                                            .foregroundColor(.white) // 화살표 색
                                     }
                                 }
                                 .padding(.trailing, 20)
@@ -100,13 +105,17 @@ struct InventoryView: View {
                         .transition(.opacity)
                         .animation(.easeInOut(duration: 0.25), value: showScrollToTopButton)
                     }
-
-
                 }
                 .background(Color.Light)
                 .task {
                     await inventoryViewModel.loadUnderLimitList(reset: true)
                 }
+                // 같은 탭 다시 눌릴 때 위로 스크롤
+                 .onChange(of: tabTappedTrigger) { _ in
+                     withAnimation(.easeInOut) {
+                         proxy.scrollTo(topID, anchor: .top)
+                     }
+                 }
             }
         }
     }
@@ -173,8 +182,4 @@ struct GridMenuView: View {
         }
         .padding(.vertical, 17)
     }
-}
-
-#Preview {
-    InventoryView()
 }

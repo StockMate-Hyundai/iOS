@@ -9,17 +9,17 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab = 0
+    @State private var tabTappedTrigger = false
     
     var body: some View {
         VStack(spacing: 0) {
             // 메인 화면
             ZStack {
                 switch selectedTab {
-                case 0: NavigationStack{ HomeView()
-//                    UserInfoView()
-                }
+                case 0: NavigationStack{ HomeView() }
                 case 1: NavigationStack{ OrderView() }
-                case 2: NavigationStack{ InventoryView() }
+                case 2:
+                NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
                 case 3: NavigationStack{ ContentView() }
                 default: NavigationStack{ HomeView() }
                 }
@@ -44,9 +44,17 @@ struct MainTabView: View {
     func tabButton(index: Int, icon: String, text: String) -> some View {
         let isSelected = selectedTab == index
         return Button {
-            withAnimation(.easeInOut) { // 탭 전환 애니메이션. 없애도 됨
-                selectedTab = index
+            if selectedTab == index {
+            // ✅ 같은 탭 다시 누르면 트리거 토글
+                tabTappedTrigger.toggle()
+            } else {
+                withAnimation(.easeInOut) {
+                    selectedTab = index
+                }
             }
+//            withAnimation(.easeInOut) { // 탭 전환 애니메이션. 없애도 됨
+//                selectedTab = index
+//            }
         } label: {
             VStack(spacing: 6) {
                 Image(icon)
