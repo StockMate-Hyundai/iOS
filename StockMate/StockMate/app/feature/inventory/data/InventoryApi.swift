@@ -72,4 +72,12 @@ enum InventoryApi {
         }
         return ApiClient.shared.request(url, method: .get)
     }
+    
+    // ✅ 부품 이름으로 검색
+    static func findByName(name: String, page: Int, size: Int) -> DataRequest {
+        let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let url = ApiClient.baseURL + "api/v1/store/find-name?name=\(encodedName)&page=\(page)&size=\(size)"
+        return ApiClient.shared.request(url, method: .get)
+    }
+
 }

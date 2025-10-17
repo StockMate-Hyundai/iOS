@@ -21,4 +21,12 @@ protocol InventoryRepositoryProtocol {
         page: Int,
         size: Int
     ) async -> AppResult<ApiResponse<InventoryPageData>>
+    
+    // 이름 검색
+    func findByName(
+        name: String,
+        page: Int,
+        size: Int
+    ) async -> AppResult<ApiResponse<InventoryPageData>>
+
 }

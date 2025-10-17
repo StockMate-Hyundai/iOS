@@ -12,6 +12,7 @@ struct InventorySearchView: View {
     @StateObject private var inventoryViewModel = InventoryViewModel()
     @State private var searchText = ""
     
+    
     private let categories = ["전기/램프", "엔진/미션", "하체/바디", "내장/외장", "기타소모품"]
     private let trims = ["준중형/소형", "중형", "대형", "SUV", "화물/트럭/승합", "수소/전기"]
     
@@ -39,8 +40,24 @@ struct InventorySearchView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
+
                     TextField("부품을 검색하세요.", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
+                        .onChange(of: searchText) { newValue in
+                            inventoryViewModel.searchInFilteredList(keyword: newValue)
+                        }
+                    
+                    if !searchText.isEmpty {
+                        Button(action: {
+                            searchText = ""
+                            inventoryViewModel.isSearching = false
+                        }) {
+                            Image(systemName: "xmark")
+                                .foregroundColor(.gray)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing,3)
+                    }
                 }
                 .padding()
                 .background(Color(.white))
@@ -48,67 +65,79 @@ struct InventorySearchView: View {
                 .padding(.horizontal)
                 .padding(.vertical)
                 
-                // 🔽 필터 버튼
-                ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         FilterMenu(
                             title: "카테고리",
                             items: categories,
-                            selected: { inventoryViewModel.selectedCategories.contains($0) },
+                            selectedItems: inventoryViewModel.selectedCategories,
                             onTap: { inventoryViewModel.toggleCategory($0) }
                         )
+                        
                         FilterMenu(
                             title: "분류",
                             items: trims,
-                            selected: { inventoryViewModel.selectedTrims.contains($0) },
+                            selectedItems: inventoryViewModel.selectedTrims,
                             onTap: { inventoryViewModel.toggleTrim($0) }
                         )
+                        
                         FilterMenu(
                             title: "모델",
                             items: filteredModels,
-                            selected: { inventoryViewModel.selectedModels.contains($0) },
+                            selectedItems: inventoryViewModel.selectedModels,
                             onTap: { inventoryViewModel.toggleModel($0) }
                         )
+                        
+                        // 🔄 초기화 버튼
+                          Button(action: {
+                              inventoryViewModel.resetFilters(with: searchText)
+                          }) {
+                              HStack(spacing: 4) {
+                                  Image(systemName: "arrow.counterclockwise")
+                                      .font(.system(size: 13))
+                                  Text("초기화")
+                                      .font(.system(size: 13, weight: .medium))
+                              }
+                              .foregroundColor(.blue)
+                              .padding(.trailing, 8)
+                          }
+                          .frame(maxWidth: .infinity, alignment: .trailing)
+                     
                     }
                     .padding(.horizontal)
-                    .padding(.top, 2)
-                    .padding(.bottom, 4)
-                }
-                
+                    .padding(.bottom, 16)
+
                 // 📋 재고 리스트
                 ScrollView {
                     LazyVStack(spacing: 10) {
-                        ForEach(inventoryViewModel.inventoryItems) { item in
+
+                        ForEach(
+                            inventoryViewModel.isSearching
+                                ? inventoryViewModel.filteredSearchResults // ✅ 검색 + 필터링
+                                : inventoryViewModel.inventoryItems
+                        ) { item in
                             InventoryCardView(item: item)
                                 .padding(.horizontal)
                                 .onAppear {
-                                    if item.id == inventoryViewModel.inventoryItems.last?.id,
-                                       inventoryViewModel.hasMore {
-                                        Task {
-                                            await inventoryViewModel.loadInventoryList()
+                                    if inventoryViewModel.isSearching {
+                                        if item.id == inventoryViewModel.searchResults.last?.id,
+                                           inventoryViewModel.searchHasMore {
+                                            Task { await inventoryViewModel.searchByName(name: searchText) }
+                                        }
+                                    } else {
+                                        if item.id == inventoryViewModel.inventoryItems.last?.id,
+                                           inventoryViewModel.hasMore {
+                                            Task { await inventoryViewModel.loadInventoryList() }
                                         }
                                     }
                                 }
-
-                            
-//                            InventoryCard(item: item)
-//                                .padding(.horizontal)
-//                                .onAppear {
-//                                    if item.id == inventoryViewModel.inventoryItems.last?.id,
-//                                       inventoryViewModel.hasMore {
-//                                        Task {
-//                                            await inventoryViewModel.loadInventoryList()
-//                                        }
-//                                    }
-//                                }
                         }
+
                         
                         if inventoryViewModel.isLoading && inventoryViewModel.hasMore {
                             ProgressView()
                                 .padding(.vertical)
                         }
                     }
-                    .padding(.top, 8)
                 }
             }
             .background(Color.Light)
@@ -120,92 +149,33 @@ struct InventorySearchView: View {
     }
 }
 
-// ✅ 재고 카드 (UI 스타일 적용)
-struct InventoryCard: View {
-    let item: InventoryItem
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(item.categoryName)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundColor(.black)
-            
-            Divider()
-                .frame(height: 0.2)
-                .background(Color.textGray2)
-            
-            HStack(alignment: .center, spacing: 12) {
-                AsyncImage(url: URL(string: item.image)) { image in
-                    image.resizable().scaledToFit()
-                } placeholder: {
-                    Color.gray.opacity(0.2)
-                }
-                .frame(width: 64, height: 64)
-                .cornerRadius(10)
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text(item.korName)
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(.black)
-                            .lineLimit(2)
-                        Spacer()
-                    }
-                    .padding(.top, 2)
-                    
-                    Text("\(item.trim)/\(item.model)")
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(.gray)
-
-                   
-
-                }
-                .frame(height: 60, alignment: .top)
-
-                VStack (alignment: .center, spacing: 6) {
-                    if item.isLack {
-                        Text("수량 부족")
-                            .font(.system(size: 13, weight: .regular))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(Color.DangerBg)
-                            .foregroundColor(.Danger)
-                            .cornerRadius(12)
-                    } else {
-                            Text("수량 여유")
-                                .font(.system(size: 13, weight: .regular))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .background(Color.StatusGreenBg)
-                                .foregroundColor(.StatusGreen)
-                                .cornerRadius(12)
-                    }
-                    
-                    VStack(alignment: .leading){
-                        Text("현재수량: \(item.amount)개")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundColor(.textGray1)
-                        
-                        Text("최소수량: \(item.limitAmount)개")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundColor(.textGray1)
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 4)
-    }
-}
-
 // ✅ 필터 버튼 공용 컴포넌트
 struct FilterMenu: View {
     let title: String
     let items: [String]
-    let selected: (String) -> Bool
+    let selectedItems: [String]
     let onTap: (String) -> Void
+    
+    var displayTitle: String {
+        if selectedItems.isEmpty {
+            return title
+        } else if selectedItems.count == 1 {
+            return selectedItems.first ?? title
+        } else {
+            return "\(title) \(selectedItems.count)"
+        }
+    }
+    
+    var isActive: Bool { !selectedItems.isEmpty }
+    
+    var truncatedTitle: String {
+        // 글자 6자까지만 표시, 이후 "..." 처리
+        if displayTitle.count > 6 {
+            let prefix = displayTitle.prefix(5)
+            return "\(prefix)…"
+        }
+        return displayTitle
+    }
     
     var body: some View {
         Menu {
@@ -215,21 +185,31 @@ struct FilterMenu: View {
                 } label: {
                     HStack {
                         Text(item)
-                        if selected(item) {
+                        if selectedItems.contains(item) {
                             Spacer()
                             Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
                         }
                     }
                 }
             }
         } label: {
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(.black)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
+            HStack(spacing: 6) {
+                Text(truncatedTitle)
+                    .font(.system(size: 13))
+                    .foregroundColor(isActive ? .blue : .black)
+                    .lineLimit(1)
+                    .truncationMode(.tail) // ✅ 안전하게 "..." 처리
+                    .multilineTextAlignment(.center)
+                
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(isActive ? .blue : .gray)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10) // ✅ 높이 늘림
+            .background(isActive ? Color.blue.opacity(0.2) : Color(.systemGray6))
+            .cornerRadius(8)
         }
     }
 }

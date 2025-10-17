@@ -34,4 +34,16 @@ final class InventoryRepositoryImpl: InventoryRepositoryProtocol {
         let dataReq = InventoryApi.getUnderLimitList(categoryName: categoryName, page: page, size: size)
         return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
     }
+    
+    // ✅ 이름 검색
+    func findByName(
+        name: String,
+        page: Int,
+        size: Int
+    ) async -> AppResult<ApiResponse<InventoryPageData>> {
+        let dataReq = InventoryApi.findByName(name: name, page: page, size: size)
+        return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
+    }
+
+    
 }
