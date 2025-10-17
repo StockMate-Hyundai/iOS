@@ -17,11 +17,54 @@ struct InventorySearchView: View {
     private let trims = ["준중형/소형", "중형", "대형", "SUV", "화물/트럭/승합", "수소/전기"]
     
     private let trimToModels: [String: [String]] = [
-        "준중형/소형": ["아반떼MD", "아반떼AD", "아반떼CN7", "I30", "엑센트", "아이오닉", "벨로스터", "캐스퍼"],
-        "중형": ["NF소나타", "YF소나타", "LF소나타", "DN8소나타", "그랜저TG", "그랜저HG", "그랜저IG", "그랜저GN7", "I40"],
+        "준중형/소형": [
+            "아반떼MD",
+            "아반떼AD",
+            "아반떼CN7",
+            "I30",
+            "엑센트",
+            "아이오닉",
+            "벨로스터",
+            "캐스퍼"
+        ],
+        "중형": [
+            "NF소나타",
+            "YF소나타",
+            "LF소나타",
+            "DN8소나타",
+            "그랜저TG",
+            "그랜저HG",
+            "그랜저IG",
+            "그랜저GN7",
+            "I40"
+        ],
         "대형": ["제네시스BH", "에쿠스"],
-        "SUV": ["베뉴", "코나OS", "코나SX2", "투싼IX", "투싼TL", "투싼NX4", "싼타페CM", "싼타페DM", "싼타페TM", "싼타페MX5", "맥스크루즈", "베라크루즈", "팰리세이드LX2", "팰리세이드LX3"],
-        "화물/트럭/승합": ["스타렉스", "그랜드스타렉스", "스타리아", "포터2", "쏠라티", "마이티", "메가트럭", "카운티"],
+        "SUV": [
+            "베뉴",
+            "코나OS",
+            "코나SX2",
+            "투싼IX",
+            "투싼TL",
+            "투싼NX4",
+            "싼타페CM",
+            "싼타페DM",
+            "싼타페TM",
+            "싼타페MX5",
+            "맥스크루즈",
+            "베라크루즈",
+            "팰리세이드LX2",
+            "팰리세이드LX3"
+        ],
+        "화물/트럭/승합": [
+            "스타렉스",
+            "그랜드스타렉스",
+            "스타리아",
+            "포터2",
+            "쏠라티",
+            "마이티",
+            "메가트럭",
+            "카운티"
+        ],
         "수소/전기": ["아이오닉5", "아이오닉6", "아이오닉9", "넥쏘FE", "넥쏘NH2"]
     ]
     
@@ -29,7 +72,8 @@ struct InventorySearchView: View {
         if inventoryViewModel.selectedTrims.isEmpty {
             return trimToModels.values.flatMap { $0 }
         } else {
-            return inventoryViewModel.selectedTrims.flatMap { trimToModels[$0] ?? [] }
+            return inventoryViewModel.selectedTrims
+                .flatMap { trimToModels[$0] ?? [] }
         }
     }
 
@@ -44,7 +88,8 @@ struct InventorySearchView: View {
                     TextField("부품을 검색하세요.", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
                         .onChange(of: searchText) { newValue in
-                            inventoryViewModel.searchInFilteredList(keyword: newValue)
+                            inventoryViewModel
+                                .searchInFilteredList(keyword: newValue)
                         }
                     
                     if !searchText.isEmpty {
@@ -65,46 +110,46 @@ struct InventorySearchView: View {
                 .padding(.horizontal)
                 .padding(.vertical)
                 
-                    HStack(spacing: 10) {
-                        FilterMenu(
-                            title: "카테고리",
-                            items: categories,
-                            selectedItems: inventoryViewModel.selectedCategories,
-                            onTap: { inventoryViewModel.toggleCategory($0) }
-                        )
+                HStack(spacing: 10) {
+                    FilterMenu(
+                        title: "카테고리",
+                        items: categories,
+                        selectedItems: inventoryViewModel.selectedCategories,
+                        onTap: { inventoryViewModel.toggleCategory($0) }
+                    )
                         
-                        FilterMenu(
-                            title: "분류",
-                            items: trims,
-                            selectedItems: inventoryViewModel.selectedTrims,
-                            onTap: { inventoryViewModel.toggleTrim($0) }
-                        )
+                    FilterMenu(
+                        title: "분류",
+                        items: trims,
+                        selectedItems: inventoryViewModel.selectedTrims,
+                        onTap: { inventoryViewModel.toggleTrim($0) }
+                    )
                         
-                        FilterMenu(
-                            title: "모델",
-                            items: filteredModels,
-                            selectedItems: inventoryViewModel.selectedModels,
-                            onTap: { inventoryViewModel.toggleModel($0) }
-                        )
+                    FilterMenu(
+                        title: "모델",
+                        items: filteredModels,
+                        selectedItems: inventoryViewModel.selectedModels,
+                        onTap: { inventoryViewModel.toggleModel($0) }
+                    )
                         
-                        // 🔄 초기화 버튼
-                          Button(action: {
-                              inventoryViewModel.resetFilters(with: searchText)
-                          }) {
-                              HStack(spacing: 4) {
-                                  Image(systemName: "arrow.counterclockwise")
-                                      .font(.system(size: 13))
-                                  Text("초기화")
-                                      .font(.system(size: 13, weight: .medium))
-                              }
-                              .foregroundColor(.blue)
-                              .padding(.trailing, 8)
-                          }
-                          .frame(maxWidth: .infinity, alignment: .trailing)
-                     
+                    // 🔄 초기화 버튼
+                    Button(action: {
+                        inventoryViewModel.resetFilters(with: searchText)
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 13))
+                            Text("초기화")
+                                .font(.system(size: 13, weight: .medium))
+                        }
+                        .foregroundColor(.blue)
+                        .padding(.trailing, 8)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                     
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 16)
 
                 // 📋 재고 리스트
                 ScrollView {
@@ -112,30 +157,38 @@ struct InventorySearchView: View {
 
                         ForEach(
                             inventoryViewModel.isSearching
-                                ? inventoryViewModel.filteredSearchResults // ✅ 검색 + 필터링
-                                : inventoryViewModel.inventoryItems
+                            ? inventoryViewModel.filteredSearchResults // ✅ 검색 + 필터링
+                            : inventoryViewModel.inventoryItems
                         ) { item in
                             InventoryCardView(item: item)
                                 .padding(.horizontal)
                                 .onAppear {
                                     if inventoryViewModel.isSearching {
-                                        if item.id == inventoryViewModel.searchResults.last?.id,
+                                        if item.id == inventoryViewModel.filteredSearchResults.last?.id,
                                            inventoryViewModel.searchHasMore {
-                                            Task { await inventoryViewModel.searchByName(name: searchText) }
+                                            Task {
+                                                await inventoryViewModel
+                                                    .searchByName(
+                                                        name: searchText
+                                                    )
+                                            }
                                         }
                                     } else {
                                         if item.id == inventoryViewModel.inventoryItems.last?.id,
                                            inventoryViewModel.hasMore {
-                                            Task { await inventoryViewModel.loadInventoryList() }
+                                            Task {
+                                                await inventoryViewModel
+                                                    .loadInventoryList()
+                                            }
                                         }
                                     }
                                 }
                         }
 
                         if inventoryViewModel.isLoading &&
-                          (inventoryViewModel.isSearching
-                            ? inventoryViewModel.searchHasMore
-                            : inventoryViewModel.hasMore) {
+                            (inventoryViewModel.isSearching
+                             ? inventoryViewModel.searchHasMore
+                             : inventoryViewModel.hasMore) {
                             ProgressView()
                                 .padding(.vertical)
                         }
@@ -210,7 +263,9 @@ struct FilterMenu: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10) // ✅ 높이 늘림
-            .background(isActive ? Color.blue.opacity(0.2) : Color(.systemGray6))
+            .background(
+                isActive ? Color.blue.opacity(0.2) : Color(.systemGray6)
+            )
             .cornerRadius(8)
         }
     }
