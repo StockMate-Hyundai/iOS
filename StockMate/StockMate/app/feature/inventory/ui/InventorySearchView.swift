@@ -87,23 +87,15 @@ struct InventorySearchView: View {
 
                     TextField("부품을 검색하세요.", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
-//                        .onChange(of: searchText) { newValue in
-//                            inventoryViewModel
-//                                .searchInFilteredList(keyword: newValue)
-//                        }
                         .onChange(of: searchText) { newValue in
-                           let term = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                           if term.isEmpty {
-                               Task { await inventoryViewModel.loadInventoryList(reset: true) }
-                           } else {
-                               Task { await inventoryViewModel.searchByName(name: term, reset: true) }
-                           }
-                       }
+                            inventoryViewModel
+                                .searchInFilteredList(keyword: newValue)
+                        }
                     
                     if !searchText.isEmpty {
                         Button(action: {
                             searchText = ""
-                            //inventoryViewModel.isSearching = false
+                            inventoryViewModel.isSearching = false
                         }) {
                             Image(systemName: "xmark")
                                 .foregroundColor(.gray)
@@ -177,7 +169,7 @@ struct InventorySearchView: View {
                                             Task {
                                                 await inventoryViewModel
                                                     .searchByName(
-                                                        name: searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+                                                        name: searchText
                                                     )
                                             }
                                         }
@@ -232,7 +224,7 @@ struct FilterMenu: View {
     var isActive: Bool { !selectedItems.isEmpty }
     
     var truncatedTitle: String {
-        // 글자 5자까지만 표시, 이후 "..." 처리
+        // 글자 6자까지만 표시, 이후 "..." 처리
         if displayTitle.count > 6 {
             let prefix = displayTitle.prefix(5)
             return "\(prefix)…"
