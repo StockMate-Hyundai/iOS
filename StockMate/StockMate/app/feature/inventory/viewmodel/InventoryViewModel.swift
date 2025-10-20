@@ -9,42 +9,46 @@ import SwiftUI
 
 @MainActor
 final class InventoryViewModel: ObservableObject {
+    // ===== 기본 상태 =====
     @Published var inventoryItems: [InventoryItem] = []
     @Published var message: String = ""
     @Published var shouldGoToLogin: Bool = false
-
+    
+    // ====== 필터 상태 ======
     @Published var selectedCategories: [String] = []
     @Published var selectedTrims: [String] = []
     @Published var selectedModels: [String] = []
 
+    
+    // ===== 전체 재고 페이지네이션 =====
     @Published var currentPage = 0
-    @Published var isLoading = false
     @Published var hasMore = true
     
+    // ====== 부족 재고 페이지네이션 ======
     @Published var underLimitItems: [InventoryItem] = []
     @Published var underLimitPage = 0
     @Published var underLimitHasMore = true
     
+    // ====== 검색 관련 ======
     @Published var searchResults: [InventoryItem] = []
     @Published var searchPage = 0
     @Published var searchHasMore = true
     @Published var isSearching = false
-
-
+   
+    // ====== 공통 상태 ======
+    @Published var isLoading = false
+    
     private let repo: InventoryRepositoryProtocol
 
     init(repo: InventoryRepositoryProtocol = InventoryRepositoryImpl()) {
         self.repo = repo
     }
 
-    // 재고 조회
-    func loadInventoryList(
-        reset: Bool = false,
-        size: Int = 20
-    ) async {
+    // MARK: - 전체 재고 로드
+    func loadInventoryList(reset: Bool = false, size: Int = 20) async {
         guard !isLoading else { return }
-        isSearching = false   // ✅ 검색 모드 해제
         isLoading = true
+        isSearching = false   // 검색 모드 해제
 
         if reset {
             currentPage = 0
@@ -81,40 +85,13 @@ final class InventoryViewModel: ObservableObject {
         }
         isLoading = false
     }
-
+    
+    
     func resetAndLoad() async {
         await loadInventoryList(reset: true)
     }
-
-    // MARK: - Filter toggle
-    func toggleCategory(_ name: String) {
-        if selectedCategories.contains(name) {
-            selectedCategories.removeAll { $0 == name }
-        } else {
-            selectedCategories.append(name)
-        }
-        Task { await resetAndLoad() }
-    }
-
-    func toggleTrim(_ trim: String) {
-        if selectedTrims.contains(trim) {
-            selectedTrims.removeAll { $0 == trim }
-        } else {
-            selectedTrims.append(trim)
-        }
-        Task { await resetAndLoad() }
-    }
-
-    func toggleModel(_ model: String) {
-        if selectedModels.contains(model) {
-            selectedModels.removeAll { $0 == model }
-        } else {
-            selectedModels.append(model)
-        }
-        Task { await resetAndLoad() }
-    }
     
-    // 부족 재고 로드
+    // MARK: -  부족 재고 로드
     func loadUnderLimitList(reset: Bool = false, size: Int = 10) async {
 //        guard !isLoading, underLimitHasMore else { return }
         guard !isLoading, (underLimitHasMore || reset) else { return }
@@ -153,7 +130,7 @@ final class InventoryViewModel: ObservableObject {
         isLoading = false
     }
     
-    // ✅ 부품 이름 검색
+    // MARK: - 이름 검색
     func searchByName(name: String, reset: Bool = false, size: Int = 20) async {
         guard !isLoading else { return }
         isLoading = true
@@ -188,7 +165,7 @@ final class InventoryViewModel: ObservableObject {
         isLoading = false
     }
     
-    // 검색 후 필터링된 리스트 계산
+    // MARK: - 검색 결과에서 로컬 필터링
     var filteredSearchResults: [InventoryItem] {
         searchResults.filter { item in
             // 카테고리 필터
@@ -207,13 +184,13 @@ final class InventoryViewModel: ObservableObject {
         }
     }
     
+    // MARK: - 검색어 입력 시 로컬 검색 전환
     func searchInFilteredList(keyword: String) {
         guard !keyword.trimmingCharacters(in: .whitespaces).isEmpty else {
             // 검색어 비면 원래 리스트 그대로 표시
             isSearching = false
             return
         }
-
         isSearching = true
         searchResults = inventoryItems.filter {
             //$0.name.localizedCaseInsensitiveContains(keyword) ||
@@ -221,7 +198,56 @@ final class InventoryViewModel: ObservableObject {
             //$0.engName.localizedCaseInsensitiveContains(keyword)
         }
     }
+    
+    // MARK: - 필터 토글 (검색모드 해제 + 전체 재로드)
+    func toggleCategory(_ name: String) {
+        if selectedCategories.contains(name) {
+            selectedCategories.removeAll { $0 == name }
+        } else {
+            selectedCategories.append(name)
+        }
+        // ✅ 검색 중일 때는 로컬 필터링만 다시 계산
+         if isSearching {
+             objectWillChange.send()
+         } else {
+             Task { await resetAndLoad() }
+         }
+        
+//        isSearching = false
+//        Task { await resetAndLoad() }
+    }
 
+    func toggleTrim(_ trim: String) {
+        if selectedTrims.contains(trim) {
+            selectedTrims.removeAll { $0 == trim }
+        } else {
+            selectedTrims.append(trim)
+        }
+        if isSearching {
+            objectWillChange.send()
+        } else {
+            Task { await resetAndLoad() }
+        }
+//        isSearching = false
+//        Task { await resetAndLoad() }
+    }
+
+    func toggleModel(_ model: String) {
+        if selectedModels.contains(model) {
+            selectedModels.removeAll { $0 == model }
+        } else {
+            selectedModels.append(model)
+        }
+        if isSearching {
+              objectWillChange.send()
+          } else {
+              Task { await resetAndLoad() }
+          }
+//        isSearching = false
+//        Task { await resetAndLoad() }
+    }
+    
+    // MARK: - 필터 초기화
     func resetFilters(with searchText: String) {
         // 1. 필터 관련 선택 초기화
         selectedCategories.removeAll()
@@ -232,15 +258,25 @@ final class InventoryViewModel: ObservableObject {
         if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             isSearching = false
             searchResults.removeAll()
-            searchPage = 0
+            // searchPage = 0
             Task { await loadInventoryList(reset: true) }
         }
         // 3. 검색어가 있는 경우 → 해당 검색어로 전체 결과 다시 검색
         else {
             isSearching = true
-            searchPage = 0
+            //searchPage = 0
             searchResults.removeAll()
             Task { await searchByName(name: searchText, reset: true) }
+        }
+    }
+    
+    // MARK: - ✅ 무한 스크롤 로드
+    func loadMore(searchText: String) async {
+        if isSearching {
+            guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+            await searchByName(name: searchText)
+        } else {
+            await loadInventoryList()
         }
     }
 

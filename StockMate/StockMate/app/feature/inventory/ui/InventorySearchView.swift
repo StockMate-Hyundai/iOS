@@ -12,59 +12,15 @@ struct InventorySearchView: View {
     @StateObject private var inventoryViewModel = InventoryViewModel()
     @State private var searchText = ""
     
-    
+    // 카테고리, 분류, 모델
     private let categories = ["전기/램프", "엔진/미션", "하체/바디", "내장/외장", "기타소모품"]
     private let trims = ["준중형/소형", "중형", "대형", "SUV", "화물/트럭/승합", "수소/전기"]
-    
     private let trimToModels: [String: [String]] = [
-        "준중형/소형": [
-            "아반떼MD",
-            "아반떼AD",
-            "아반떼CN7",
-            "I30",
-            "엑센트",
-            "아이오닉",
-            "벨로스터",
-            "캐스퍼"
-        ],
-        "중형": [
-            "NF소나타",
-            "YF소나타",
-            "LF소나타",
-            "DN8소나타",
-            "그랜저TG",
-            "그랜저HG",
-            "그랜저IG",
-            "그랜저GN7",
-            "I40"
-        ],
+        "준중형/소형": [ "아반떼MD", "아반떼AD", "아반떼CN7", "I30", "엑센트", "아이오닉", "벨로스터", "캐스퍼" ],
+        "중형": [ "NF소나타", "YF소나타", "LF소나타", "DN8소나타", "그랜저TG", "그랜저HG", "그랜저IG", "그랜저GN7", "I40" ],
         "대형": ["제네시스BH", "에쿠스"],
-        "SUV": [
-            "베뉴",
-            "코나OS",
-            "코나SX2",
-            "투싼IX",
-            "투싼TL",
-            "투싼NX4",
-            "싼타페CM",
-            "싼타페DM",
-            "싼타페TM",
-            "싼타페MX5",
-            "맥스크루즈",
-            "베라크루즈",
-            "팰리세이드LX2",
-            "팰리세이드LX3"
-        ],
-        "화물/트럭/승합": [
-            "스타렉스",
-            "그랜드스타렉스",
-            "스타리아",
-            "포터2",
-            "쏠라티",
-            "마이티",
-            "메가트럭",
-            "카운티"
-        ],
+        "SUV": [ "베뉴", "코나OS", "코나SX2", "투싼IX", "투싼TL", "투싼NX4", "싼타페CM", "싼타페DM", "싼타페TM", "싼타페MX5", "맥스크루즈", "베라크루즈", "팰리세이드LX2", "팰리세이드LX3" ],
+        "화물/트럭/승합": [ "스타렉스", "그랜드스타렉스", "스타리아", "포터2", "쏠라티", "마이티", "메가트럭", "카운티" ],
         "수소/전기": ["아이오닉5", "아이오닉6", "아이오닉9", "넥쏘FE", "넥쏘NH2"]
     ]
     
@@ -87,9 +43,10 @@ struct InventorySearchView: View {
 
                     TextField("부품을 검색하세요.", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
-                        .onChange(of: searchText) { newValue in
-                            inventoryViewModel
-                                .searchInFilteredList(keyword: newValue)
+                        .onSubmit {
+                            Task {
+                                await inventoryViewModel.searchByName(name: searchText, reset: true)
+                            }
                         }
                     
                     if !searchText.isEmpty {
@@ -107,9 +64,14 @@ struct InventorySearchView: View {
                 .padding()
                 .background(Color(.white))
                 .cornerRadius(9999)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9999)
+                        .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                )
                 .padding(.horizontal)
                 .padding(.vertical)
                 
+                // 필터 및 초기화 버튼
                 HStack(spacing: 10) {
                     FilterMenu(
                         title: "카테고리",
@@ -138,10 +100,9 @@ struct InventorySearchView: View {
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.counterclockwise")
-                                .font(.system(size: 13))
                             Text("초기화")
-                                .font(.system(size: 13, weight: .medium))
                         }
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.blue)
                         .padding(.trailing, 8)
                     }
@@ -157,41 +118,32 @@ struct InventorySearchView: View {
 
                         ForEach(
                             inventoryViewModel.isSearching
-                            ? inventoryViewModel.filteredSearchResults // ✅ 검색 + 필터링
+                            ? inventoryViewModel.filteredSearchResults // 검색 + 필터링
                             : inventoryViewModel.inventoryItems
                         ) { item in
                             InventoryCardView(item: item)
                                 .padding(.horizontal)
                                 .onAppear {
-                                    if inventoryViewModel.isSearching {
-                                        if item.id == inventoryViewModel.filteredSearchResults.last?.id,
-                                           inventoryViewModel.searchHasMore {
-                                            Task {
-                                                await inventoryViewModel
-                                                    .searchByName(
-                                                        name: searchText
-                                                    )
+                                    Task {
+                                        if inventoryViewModel.isSearching {
+                                            if item.id == inventoryViewModel.filteredSearchResults.last?.id,
+                                               inventoryViewModel.searchHasMore {
+                                                await inventoryViewModel.loadMore(searchText: searchText)
                                             }
-                                        }
-                                    } else {
-                                        if item.id == inventoryViewModel.inventoryItems.last?.id,
-                                           inventoryViewModel.hasMore {
-                                            Task {
-                                                await inventoryViewModel
-                                                    .loadInventoryList()
+                                        } else {
+                                            if item.id == inventoryViewModel.inventoryItems.last?.id,
+                                               inventoryViewModel.hasMore {
+                                                await inventoryViewModel.loadMore(searchText: searchText)
                                             }
                                         }
                                     }
                                 }
                         }
 
-                        if inventoryViewModel.isLoading &&
-                            (inventoryViewModel.isSearching
-                             ? inventoryViewModel.searchHasMore
-                             : inventoryViewModel.hasMore) {
-                            ProgressView()
-                                .padding(.vertical)
-                        }
+                        if inventoryViewModel.isLoading {
+                              ProgressView()
+                                  .padding(.vertical)
+                          }
                     }
                 }
             }
@@ -204,7 +156,7 @@ struct InventorySearchView: View {
     }
 }
 
-// ✅ 필터 버튼 공용 컴포넌트
+// 필터 버튼 공용 컴포넌트
 struct FilterMenu: View {
     let title: String
     let items: [String]
@@ -217,7 +169,7 @@ struct FilterMenu: View {
         } else if selectedItems.count == 1 {
             return selectedItems.first ?? title
         } else {
-            return "\(title) \(selectedItems.count)"
+            return "\(title) (\(selectedItems.count))"
         }
     }
     
@@ -225,8 +177,8 @@ struct FilterMenu: View {
     
     var truncatedTitle: String {
         // 글자 6자까지만 표시, 이후 "..." 처리
-        if displayTitle.count > 6 {
-            let prefix = displayTitle.prefix(5)
+        if displayTitle.count > 8 {
+            let prefix = displayTitle.prefix(8)
             return "\(prefix)…"
         }
         return displayTitle
@@ -250,19 +202,19 @@ struct FilterMenu: View {
             }
         } label: {
             HStack(spacing: 6) {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(isActive ? .blue : .gray)
+                
                 Text(truncatedTitle)
                     .font(.system(size: 13))
                     .foregroundColor(isActive ? .blue : .black)
                     .lineLimit(1)
-                    .truncationMode(.tail) // ✅ 안전하게 "..." 처리
+                    .truncationMode(.tail) // 안전하게 "..." 처리
                     .multilineTextAlignment(.center)
-                
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(isActive ? .blue : .gray)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 10) // ✅ 높이 늘림
+            .padding(.vertical, 10) // 높이 늘림
             .background(
                 isActive ? Color.blue.opacity(0.2) : Color(.systemGray6)
             )

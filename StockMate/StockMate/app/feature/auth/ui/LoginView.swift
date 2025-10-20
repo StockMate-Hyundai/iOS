@@ -121,7 +121,7 @@ struct LoginView: View {
     private func isValidForm() -> Bool {
         emailError = isValidEmail(authViewModel.email) ? nil : "이메일 형식을 확인해주세요"
         pwError = authViewModel.password.count >= 8 ? nil : "8자 이상 비밀번호를 입력해주세요"
-        return emailError == nil //&& pwError == nil
+        return emailError == nil && pwError == nil
     }
     
 }
