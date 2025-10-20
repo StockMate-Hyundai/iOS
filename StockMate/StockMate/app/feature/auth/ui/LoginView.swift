@@ -18,7 +18,6 @@ struct LoginView: View {
     @State private var emailError: String? = nil
     @State private var pwError: String? = nil
     
-//    var onLoginSuccess: () -> Void = {}
     var onLogin: (String, String) -> Void = { _, _ in }
     var onClickRegister: () -> Void = {}
     
