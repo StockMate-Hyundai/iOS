@@ -44,8 +44,11 @@ struct InventorySearchView: View {
                     TextField("부품을 검색하세요.", text: $searchText)
                         .textFieldStyle(PlainTextFieldStyle())
                         .onSubmit {
+                            let term = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+                            guard !term.isEmpty else { return }
                             Task {
-                                await inventoryViewModel.searchByName(name: searchText, reset: true)
+//                                await inventoryViewModel.searchByName(name: searchText, reset: true)
+                                await inventoryViewModel.searchByName(name: term, reset: true)
                             }
                         }
                     

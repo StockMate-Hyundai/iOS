@@ -91,7 +91,7 @@ final class InventoryViewModel: ObservableObject {
         await loadInventoryList(reset: true)
     }
     
-    // MARK: -  부족 재고 로드
+    // MARK: - 부족 재고 로드
     func loadUnderLimitList(reset: Bool = false, size: Int = 10) async {
 //        guard !isLoading, underLimitHasMore else { return }
         guard !isLoading, (underLimitHasMore || reset) else { return }
@@ -184,21 +184,6 @@ final class InventoryViewModel: ObservableObject {
         }
     }
     
-    // MARK: - 검색어 입력 시 로컬 검색 전환
-    func searchInFilteredList(keyword: String) {
-        guard !keyword.trimmingCharacters(in: .whitespaces).isEmpty else {
-            // 검색어 비면 원래 리스트 그대로 표시
-            isSearching = false
-            return
-        }
-        isSearching = true
-        searchResults = inventoryItems.filter {
-            //$0.name.localizedCaseInsensitiveContains(keyword) ||
-            $0.korName.localizedCaseInsensitiveContains(keyword) // ||
-            //$0.engName.localizedCaseInsensitiveContains(keyword)
-        }
-    }
-    
     // MARK: - 필터 토글 (검색모드 해제 + 전체 재로드)
     func toggleCategory(_ name: String) {
         if selectedCategories.contains(name) {
@@ -266,7 +251,13 @@ final class InventoryViewModel: ObservableObject {
             isSearching = true
             //searchPage = 0
             searchResults.removeAll()
-            Task { await searchByName(name: searchText, reset: true) }
+//            Task { await searchByName(name: searchText, reset: true) }
+            Task {
+                await searchByName(
+                    name: searchText.trimmingCharacters(in: .whitespacesAndNewlines),
+                    reset: true
+                )
+            }
         }
     }
     
