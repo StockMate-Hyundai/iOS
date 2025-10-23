@@ -11,10 +11,11 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var userViewModel = UserViewModel()
+    @StateObject private var inventoryViewModel = InventoryViewModel()
     
     var body: some View {
         ScrollView {
-             VStack(alignment: .leading, spacing: 24) {
+             VStack(alignment: .leading, spacing: 15) {
                  // 상단 프로필
                  HStack(spacing: 16) {
                      ProfileCircleView(name: userViewModel.userInfo?.owner ?? "사용자", size: 50)
@@ -37,55 +38,41 @@ struct HomeView: View {
                      Image("notification")
                          .font(.system(size: 20))
                          .foregroundColor(.gray)
+                         .padding(.trailing, 5)
                  }
                  .padding(.horizontal)
                  
-                 
-                 // 검색창
+                 // 🔍 검색창
                  HStack {
                      Image(systemName: "magnifyingglass")
-                         .foregroundColor(Color(hex: "#4B5565"))
-                     Text("Search for Accessories")
+                         .foregroundColor(.gray)
+
+                     Text("부품을 검색하세요.")
                          .foregroundColor(.gray)
                      Spacer()
                  }
                  .padding()
-                 .background(
-                     RoundedRectangle(cornerRadius: 120)
-                         .fill(Color(hex: "#EEF2F6"))
-                 )
+                 .background(Color(.white))
+                 .cornerRadius(9999)
                  .overlay(
-                     RoundedRectangle(cornerRadius: 120)
-                         .stroke(Color(hex: "#9AA4B2"), lineWidth: 1)
+                     RoundedRectangle(cornerRadius: 9999)
+                         .stroke(Color.gray.opacity(0.4), lineWidth: 1)
                  )
                  .padding(.horizontal)
 
                  
-                 
-                 // 상태 요약 카드
-                 HStack(spacing: 13) {
-                     StatusItem(title: "입고", count: 77, color: .IncomingBg, icon: "incoming")
-                     StatusItem(title: "부족", count: 33, color: .DangerBg, icon: "lack")
-                     StatusItem(title: "승인대기", count: 27, color: .WarningBg, icon: "wait")
-                     StatusItem(title: "반품/불량", count: 4, color: .DefectBg, icon: "defect")
-                     StatusItem(title: "이동요청", count: 33, color: .TransferBg, icon: "transfer")
-                 }
-                 .padding()
-                 .background(Color.white)
-                 .cornerRadius(16)
-                 .padding(.horizontal)
-                 
+                 lackStockSection
                  
                  
                  // 도넛 차트 섹션
                  VStack(alignment: .leading, spacing: 18) {
-                     Text("제목")
+                     Text("지난달 카테고리 별 지출")
                          .font(.headline)
-                         .padding()
+                         .padding(4)
                      
                      HStack{
                          DonutChartView()
-                             .frame(height: 170)
+                             .frame(height: 130)
                              .padding()
                              .background(Color.white)
                              .cornerRadius(16)
@@ -103,13 +90,12 @@ struct HomeView: View {
                  
                  // 막대그래프 섹션
                  VStack(alignment: .leading, spacing: 8) {
-                     Text("제목")
+                     Text("지출 현황")
                          .font(.headline)
-                         .padding(.top)
-                         .padding(.leading)
+                         .padding(4)
                      
                      BarChartView()
-                         .frame(height: 200)
+                         .frame(height: 150)
 //                         .padding()
                          .background(Color.white)
                          .shadow(color: .gray.opacity(0.1), radius: 4)
@@ -122,11 +108,15 @@ struct HomeView: View {
              .padding(.vertical)
          }
         .background(Color.Light)
+        .task {
+            // 카테고리 데이터 로드
+            await inventoryViewModel.loadLackCountByCategory()
+        }
         .onAppear {
             Task { await userViewModel.loadUserInfo() }
         }
         // 화면 디자인 시 잠시 주석처리
-//        // ✅ 세션 만료 시 자동으로 로그인 뷰로 이동
+        // ✅ 세션 만료 시 자동으로 로그인 뷰로 이동
 //        .onChange(of: userViewModel.shouldGoToLogin) { shouldGo in
 //            if shouldGo {
 //                print("세션 만료됨 → 로그인 화면으로 이동")
@@ -134,10 +124,60 @@ struct HomeView: View {
 //            }
 //        }
      }
+    
+    private var lackStockSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("재고 부족 조회")
+                .font(.headline)
+            HStack(spacing: 13) {
+                ForEach(inventoryViewModel.lackCounts, id: \.id) { item in
+                    NavigationLink {
+                        LackListView(selectedCategory: item.categoryName)
+                    } label: {
+                        StatusItem(
+                            title: item.categoryName,
+                            count: item.count,
+                            color: colorForCategory(item.categoryName),
+                            icon: iconForCategory(item.categoryName)
+                        )
+                    }
+                }
+            }
+            .padding(.vertical, 4)
+        }
+        .frame(maxWidth: .infinity, minHeight: 70)
+        .padding()
+        .background(Color.white)
+        .cornerRadius(16)
+        .padding(.horizontal)
+    }
+    
+
 }
 
 
+private func colorForCategory(_ category: String) -> Color {
+    switch category {
+        case "전기/램프": return .Hstatus1Bg
+        case "엔진/미션": return .Hstatus2Bg
+        case "하체/바디": return .Hstatus3Bg
+        case "내장/외장": return .Hstatus4Bg
+        case "기타소모품": return .Hstatus5Bg
+        default: return .gray.opacity(0.3)
+    }
+}
 
+
+private func iconForCategory(_ name: String) -> String {
+    switch name {
+        case "전기/램프": return "lightbulb"
+        case "엔진/미션": return "cog"
+        case "하체/바디": return "spanner"
+        case "내장/외장": return "chair"
+        case "기타소모품": return "package"
+        default: return "questionmark"
+    }
+}
 
 // MARK: - 상태 아이템 컴포넌트
 struct StatusItem: View {
@@ -152,13 +192,13 @@ struct StatusItem: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 25, height: 25)
-                .foregroundColor(.white)
                 .padding(12)
                 .background(color)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .clipShape(RoundedRectangle(cornerRadius: 100))
             
             Text(title)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.black)
                 .padding(.top, 5)
                 .lineLimit(1)
             
@@ -196,8 +236,8 @@ struct DonutChartView: View {
 struct BarChartView: View {
     let values: [CGFloat] = [0.89, 0.5, 0.9, 0.3, 0.7]
     let colors: [Color] = [
-        Color(hex: "6BE6D3"), .black, Color(hex: "7DBBFF"), Color(hex: "B899EB"), Color(hex: "71DD8C")]
-    // 6BE6D3
+        .LightBlue04, .Primary, .LightBlue04, .LightBlue04, .LightBlue04
+    ]
     var body: some View {
         HStack(alignment: .bottom, spacing: 33) {
             ForEach(0..<values.count, id: \.self) { i in

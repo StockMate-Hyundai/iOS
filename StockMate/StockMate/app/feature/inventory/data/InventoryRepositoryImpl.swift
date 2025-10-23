@@ -44,6 +44,11 @@ final class InventoryRepositoryImpl: InventoryRepositoryProtocol {
         let dataReq = InventoryApi.findByName(name: name, page: page, size: size)
         return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
     }
-
     
+    // 카테고리별 부족 재고 개수 조회
+    func getLackCountByCategory() async -> AppResult<ApiResponse<[LackCountItem]>> {
+        let dataReq = InventoryApi.getLackCountByCategory()
+        return await safeApi(dataReq, decodeTo: ApiResponse<[LackCountItem]>.self)
+    }
+
 }

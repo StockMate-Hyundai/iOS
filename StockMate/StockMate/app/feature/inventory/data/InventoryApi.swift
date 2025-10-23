@@ -41,6 +41,13 @@ struct InventoryItem: Decodable, Identifiable {
     let isLack: Bool
 }
 
+struct LackCountItem: Decodable, Identifiable {
+    var id: String { categoryName } // SwiftUI ForEach에서 식별자 사용
+    let categoryName: String
+    let count: Int
+}
+
+
 enum InventoryApi {
     static func getInventoryList(
         page: Int,
@@ -80,4 +87,9 @@ enum InventoryApi {
         return ApiClient.shared.request(url, method: .get)
     }
 
+    // ✅ 카테고리별 부족 재고 개수 조회
+    static func getLackCountByCategory() -> DataRequest {
+        let url = ApiClient.baseURL + "api/v1/store/lack-count"
+        return ApiClient.shared.request(url, method: .get)
+    }
 }

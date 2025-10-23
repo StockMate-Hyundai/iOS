@@ -29,4 +29,6 @@ protocol InventoryRepositoryProtocol {
         size: Int
     ) async -> AppResult<ApiResponse<InventoryPageData>>
 
+    func getLackCountByCategory() async -> AppResult<ApiResponse<[LackCountItem]>>
+
 }

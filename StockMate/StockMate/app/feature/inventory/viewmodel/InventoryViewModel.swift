@@ -38,6 +38,10 @@ final class InventoryViewModel: ObservableObject {
     // ====== 공통 상태 ======
     @Published var isLoading = false
     
+    // ===== 카테고리별 부족 재고 개수 =====
+    @Published var lackCounts: [LackCountItem] = []
+    
+    
     private let repo: InventoryRepositoryProtocol
 
     init(repo: InventoryRepositoryProtocol = InventoryRepositoryImpl()) {
@@ -269,6 +273,31 @@ final class InventoryViewModel: ObservableObject {
         } else {
             await loadInventoryList()
         }
+    }
+    
+    
+    // MARK: - 카테고리별 부족 재고 개수 로드
+    func loadLackCountByCategory() async {
+        guard !isLoading else { return }
+        isLoading = true
+
+        let result = await repo.getLackCountByCategory()
+
+        switch result {
+        case .success(let apiResp):
+            if let data = apiResp.data {
+                lackCounts = data
+            } else {
+                message = apiResp.message
+            }
+        case .failure(let err):
+            message = err.message
+            if err.code == 401 || err.code == 403 {
+                shouldGoToLogin = true
+            }
+        }
+
+        isLoading = false
     }
 
 }

@@ -20,8 +20,9 @@ struct MainTabView: View {
                 case 1: NavigationStack{ OrderView() }
                 case 2:
                 NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
-                case 3: NavigationStack{ ContentView() }
-                default: NavigationStack{ HomeView() }
+//                case 3: NavigationStack{ ContentView() }
+                case 3: NavigationStack{ ProfileView() }
+                default: NavigationStack{ ContentView() }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

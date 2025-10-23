@@ -28,12 +28,12 @@ extension Color {
     
     // Etc
     static let Gray   = Color(hex: "#ABABAB")
+    static let GrayStroke   = Color(hex: "#DBDBDB")
     static let White = Color(hex: "#FFFFFF")
     static let Dark = Color(hex: "#04150C")
     static let Light = Color(hex: "#F7F7F7")
     
     
-
     // Text
     static let textBlack = Color(hex: "#152C07")
     static let textGray1 = Color(hex: "#5D5C5D")
@@ -76,6 +76,25 @@ extension Color {
     static let StatusGreenBg   = Color(hex: "#EAFADE")
     static let StatusRedBg = Color(hex: "#FDE0DD")
     static let StatusPurpleBg  = Color(hex: "#E9E6FF")
+    
+    
+    
+    //DFF6FC
+    // Home Status
+    static let Hstatus1   = Color(hex: "#DFF6FC")
+    static let Hstatus2 = Color(hex: "#DBDFF3")
+    static let Hstatus3  = Color(hex: "#EB5032")
+    static let Hstatus4  = Color(hex: "#8DDB55")
+    static let Hstatus5  = Color(hex: "#8892A2")
+    
+    // Home Status Background
+    static let Hstatus1Bg   = Color(hex: "#DFF6FC")
+    static let Hstatus2Bg = Color(hex: "#DBDFF3")
+    static let Hstatus3Bg  = Color(hex: "#FCE3DE")
+    static let Hstatus4Bg  = Color(hex: "#EDF9E4")
+    static let Hstatus5Bg  = Color(hex: "#ECEEF0")
+
+    
     
     // 투명도 포함 예시
     static let boxBgWhite = Color(hex: "#40FFFFFF") // 투명도 포함
