@@ -20,8 +20,8 @@ struct HomeView: View {
                  HStack(spacing: 16) {
                      ProfileCircleView(name: userViewModel.userInfo?.owner ?? "사용자", size: 50)
                      
-                     VStack(alignment: .leading, spacing: 4) {
-                         HStack {
+                     VStack(alignment: .leading, spacing: 1) {
+                         HStack(spacing: 2)  {
                              Image("location")
                                  .foregroundColor(.gray)
                              Text(userViewModel.userInfo?.storeName ?? "가게명 없음")
@@ -43,23 +43,25 @@ struct HomeView: View {
                  .padding(.horizontal)
                  
                  // 🔍 검색창
-                 HStack {
-                     Image(systemName: "magnifyingglass")
-                         .foregroundColor(.gray)
-
-                     Text("부품을 검색하세요.")
-                         .foregroundColor(.gray)
-                     Spacer()
+                 NavigationLink(destination: InventorySearchView()) {
+                     HStack {
+                         Image(systemName: "magnifyingglass")
+                             .foregroundColor(.gray)
+                         
+                         Text("부품을 검색하세요.")
+                             .foregroundColor(.gray)
+                         Spacer()
+                     }
+                     .padding()
+                     .background(Color(.white))
+                     .cornerRadius(9999)
+                     .overlay(
+                        RoundedRectangle(cornerRadius: 9999)
+                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                     )
+                     .padding(.horizontal)
                  }
-                 .padding()
-                 .background(Color(.white))
-                 .cornerRadius(9999)
-                 .overlay(
-                     RoundedRectangle(cornerRadius: 9999)
-                         .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-                 )
-                 .padding(.horizontal)
-
+                 .buttonStyle(.plain)
                  
                  lackStockSection
                  

@@ -149,20 +149,20 @@ struct OrderRequestView: View {
     }
 }
 
-// ✅ 특정 코너만 둥글게 처리할 수 있게 하는 Shape
-struct RoundedCorner: Shape {
-    var radius: CGFloat = 16
-    var corners: UIRectCorner = .allCorners
-
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(
-            roundedRect: rect,
-            byRoundingCorners: corners,
-            cornerRadii: CGSize(width: radius, height: radius)
-        )
-        return Path(path.cgPath)
-    }
-}
+//// ✅ 특정 코너만 둥글게 처리할 수 있게 하는 Shape
+//struct RoundedCorner: Shape {
+//    var radius: CGFloat = 16
+//    var corners: UIRectCorner = .allCorners
+//
+//    func path(in rect: CGRect) -> Path {
+//        let path = UIBezierPath(
+//            roundedRect: rect,
+//            byRoundingCorners: corners,
+//            cornerRadii: CGSize(width: radius, height: radius)
+//        )
+//        return Path(path.cgPath)
+//    }
+//}
 
 #Preview {
     OrderRequestView()

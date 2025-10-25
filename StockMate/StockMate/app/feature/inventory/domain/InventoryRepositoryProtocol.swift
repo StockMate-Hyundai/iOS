@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Alamofire
 
 protocol InventoryRepositoryProtocol {
     func getInventoryList(

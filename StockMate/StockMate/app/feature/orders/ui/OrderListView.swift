@@ -13,14 +13,6 @@ struct OrderListView: View {
     var body: some View {
 //        NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                // 타이틀
-                Text("주문 내역")
-                    .font(.title2)
-                    .bold()
-                    .padding(.top, 13)
-                    .padding(.leading, 25)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
                 
                 if orderViewModel.isLoading {
                     ProgressView()
@@ -61,6 +53,7 @@ struct OrderListView: View {
                 }
             }
             .background(Color.Light)
+            .navigationTitle("주문 내역")
             .task {
                 await orderViewModel.loadOrders()
             }
