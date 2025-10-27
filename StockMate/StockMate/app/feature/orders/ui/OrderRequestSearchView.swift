@@ -129,7 +129,6 @@ struct OrderRequestSearchView: View {
                         ) { item in
                             let qty = cartViewModel.quantity(for: item.id)
                             
-                            //                            InventoryCardView(item: item)
                                   OrderRequestCardView(
                                       item: item,
                                       quantity: qty,
@@ -166,7 +165,7 @@ struct OrderRequestSearchView: View {
                 }
             }
             .background(Color.Light)
-            .navigationTitle("재고 조회")
+            .navigationTitle("직접 발주")
             .task {
                 await inventoryViewModel.loadInventoryList(reset: true)
                 await cartViewModel.fetchCart()

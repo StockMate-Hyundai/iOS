@@ -111,7 +111,6 @@ struct OrderView: View {
                 if inventoryViewModel.underLimitItems.isEmpty {
                        await inventoryViewModel.loadUnderLimitList(reset: true)
                    }
-//                await inventoryViewModel.loadUnderLimitList(reset: true)
                 await cartViewModel.fetchCart()
             }
             

@@ -17,7 +17,7 @@ struct CartSummaryBar: View {
 
             if let cart = cartVM.cart,
                !cart.items.isEmpty {
-                NavigationLink(destination: OrderCartView()) {
+                NavigationLink(destination: OrderCartView(cartViewModel: cartVM)) {
                     HStack(spacing: 12) {
                         Circle()
                             .fill(Color.white)

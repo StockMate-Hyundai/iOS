@@ -132,7 +132,8 @@ final class CartViewModel: ObservableObject {
                 model: nil,
                 trim: nil,
                 price: nil,
-                stock: nil
+                stock: nil,
+                image: nil
             ))
         }
 
