@@ -40,9 +40,8 @@ struct OrderCartView: View {
             }
             .background(Color.Light)
             
-            Button {
-                // TODO: 결제 처리
-            } label: {
+            
+            NavigationLink(destination: OrderInfoView(cartViewModel: cartViewModel)) {
                 Text("\(cartViewModel.cart?.totalPrice ?? 0)원 결제하기")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.white)
@@ -50,6 +49,7 @@ struct OrderCartView: View {
                     .frame(height: 60)
                     .background(Color.Primary)
             }
+            
         }
         .background(Color.Light)
         .navigationTitle("장바구니 확인")
