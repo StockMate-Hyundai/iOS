@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @StateObject var cartVM = CartViewModel()
+    
     @State private var selectedTab = 0
     @State private var tabTappedTrigger = false
     
@@ -17,7 +19,8 @@ struct MainTabView: View {
             ZStack {
                 switch selectedTab {
                 case 0: NavigationStack{ HomeView() }
-                case 1: NavigationStack{ OrderView() }
+                case 1: NavigationStack{ OrderView(cartViewModel: cartVM) } //, inventoryViewModel: inventoryVM) }
+//                case 1: NavigationStack{ OrderView() }
                 case 2:
                 NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
 //                case 3: NavigationStack{ ContentView() }
