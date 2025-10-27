@@ -8,14 +8,13 @@
 import SwiftUI
 
 struct OrderView: View {
-    @StateObject private var inventoryVM = InventoryViewModel()
-    @StateObject private var cartVM = CartViewModel()
+    @StateObject private var inventoryViewModel = InventoryViewModel()
+    @StateObject private var cartViewModel = CartViewModel()
 
     var body: some View {
         NavigationStack {
             ZStack{
                 
-            
                 ScrollView {
                     // 타이틀
                     Text("재고 관리")
@@ -62,64 +61,58 @@ struct OrderView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
                     LazyVStack(alignment: .leading, spacing: 14) {
-                        ForEach(inventoryVM.underLimitItems) { item in
+                        ForEach(inventoryViewModel.underLimitItems) { item in
                             
-                            let qty = cartVM.quantity(for: item.id)
+                            let qty = cartViewModel.quantity(for: item.id)
                             
                             OrderRequestCardView(
                                 item: item,
                                 quantity: qty,
                                 onIncrease: {
                                     Task {
-                                        await cartVM.increaseQuantity(for: item.id)
+                                        await cartViewModel.increaseQuantity(for: item.id)
                                     }
                                 },
                                 onDecrease: {
                                     Task {
-                                        await cartVM.decreaseQuantity(for: item.id)
+                                        await cartViewModel.decreaseQuantity(for: item.id)
                                     }
                                 },
                                 onAddToCart: {
                                     Task {
-                                        await cartVM.addToCart(partId: item.id, amount: 1)
+                                        await cartViewModel.addToCart(partId: item.id, amount: 1)
                                     }
                                 },
                                 onRemoveFromCart: {
                                     Task {
-                                        await cartVM.decreaseQuantity(for: item.id)
+                                        await cartViewModel.decreaseQuantity(for: item.id)
                                     }
                                 }
                             )
                             .onAppear {
-                                if item.id == inventoryVM.underLimitItems.last?.id {
-                                    Task { await inventoryVM.loadUnderLimitList() }
+                                if item.id == inventoryViewModel.underLimitItems.last?.id {
+                                    Task { await inventoryViewModel.loadUnderLimitList() }
                                 }
                             }
                         }
                         
-                        if inventoryVM.isLoading {
+                        if inventoryViewModel.isLoading {
                             ProgressView().padding()
                         }
                     }
                     .padding(.horizontal)
                     
-                    
-                    
-                    
                 }
                 .background(Color.Light)
                 .task {
-                    await inventoryVM.loadUnderLimitList(reset: true)
-                    await cartVM.fetchCart()
-                }
-                .alert(cartVM.message, isPresented: .constant(!cartVM.message.isEmpty)) {
-                    Button("확인") { cartVM.message = "" }
+                    await inventoryViewModel.loadUnderLimitList(reset: true)
+                    await cartViewModel.fetchCart()
                 }
                 
-                // OrderView 내부 ScrollView 아래에 overlay 혹은 bottomBar
+                // OrderView 내부 ScrollView 아래 장바구니 확인 버튼
                 VStack {
                     Spacer()
-                    CartSummaryBar(cartVM: cartVM)
+                    CartSummaryBar(cartVM: cartViewModel)
                 }
                 .ignoresSafeArea(edges: .bottom)
 

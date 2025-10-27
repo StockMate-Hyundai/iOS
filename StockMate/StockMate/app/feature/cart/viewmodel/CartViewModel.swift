@@ -40,9 +40,9 @@ final class CartViewModel: ObservableObject {
     func addToCart(partId: Int, amount: Int) async {
         let req = CartUpdateRequest(items: [CartUpdateItem(partId: partId, amount: amount)])
         switch await repository.addToCart(request: req) {
-        case .success(let response):
-            self.cart = response.data
-            self.items = response.data?.items ?? []
+        case .success:
+            await fetchCart()
+            updateLocalCartState()
         case .failure(let error):
             handleError(error)
         }
@@ -50,6 +50,12 @@ final class CartViewModel: ObservableObject {
 
     // MARK: - Update Quantity (전체 덮어쓰기)
     func updateCart() async {
+        // ✅ items가 비면 clearCart 호출하고 return
+          if items.isEmpty {
+              await clearCart()
+              return
+          }
+        
         let requestItems = items.map { CartUpdateItem(partId: $0.partId, amount: $0.amount) }
         let req = CartUpdateRequest(items: requestItems)
 
@@ -75,21 +81,48 @@ final class CartViewModel: ObservableObject {
     // MARK: - Private
     private func handleError(_ error: AppError) {
         message = error.message
+        print("🚨 Error (\(error.code)): \(error.message)")
+        
         if error.code == 401 {
             shouldGoToLogin = true
         }
     }
     
-    
     func quantity(for partId: Int) -> Int {
-         return items.first(where: { $0.partId == partId })?.amount ?? 0
-     }
+        return items.first(where: { $0.partId == partId })?.amount ?? 0
+    }
+
+    private func updateLocalCartState() {
+        let total = items.reduce(0) { result, item in
+            result + (item.price ?? 0) * item.amount
+        }
+
+        if let cart = cart {
+            self.cart = CartData(
+                cartId: cart.cartId,
+                memberId: cart.memberId,
+                items: self.items,
+                totalPrice: total
+            )
+        } else {
+            // fallback: cart가 nil일 수 있는 초기 로드 상황 대비
+            self.cart = CartData(
+                cartId: -1,
+                memberId: -1,
+                items: self.items,
+                totalPrice: total
+            )
+        }
+        
+        objectWillChange.send() // 중요! SwiftUI에게 “바뀌었어!” 알림
+    }
+
 
     func increaseQuantity(for partId: Int) async {
         if let index = items.firstIndex(where: { $0.partId == partId }) {
             items[index].amount += 1
         } else {
-            let newItem = CartItem(
+            items.append(CartItem(
                 cartItemId: 0,
                 partId: partId,
                 amount: 1,
@@ -100,36 +133,45 @@ final class CartViewModel: ObservableObject {
                 trim: nil,
                 price: nil,
                 stock: nil
-            )
-            items.append(newItem)
+            ))
         }
+
         await syncCart()
+        updateLocalCartState()
     }
 
     func decreaseQuantity(for partId: Int) async {
-        guard let index = items.firstIndex(where: { $0.partId == partId }) else { return }
+        guard let index = items.firstIndex(where: { $0.partId == partId }) else {
+            return
+        }
 
         if items[index].amount > 1 {
             items[index].amount -= 1
         } else {
             items.remove(at: index)
         }
-        await syncCart()
-    }
 
+        await syncCart()
+        updateLocalCartState()
+    }
     
-    // 외부에서 호출하는 기존 updateCart()는 그대로 유지
     private func syncCart() async {
+        if items.isEmpty {
+            // ✅ 장바구니가 빈 경우는 clearCart 호출
+            await clearCart()
+            return
+        }
         let updates = items.map {
             CartUpdateItem(partId: $0.partId, amount: $0.amount)
         }
         let request = CartUpdateRequest(items: updates)
-        let response = await repository.updateCart(request: request)
 
-        if case .success(let result) = response, let data = result.data {
-            self.items = data.items  // 서버 최신 값으로 맞추기
+        switch await repository.updateCart(request: request) {
+        case .success:
+            await fetchCart()
+        case .failure(let error):
+            handleError(error)
         }
     }
 
-    
 }
