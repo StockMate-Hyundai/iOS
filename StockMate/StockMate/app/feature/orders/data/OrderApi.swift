@@ -88,10 +88,29 @@ struct OrderPartDetail: Decodable {
     let amount: Int
 }
 
+
+// MARK: - 주문 생성 Request
+struct OrderRequest: Encodable {
+    let orderItems: [OrderItems]
+    let requestedShippingDate: String
+    let paymentType: String
+    let etc: String
+}
+
+struct OrderItems: Encodable {
+    let partId: Int
+    let amount: Int
+}
+
+
+
+
+
+
 // MARK: - API Call
 
 enum OrderApi {
-    // ✅ 내 주문 목록 조회
+    // ✅ 내 주문 리스트 조회 API
     static func getMyOrderList(
         status: String? = nil,
         startDate: String? = nil,
@@ -110,7 +129,7 @@ enum OrderApi {
         if let endDate = endDate, !endDate.isEmpty {
             url += "&endDate=\(endDate.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
         }
-
+        
         return ApiClient.shared.request(url, method: .get)
     }
     
@@ -120,5 +139,19 @@ enum OrderApi {
         let url = ApiClient.baseURL + "api/v1/order/detail?orderId=\(orderId)"
         return ApiClient.shared.request(url, method: .get)
     }
-
+    
+    
+    // ✅ 주문 생성 API
+    static func createOrder(_ requestBody: OrderRequest) -> DataRequest {
+        let url = ApiClient.baseURL + "api/v1/order"
+        return ApiClient.shared.request(
+            url,
+            method: .post,
+            parameters: requestBody,
+            encoder: JSONParameterEncoder.default
+        )
+    }
+    
+    
+    
 }

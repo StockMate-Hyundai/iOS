@@ -20,4 +20,7 @@ protocol OrderRepositoryProtocol {
     func fetchOrderDetail(
         orderId: Int
     ) async -> AppResult<OrderResponseItem>
+    
+    // 주문 생성
+    func createOrder(request: OrderRequest) async -> AppResult<String>
 }

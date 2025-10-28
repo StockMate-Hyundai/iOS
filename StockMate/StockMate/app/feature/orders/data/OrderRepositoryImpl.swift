@@ -58,5 +58,43 @@ final class OrderRepositoryImpl: OrderRepositoryProtocol {
             return .failure(error)
         }
     }
+    
+//    func createOrder(request: OrderRequest) async -> AppResult<String> {
+//        let request = OrderApi.createOrder(request)
+//        
+//        let result = await safeApi(request, decodeTo: ApiResponse<String>.self)
+//
+//        switch result {
+//        case .success(let response):
+//            if let data = response.data {
+//                return .success(data)
+//            } else {
+//                return .failure(.init(code: response.status, message: response.message, underlying: nil))
+//            }
+//        case .failure(let error):
+//            return .failure(error)
+//        }
+//    }
+    func createOrder(request: OrderRequest) async -> AppResult<String> {
+        let request = OrderApi.createOrder(request)
+        let result = await safeApi(request, decodeTo: ApiResponse<String>.self)
+        
+        switch result {
+        case .success(let response):
+            return .success(response.data ?? "success")
+        case .failure(let error):
+            return .failure(error)
+        }
 
+//        switch result {
+//        case .success(let response):
+//            if let data = response.data {
+//                return .success(data)
+//            } else {
+//                return .failure(.init(code: -1, message: "주문 결과가 비었습니다.", underlying: nil))
+//            }
+//        case .failure(let error):
+//            return .failure(error)
+//        }
+    }
 }
