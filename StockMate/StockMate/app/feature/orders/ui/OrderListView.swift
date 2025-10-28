@@ -42,7 +42,7 @@ struct OrderListView: View {
                                         .padding(.top)
 
                                     ForEach(orders) { order in
-                                        OrderListCardView(order: order)
+                                        OrderListCardView(order: order, orderViewModel: orderViewModel)
                                     }
                                 }
                             }
@@ -70,6 +70,7 @@ struct OrderListView: View {
 
 struct OrderListCardView: View {
     let order: OrderResponseItem
+    @ObservedObject var orderViewModel: OrderViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
@@ -79,7 +80,7 @@ struct OrderListCardView: View {
                     .font(.caption)
                     .foregroundColor(.gray)
                 Spacer()
-                NavigationLink(destination: OrderDetailView(orderId: order.id)) {
+                NavigationLink(destination: OrderDetailView(orderId: order.id, orderViewModel: orderViewModel)) {
                     Text("주문 상세 >")
                         .font(.caption)
                         .foregroundColor(.gray)
@@ -130,6 +131,9 @@ struct OrderListCardView: View {
             if order.orderStatus == "ORDER_COMPLETED" {
                 Button(action: {
                     // 주문취소 처리
+                    Task {
+                        await orderViewModel.cancelOrder(orderId: order.id)
+                    }
                 }) {
                     Text("주문 취소")
                         .font(.system(size: 13, weight: .semibold))

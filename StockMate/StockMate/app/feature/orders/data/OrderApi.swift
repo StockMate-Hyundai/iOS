@@ -102,9 +102,13 @@ struct OrderItems: Encodable {
     let amount: Int
 }
 
-
-
-
+// Response
+struct OrderCreateResponseData: Decodable {
+    let orderId: Int
+    let orderNumber: String
+    let totalPrice: Int
+    let orderStatus: String
+}
 
 
 // MARK: - API Call
@@ -151,7 +155,13 @@ enum OrderApi {
             encoder: JSONParameterEncoder.default
         )
     }
-    
-    
-    
+ 
+    // ✅ 주문 취소 API
+    static func cancelOrder(orderId: Int) -> DataRequest {
+        let url = ApiClient.baseURL + "api/v1/order/\(orderId)/cancel"
+        print("🚀 CancelOrder URL:", url)
+        return ApiClient.shared.request(url, method: .put)
+            .validate() // ✅ 서버 상태코드 확인
+    }
+
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OrderDetailView: View {
     let orderId: Int
+    @ObservedObject var orderViewModel: OrderViewModel
     @StateObject private var viewModel = OrderDetailViewModel()
 
     var body: some View {
@@ -147,7 +148,13 @@ struct OrderDetailView: View {
                         }
 
                         // 오른쪽: 주문 취소
-                        Button(action: {}) {
+                        Button(action: {
+                            // 주문취소 처리
+                            Task {
+                                await orderViewModel.cancelOrder(orderId: orderId)
+                            }
+                            
+                        }) {
                             Text("주문 취소")
                                 .font(.system(size: 15, weight: .semibold))
                                 .frame(maxWidth: .infinity)

@@ -14,6 +14,9 @@ final class OrderViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     @Published var isOrderSuccess: Bool = false
+    @Published var isOrderCanceled: Bool = false
+    
+    @Published var createdOrderId: Int?
     
     private let repository: OrderRepositoryProtocol
 
@@ -48,42 +51,63 @@ final class OrderViewModel: ObservableObject {
     }
     
     // 주문 생성
-    func createOrder(request: OrderRequest) async -> Bool {
-        isLoading = true
-        defer { isLoading = false }
-        
+    func createOrder(request: OrderRequest) async {
         let result = await repository.createOrder(request: request)
+
+        switch result {
+        case .success(let response):
+            self.createdOrderId = response.orderId
+            self.isOrderSuccess = true
+
+        case .failure(let error):
+            print("❌ 주문 실패:", error.message)
+            self.errorMessage = error.message
+        }
+
+//        switch result {
+//        case .success(let data):
+//            let id = data.orderId
+//            DispatchQueue.main.async {
+//                self.createdOrderId = id
+//                self.isOrderSuccess = true
+//            }
+//
+//        case .failure(let error):
+//            print("❌ 주문 실패:", error.message)
+//            self.errorMessage = error.message
+//        }
+    }
+
+//    func createOrder(request: OrderRequest) async -> Bool {
+//        isLoading = true
+//        defer { isLoading = false }
+//        
+//        let result = await repository.createOrder(request: request)
+//        
+//        switch result {
+//        case .success(_):
+//            isOrderSuccess = true
+//            return true
+//        case .failure(let error):
+//            errorMessage = error.message
+//            print("❌ 주문 실패:", error.message)
+//            return false
+//        }
+//    }
+
+
+    func cancelOrder(orderId: Int) async {
+        isLoading = true
+        let result = await repository.cancelOrder(orderId: orderId)
         
         switch result {
-        case .success(_):
-            isOrderSuccess = true
-            return true
+        case .success:
+            await loadOrders()      // ✅ 취소 후 즉시 UI 새로고침
         case .failure(let error):
             errorMessage = error.message
-            print("❌ 주문 실패:", error.message)
-            return false
         }
+        isLoading = false
     }
-//    func createOrder(
-//         items: [OrderItems],
-//         requestedDate: String,
-//         payment: String,
-//         etc: String
-//     ) async {
-//         let requestBody = OrderRequest(
-//             orderItems: items,
-//             requestedShippingDate: requestedDate,
-//             paymentType: payment,
-//             etc: etc
-//         )
-//
-//         let result = await repository.createOrder(request: requestBody)
-//
-//         switch result {
-//         case .success(let orderNumber):
-//             print("✅ 주문 성공:", orderNumber)
-//         case .failure(let error):
-//             print("❌ 주문 실패:", error.message)
-//         }
-//     }
+
+
 }
