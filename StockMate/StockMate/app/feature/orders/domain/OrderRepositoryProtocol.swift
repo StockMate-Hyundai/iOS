@@ -22,7 +22,6 @@ protocol OrderRepositoryProtocol {
     ) async -> AppResult<OrderResponseItem>
     
     // 주문 생성
-//    func createOrder(request: OrderRequest) async -> AppResult<OrderCreateResponseData>
     func createOrder(request: OrderRequest) async -> AppResult<OrderCreateResponseData>
 
     

@@ -89,7 +89,7 @@ struct OrderInfoView: View {
 extension OrderInfoView {
     
     private var contentView: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 17) {
             shippingInfoSection
             orderListSection
             paymentSection
@@ -170,12 +170,20 @@ extension OrderInfoView {
                 .padding(.leading, 5)
             
             VStack(alignment: .leading, spacing: 5) {
-                RadioButtonRow(title: "예치금 (잔액 ₩1,200,000)", selected: paymentType == .deposit) {
-                    paymentType = .deposit
+                HStack{
+                    RadioButtonRow(title: "예치금 (잔액 ₩1,200,000)", selected: paymentType == .deposit) {
+                        paymentType = .deposit
+                    }
+                    Spacer()
                 }
-                RadioButtonRow(title: "직접 결제", selected: paymentType == .card) {
-                    paymentType = .card
+                .frame(height: 35)
+                HStack{
+                    RadioButtonRow(title: "직접 결제", selected: paymentType == .card) {
+                        paymentType = .card
+                    }
+                    Spacer()
                 }
+                .frame(height: 35)
             }
             .padding()
             .frame(maxWidth: .infinity)
@@ -191,27 +199,35 @@ extension OrderInfoView {
                 .padding(.leading, 5)
             
             VStack(alignment: .leading, spacing: 5) {
-                RadioButtonRow(title: "오늘", selected: {
-                    if case .today = shippingDateOption { return true }
-                    return false
-                }()) {
-                    shippingDateOption = .today
-                }
-                
-                RadioButtonRow(title: "내일", selected: {
-                    if case .tomorrow = shippingDateOption { return true }
-                    return false
-                }()) {
-                    shippingDateOption = .tomorrow
-                }
-                
                 HStack {
+                    RadioButtonRow(title: "오늘", selected: {
+                        if case .today = shippingDateOption { return true }
+                        return false
+                    }()) {
+                        shippingDateOption = .today
+                    }
+                    Spacer()
+                }
+                .frame(height: 35)
+                HStack {
+                    RadioButtonRow(title: "내일", selected: {
+                        if case .tomorrow = shippingDateOption { return true }
+                        return false
+                    }()) {
+                        shippingDateOption = .tomorrow
+                    }
+                    Spacer()
+                }
+                .frame(height: 35)
+                
+                HStack (spacing: 30){
                     RadioButtonRow(title: "날짜 선택", selected: {
                         if case .specific(_) = shippingDateOption { return true }
                         return false
                     }()) {
                         shippingDateOption = .specific(specificDate)
                     }
+                    .padding(.trailing, 5)
                     
                     if case .specific(_) = shippingDateOption {
                         CustomDatePickerField(date: Binding {

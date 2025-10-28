@@ -42,6 +42,7 @@ struct OrderResponseItem: Decodable, Identifiable {
     let memberId: Int
     let userInfo: OrderUserInfo?
     let orderItems: [OrderItem]
+    let paymentType: String?
     let etc: String?
     let rejectedMessage: String?
     let carrier: String?

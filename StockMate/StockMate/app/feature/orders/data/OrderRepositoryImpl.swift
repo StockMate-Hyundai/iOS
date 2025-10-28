@@ -59,36 +59,6 @@ final class OrderRepositoryImpl: OrderRepositoryProtocol {
         }
     }
     
-//    func createOrder(request: OrderRequest) async -> AppResult<String> {
-//        let request = OrderApi.createOrder(request)
-//        
-//        let result = await safeApi(request, decodeTo: ApiResponse<String>.self)
-//
-//        switch result {
-//        case .success(let response):
-//            if let data = response.data {
-//                return .success(data)
-//            } else {
-//                return .failure(.init(code: response.status, message: response.message, underlying: nil))
-//            }
-//        case .failure(let error):
-//            return .failure(error)
-//        }
-//    }
-    
-//    func createOrder(request: OrderRequest) async -> AppResult<OrderCreateResponseData> {
-////    func createOrder(request: OrderRequest) async -> AppResult<String> {
-//        let request = OrderApi.createOrder(request)
-//        let result = await safeApi(request, decodeTo: ApiResponse<OrderCreateResponseData>.self)
-//        
-//        switch result {
-//        case .success(let response):
-//            return .success(response.data ?? "success")
-//        case .failure(let error):
-//            return .failure(error)
-//        }
-//    }
-    
     func createOrder(request: OrderRequest) async -> AppResult<OrderCreateResponseData> {
         let request = OrderApi.createOrder(request)
 

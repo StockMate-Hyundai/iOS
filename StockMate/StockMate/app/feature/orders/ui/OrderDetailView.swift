@@ -114,16 +114,21 @@ struct OrderDetailView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("결제 정보")
                                 .font(.system(size: 15, weight: .semibold))
-                            infoRow("결제 수단", "예치금")
+                            
+                            if order.paymentType == "DEPOSIT" {
+                                infoRow("결제 수단", "예치금")
+                            } else {
+                                infoRow("결제 수단", "카드 결제")
+                            }
+                            
                             infoRow("상품금액", "\(formatPrice(order.totalPrice))원")
-                            infoRow("배송비", "\(formatPrice(3000))원")
                             infoRow("배송희망일", formatDateOrDash(order.requestedShippingDate))
                             Divider().padding(.vertical, 4)
                             HStack {
                                 Text("총 결제 금액")
                                     .font(.headline)
                                 Spacer()
-                                Text("\(formatPrice(order.totalPrice + 3000))원")
+                                Text("\(formatPrice(order.totalPrice))원")
                                     .font(.headline.bold())
                                     .foregroundColor(.Primary)
                             }

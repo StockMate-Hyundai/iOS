@@ -24,7 +24,8 @@ struct MainTabView: View {
                 case 2:
                 NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
 //                case 3: NavigationStack{ ContentView() }
-                case 3: NavigationStack{ ProfileView() }
+                case 3: NavigationStack{ ReceiptView() }
+//                case 3: NavigationStack{ ProfileView() }
                 default: NavigationStack{ ContentView() }
                 }
             }
