@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Alamofire
 
 protocol InventoryRepositoryProtocol {
     func getInventoryList(
@@ -28,5 +29,7 @@ protocol InventoryRepositoryProtocol {
         page: Int,
         size: Int
     ) async -> AppResult<ApiResponse<InventoryPageData>>
+
+    func getLackCountByCategory() async -> AppResult<ApiResponse<[LackCountItem]>>
 
 }

@@ -16,6 +16,15 @@ struct ContentView: View {
             Text("임시 화면")
         }
         .padding()
+        HStack(spacing: 20) {
+            Image(systemName: "gearshape")
+                .font(.system(size: 40))
+                .foregroundColor(.blue)
+
+            Image(systemName: "lightbulb")
+                .font(.system(size: 40))
+                .foregroundColor(.cyan)
+        }
     }
 }
 

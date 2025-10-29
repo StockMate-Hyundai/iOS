@@ -24,17 +24,6 @@ struct IncomingScanView: View {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color.blue, lineWidth: 3)
                     .frame(width: 220, height: 220)
-                    .overlay(
-                        // 모서리 강조
-                        ZStack {
-                            Color.clear
-                                .overlay(
-                                    Rectangle()
-                                        .trim(from: 0, to: 0.25)
-                                        .stroke(Color.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                                )
-                        }
-                    )
             }
             .padding(.top, 20)
             

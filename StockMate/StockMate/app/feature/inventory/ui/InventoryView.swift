@@ -89,7 +89,7 @@ struct InventoryView: View {
                                 } label: {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.Secondary) // 배경색
+                                            .fill(Color.Primary) // 배경색
                                             .frame(width: 50, height: 50)
                                         Image(systemName: "arrow.up")
                                             .font(
@@ -146,7 +146,7 @@ struct GridMenuView: View {
                                 ZStack {
                                     // 타원 배경
                                     Rectangle()
-                                        .fill(item.1 ? Color.white.opacity(0.2) : Color.Secondary)
+                                        .fill(item.1 ? Color.white.opacity(0.2) : Color.Primary)
                                         .frame(width: 35, height: 26)
                                         .cornerRadius(80)
                                     
@@ -162,7 +162,7 @@ struct GridMenuView: View {
                             
                             Text(item.0)
                                 .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(item.1 ? .white : Color.Secondary)
+                                .foregroundColor(item.1 ? .white : Color.Primary)
                         }
                         .padding(.horizontal, 20)
                         .padding(.vertical, 20)
@@ -170,7 +170,7 @@ struct GridMenuView: View {
                         .frame(maxWidth: .infinity)
                         .background(
                             RoundedRectangle(cornerRadius: 24)
-                                .fill(item.1 ? Color.Secondary : Color.white)
+                                .fill(item.1 ? Color.Primary : Color.white)
                                 // 카드 그림자 (Figma 스펙: y=4, blur=4, opacity=25%, black)
                                 .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 4)
                         )
