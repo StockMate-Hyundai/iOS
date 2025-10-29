@@ -63,37 +63,7 @@ final class OrderViewModel: ObservableObject {
             print("❌ 주문 실패:", error.message)
             self.errorMessage = error.message
         }
-
-//        switch result {
-//        case .success(let data):
-//            let id = data.orderId
-//            DispatchQueue.main.async {
-//                self.createdOrderId = id
-//                self.isOrderSuccess = true
-//            }
-//
-//        case .failure(let error):
-//            print("❌ 주문 실패:", error.message)
-//            self.errorMessage = error.message
-//        }
     }
-
-//    func createOrder(request: OrderRequest) async -> Bool {
-//        isLoading = true
-//        defer { isLoading = false }
-//        
-//        let result = await repository.createOrder(request: request)
-//        
-//        switch result {
-//        case .success(_):
-//            isOrderSuccess = true
-//            return true
-//        case .failure(let error):
-//            errorMessage = error.message
-//            print("❌ 주문 실패:", error.message)
-//            return false
-//        }
-//    }
 
 
     func cancelOrder(orderId: Int) async {

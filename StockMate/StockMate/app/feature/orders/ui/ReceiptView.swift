@@ -164,7 +164,12 @@ struct ReceiptView: View {
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("receipt.pdf")
             if pdfDoc.write(to: tempURL) {
                 let av = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
-                UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true)
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let rootVC = windowScene.windows.first?.rootViewController {
+                    rootVC.present(av, animated: true)
+                }
+//                let av = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+//                UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true)
             }
         }
     }

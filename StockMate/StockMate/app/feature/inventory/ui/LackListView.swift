@@ -73,11 +73,6 @@ struct LackListView: View {
     }
 }
 
-#Preview {
-    LackListView(selectedCategory: "엔진/미션")
-        .environmentObject(InventoryViewModel())
-}
-
 struct CategoryButton: View {
     let title: String
     let isSelected: Bool
