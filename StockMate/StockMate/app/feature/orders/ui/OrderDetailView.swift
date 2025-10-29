@@ -21,15 +21,16 @@ struct OrderDetailView: View {
                 VStack(spacing: 16) {
                     
                     // ✅ 주문 정보
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(formatDate(order.createdAt))
                             .font(.system(size: 15, weight: .semibold))
-                        Text("주문번호: \(order.orderNumber)")
-                            .font(.system(size: 14))
-                            .foregroundColor(.gray)
+                            .padding(.bottom, 4)
+                        
+                        infoRow("주문번호", order.orderNumber)
                         HStack {
-                            Text("상태:")
-                                .font(.system(size: 14, weight: .semibold))
+                            Text("상태")
+                                .font(.system(size: 14))
+                            Spacer()
                             Text(statusText(order.orderStatus))
                                 .font(.system(size: 13, weight: .semibold))
                                 .padding(.horizontal, 10)
@@ -37,14 +38,15 @@ struct OrderDetailView: View {
                                 .background(statusBdColor(order.orderStatus))
                                 .foregroundColor(statusColor(order.orderStatus))
                                 .cornerRadius(12)
+                                .padding(.leading,4)
                         }
+                        
                     }
                     .frame(maxWidth: .infinity, alignment: .leading) // ✅ 이거 추가
                     .padding(.all, 20)
                     .background(Color.white)
                     .cornerRadius(16)
                     .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
-//                    .padding(.horizontal, 20)
 
 
                     // ✅ 배송 정보
@@ -52,22 +54,29 @@ struct OrderDetailView: View {
                         Text("배송정보")
                             .font(.system(size: 15, weight: .semibold))
                             .padding(.bottom, 4)
-                        Text(order.userInfo?.owner ?? "-")
-                        Text(order.userInfo?.address ?? "-")
-                        if !(order.etc ?? "").isEmpty {
-                            Text(order.etc ?? "")
-                        }
-                        if let email = order.userInfo?.email {
-                            Text(email)
-                                .foregroundColor(.gray)
-                        }
+                        
+                        infoRow("주문자명", order.userInfo?.owner ?? "-")
+                        infoRow("주소", order.userInfo?.address ?? "-")
+                        // ✅ 운송장정보 안전 처리
+                        let trackingText: String = {
+                            if let carrier = order.carrier,
+                               let trackingNo = order.trackingNumber,
+                               !carrier.isEmpty,
+                               !trackingNo.isEmpty {
+                                return "\(carrier): \(trackingNo)"
+                            }
+                            return "-"
+                        }()
+                        infoRow("운송장번호", trackingText)
+                        
+                        infoRow("요청사항", order.etc ?? "")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
                     .padding(.all, 20)
                     .background(Color.white)
                     .cornerRadius(16)
                     .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
-//                    .padding(.horizontal, 20)
+
                     
                     // ✅ 주문 상품
                     OrderSectionCard {
@@ -138,7 +147,8 @@ struct OrderDetailView: View {
                     // ✅ 하단 버튼
                     HStack(spacing: 12) {
                         // 왼쪽: 영수증 확인
-                        Button(action: {}) {
+                        // 왼쪽: 영수증 확인
+                        NavigationLink(destination: ReceiptView(orderId: order.id)) {
                             Text("영수증 확인")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Color.Primary)
@@ -152,24 +162,55 @@ struct OrderDetailView: View {
                                 .cornerRadius(10)
                         }
 
-                        // 오른쪽: 주문 취소
-                        Button(action: {
-                            // 주문취소 처리
-                            Task {
-                                await orderViewModel.cancelOrder(orderId: orderId)
+
+                        // 오른쪽 버튼: 주문 상태에 따라 변경
+                        if order.orderStatus == "ORDER_COMPLETED" {
+                            // 주문 완료 → "주문취소" 버튼
+                            Button(action: {
+                                Task {
+                                    await orderViewModel.cancelOrder(orderId: orderId)
+                                }
+                            }) {
+                                Text("주문 취소")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(Color(hex: "#1D4ED8"))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
                             }
-                            
-                        }) {
-                            Text("주문 취소")
-                                .font(.system(size: 15, weight: .semibold))
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 48)
-                                .background(Color(hex: "#1D4ED8"))
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
+                           
+                        } else if order.orderStatus == "ORDER_COMPLETED" {
+                            // 배송 완료 → "입고 하기" 버튼
+                            Button(action: {
+                                // TODO: 입고 처리 버튼
+                            }) {
+                                Text("입고 처리")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(Color(hex: "#1D4ED8"))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                            }
+                           
+                        } else {
+                            // 👉 나머지 상태 → "재주문하기" 버튼
+                            Button(action: {
+                                // TODO: 평가 액션 처리
+                            }) {
+                                Text("재주문하기")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(Color(hex: "#1D4ED8"))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                            }
+
                         }
                     }
-                    .padding(.top, 10)
+                    .padding(.top, 5)
 
                 }
                 .padding(.horizontal, 20) // ✅ 전체 섹션 동일 여백
