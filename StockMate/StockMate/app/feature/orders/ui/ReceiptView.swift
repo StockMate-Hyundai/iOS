@@ -12,8 +12,10 @@ enum PDFType {
     case a4
     case receipt80mm
 }
-
+// TODO: API 연결 후 주문 상세 페이지와 연결
 struct ReceiptView: View {
+    
+    
     @State var paymentType = "예치금"
     @State var approvalNumber = "202510300743"
     @State var date = "2025/10/30 07:43:54"
