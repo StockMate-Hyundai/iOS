@@ -19,6 +19,12 @@ struct OrderDetailView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let order = viewModel.order {
                 VStack(spacing: 16) {
+                    VStack {
+                        DeliveryStatusView(currentStep: deliveryStep(for: order.orderStatus))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+
                     
                     // ✅ 주문 정보
                     VStack(alignment: .leading, spacing: 6) {
@@ -27,6 +33,7 @@ struct OrderDetailView: View {
                             .padding(.bottom, 4)
                         
                         infoRow("주문번호", order.orderNumber)
+                        
                         HStack {
                             Text("상태")
                                 .font(.system(size: 14))
@@ -248,12 +255,18 @@ struct OrderDetailView: View {
 
     func statusText(_ status: String) -> String {
         switch status {
-        case "ORDER_COMPLETED": return "주문 완료"
+        case "ORDER_COMPLETED": return "주문 완료"  //
+        case "PAY_COMPLETED": return "결제 완료"
+        case "PENDING_APPROVAL": return "승인 대기" //
+        case "FAILED": return "결제 실패"
         case "PENDING_SHIPPING": return "출고 대기"
-        case "REJECTED": return "출고 반려"
-        case "SHIPPING": return "배송 중"
+        case "SHIPPING": return "배송중"
+        case "PENDING_RECEIVING": return "입고 대기"
+        case "REJECTED": return "주문 반려"
         case "DELIVERED": return "배송 완료"
         case "RECEIVED": return "입고 완료"
+        case "REFUNDED": return "환불 완료"
+        case "REFUND_REJECTED": return "환불 반려"
         case "CANCELLED": return "주문 취소"
         default: return "알 수 없음"
         }
@@ -262,12 +275,18 @@ struct OrderDetailView: View {
     func statusColor(_ status: String) -> Color {
         switch status {
         case "ORDER_COMPLETED": return .StatusGreen
+        case "PAY_COMPLETED": return .StatusGreen
+        case "PENDING_APPROVAL": return .Warning
+        case "FAILED": return .Danger
         case "PENDING_SHIPPING": return .InvUse
-        case "REJECTED": return .Danger
         case "SHIPPING": return .Transfer
+        case "PENDING_RECEIVING": return .Secondary
+        case "REJECTED": return .Danger
         case "DELIVERED": return .Secondary
         case "RECEIVED": return .StatusPurple
-        case "CANCELLED": return .gray
+        case "REFUNDED": return .Gray
+        case "REFUND_REJECTED": return .Gray
+        case "CANCELLED": return .Gray
         default: return .gray.opacity(0.6)
         }
     }
@@ -275,11 +294,17 @@ struct OrderDetailView: View {
     func statusBdColor(_ status: String) -> Color {
         switch status {
         case "ORDER_COMPLETED": return .StatusGreenBg
+        case "PAY_COMPLETED": return .StatusGreenBg
+        case "PENDING_APPROVAL": return .WarningBg
+        case "FAILED": return .DangerBg
         case "PENDING_SHIPPING": return .InvUseBg
-        case "REJECTED": return .DangerBg
         case "SHIPPING": return .TransferBg
+        case "PENDING_RECEIVING": return .LightBlue04
+        case "REJECTED": return .DangerBg
         case "DELIVERED": return .LightBlue04
         case "RECEIVED": return .StatusPurpleBg
+        case "REFUNDED": return Color(hex: "#EEEEEF")
+        case "REFUND_REJECTED": return Color(hex: "#EEEEEF")
         case "CANCELLED": return Color(hex: "#EEEEEF")
         default: return .gray.opacity(0.6)
         }
@@ -318,4 +343,25 @@ func formatDateOrDash(_ isoDate: String?) -> String {
     let comps = isoDate.split(separator: "T").first?.split(separator: "-") ?? []
     guard comps.count == 3 else { return "-" }
     return "\(comps[0])년 \(comps[1])월 \(comps[2])일"
+}
+
+func deliveryStep(for status: String) -> Int {
+    //6 -> 전체 회색
+    //4 -> 전체 파란색
+    switch status {
+    case "ORDER_COMPLETED": return 0    // 주문 완료
+    case "PAY_COMPLETED": return 0      // 결제 완료
+    case "PENDING_APPROVAL": return 1   // 승인 대기
+    case "FAILED": return 6             // 결제 실패
+    case "PENDING_SHIPPING": return 2   // 출고 대기
+    case "SHIPPING": return 3           // 배송중
+    case "PENDING_RECEIVING": return 4  // 입고 대기
+    case "REJECTED": return 6           // 승인 반려
+    case "DELIVERED": return 4          // 배송 완료
+    case "RECEIVED": return 4           // 입고 완료
+    case "REFUNDED": return 6           // 환불 완료
+    case "REFUND_REJECTED": return 6    // 환불 반려
+    case "CANCELLED": return 6          // 주문 취소
+    default: return 6
+    }
 }

@@ -95,6 +95,8 @@ extension Color {
     static let Hstatus5Bg  = Color(hex: "#ECEEF0")
 
     
+    static let Grayline   = Color(hex: "#ECECED")
+    static let Grayline2   = Color(hex: "#DDDDDD")
     
     // 투명도 포함 예시
     static let boxBgWhite = Color(hex: "#40FFFFFF") // 투명도 포함
