@@ -79,6 +79,7 @@ struct DepositChargeView: View {
             
             // 충전 버튼
             Button {
+                guard !isCharging else { return }
                 Task {
                     guard let amount = Int(amountText), amount > 0 else { return }
                     isCharging = true
@@ -107,6 +108,7 @@ struct DepositChargeView: View {
             .cornerRadius(28)
             .padding(.top, 28)
             .padding(.horizontal, 10)
+            .disabled(isCharging)
         }
         .padding(.horizontal, 20)
 //        .padding(.top, 20)

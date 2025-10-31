@@ -154,7 +154,6 @@ struct OrderDetailView: View {
                     // ✅ 하단 버튼
                     HStack(spacing: 12) {
                         // 왼쪽: 영수증 확인
-                        // 왼쪽: 영수증 확인
                         NavigationLink(destination: ReceiptView(orderId: order.id)) {
                             Text("영수증 확인")
                                 .font(.system(size: 15, weight: .semibold))
@@ -171,8 +170,10 @@ struct OrderDetailView: View {
 
 
                         // 오른쪽 버튼: 주문 상태에 따라 변경
-                        if order.orderStatus == "ORDER_COMPLETED" {
-                            // 주문 완료 → "주문취소" 버튼
+                        if order.orderStatus == "ORDER_COMPLETED" ||
+                           order.orderStatus == "PAY_COMPLETED" ||
+                           order.orderStatus == "PENDING_APPROVAL" {
+                            // "주문취소" → 주문완료/결제완료/승인대기
                             Button(action: {
                                 Task {
                                     await orderViewModel.cancelOrder(orderId: orderId)
@@ -187,8 +188,9 @@ struct OrderDetailView: View {
                                     .cornerRadius(10)
                             }
                            
-                        } else if order.orderStatus == "ORDER_COMPLETED" {
-                            // 배송 완료 → "입고 하기" 버튼
+                        } else if order.orderStatus == "PENDING_RECEIVING" ||
+                                    order.orderStatus == "DELIVERED"  {
+                            // "입고 하기" → 입고대기/배송완료
                             Button(action: {
                                 // TODO: 입고 처리 버튼
                             }) {
@@ -247,68 +249,7 @@ struct OrderDetailView: View {
         .font(.system(size: 14))
     }
 
-    func formatDate(_ isoDate: String) -> String {
-        let comps = isoDate.split(separator: "T").first?.split(separator: "-") ?? []
-        guard comps.count == 3 else { return isoDate }
-        return "\(comps[0])년 \(comps[1])월 \(comps[2])일"
-    }
-
-    func statusText(_ status: String) -> String {
-        switch status {
-        case "ORDER_COMPLETED": return "주문 완료"  //
-        case "PAY_COMPLETED": return "결제 완료"
-        case "PENDING_APPROVAL": return "승인 대기" //
-        case "FAILED": return "결제 실패"
-        case "PENDING_SHIPPING": return "출고 대기"
-        case "SHIPPING": return "배송중"
-        case "PENDING_RECEIVING": return "입고 대기"
-        case "REJECTED": return "주문 반려"
-        case "DELIVERED": return "배송 완료"
-        case "RECEIVED": return "입고 완료"
-        case "REFUNDED": return "환불 완료"
-        case "REFUND_REJECTED": return "환불 반려"
-        case "CANCELLED": return "주문 취소"
-        default: return "알 수 없음"
-        }
-    }
-
-    func statusColor(_ status: String) -> Color {
-        switch status {
-        case "ORDER_COMPLETED": return .StatusGreen
-        case "PAY_COMPLETED": return .StatusGreen
-        case "PENDING_APPROVAL": return .Warning
-        case "FAILED": return .Danger
-        case "PENDING_SHIPPING": return .InvUse
-        case "SHIPPING": return .Transfer
-        case "PENDING_RECEIVING": return .Secondary
-        case "REJECTED": return .Danger
-        case "DELIVERED": return .Secondary
-        case "RECEIVED": return .StatusPurple
-        case "REFUNDED": return .Gray
-        case "REFUND_REJECTED": return .Gray
-        case "CANCELLED": return .Gray
-        default: return .gray.opacity(0.6)
-        }
-    }
-
-    func statusBdColor(_ status: String) -> Color {
-        switch status {
-        case "ORDER_COMPLETED": return .StatusGreenBg
-        case "PAY_COMPLETED": return .StatusGreenBg
-        case "PENDING_APPROVAL": return .WarningBg
-        case "FAILED": return .DangerBg
-        case "PENDING_SHIPPING": return .InvUseBg
-        case "SHIPPING": return .TransferBg
-        case "PENDING_RECEIVING": return .LightBlue04
-        case "REJECTED": return .DangerBg
-        case "DELIVERED": return .LightBlue04
-        case "RECEIVED": return .StatusPurpleBg
-        case "REFUNDED": return Color(hex: "#EEEEEF")
-        case "REFUND_REJECTED": return Color(hex: "#EEEEEF")
-        case "CANCELLED": return Color(hex: "#EEEEEF")
-        default: return .gray.opacity(0.6)
-        }
-    }
+ 
 }
 
 // ✅ 카드 레이아웃 통일용
@@ -363,5 +304,68 @@ func deliveryStep(for status: String) -> Int {
     case "REFUND_REJECTED": return 6    // 환불 반려
     case "CANCELLED": return 6          // 주문 취소
     default: return 6
+    }
+}
+
+func formatDate(_ isoDate: String) -> String {
+    let comps = isoDate.split(separator: "T").first?.split(separator: "-") ?? []
+    guard comps.count == 3 else { return isoDate }
+    return "\(comps[0])년 \(comps[1])월 \(comps[2])일"
+}
+
+func statusText(_ status: String) -> String {
+    switch status {
+    case "ORDER_COMPLETED": return "주문 완료"      // 주문 완료
+    case "PAY_COMPLETED": return "결제 완료"        // 결제 완료
+    case "PENDING_APPROVAL": return "승인 대기"     // 승인대기
+    case "FAILED": return "결제 실패"               // 결제 실패
+    case "PENDING_SHIPPING": return "출고 대기"     // 출고 대기
+    case "SHIPPING": return "배송중"               // 배송중
+    case "PENDING_RECEIVING": return "배송 완료"    // 입고대기
+    case "REJECTED": return "승인 반려"             // 이론상 출고 반려
+    case "DELIVERED": return "배송 완료"            // 배송 완료
+    case "RECEIVED": return "입고 완료"             // 입고 완료
+    case "REFUNDED": return "환불 완료"             // 환불 완료
+    case "REFUND_REJECTED": return "환불 반려"      // 환불 반려
+    case "CANCELLED": return "주문 취소"            // 주문 취소
+    default: return "알 수 없음"
+    }
+}
+
+func statusColor(_ status: String) -> Color {
+    switch status {
+    case "ORDER_COMPLETED": return .StatusGreen
+    case "PAY_COMPLETED": return .StatusGreen
+    case "PENDING_APPROVAL": return .Warning
+    case "FAILED": return .Danger
+    case "PENDING_SHIPPING": return .InvUse
+    case "SHIPPING": return .Transfer
+    case "PENDING_RECEIVING": return .Secondary
+    case "REJECTED": return .Danger
+    case "DELIVERED": return .Secondary
+    case "RECEIVED": return .StatusPurple
+    case "REFUNDED": return .Gray
+    case "REFUND_REJECTED": return .Gray
+    case "CANCELLED": return .Gray
+    default: return .gray.opacity(0.6)
+    }
+}
+
+func statusBdColor(_ status: String) -> Color {
+    switch status {
+    case "ORDER_COMPLETED": return .StatusGreenBg
+    case "PAY_COMPLETED": return .StatusGreenBg
+    case "PENDING_APPROVAL": return .WarningBg
+    case "FAILED": return .DangerBg
+    case "PENDING_SHIPPING": return .InvUseBg
+    case "SHIPPING": return .TransferBg
+    case "PENDING_RECEIVING": return .LightBlue04
+    case "REJECTED": return .DangerBg
+    case "DELIVERED": return .LightBlue04
+    case "RECEIVED": return .StatusPurpleBg
+    case "REFUNDED": return Color(hex: "#EEEEEF")
+    case "REFUND_REJECTED": return Color(hex: "#EEEEEF")
+    case "CANCELLED": return Color(hex: "#EEEEEF")
+    default: return .gray.opacity(0.6)
     }
 }

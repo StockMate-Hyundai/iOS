@@ -155,43 +155,4 @@ struct OrderListCardView: View {
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .padding(.horizontal)
     }
-
-    func statusText(_ status: String) -> String {
-        switch status {
-        case "ORDER_COMPLETED": return "주문 완료"
-        case "PENDING_SHIPPING": return "출고 대기"
-        case "REJECTED": return "출고 반려"
-        case "SHIPPING": return "배송 중"
-        case "DELIVERED": return "배송 완료"
-        case "RECEIVED": return "입고 완료"
-        case "CANCELLED": return "주문 취소"
-        default: return "알 수 없음"
-        }
-    }
-
-    func statusColor(_ status: String) -> Color {
-        switch status {
-        case "ORDER_COMPLETED": return .StatusGreen
-        case "PENDING_SHIPPING": return .InvUse
-        case "REJECTED": return .Danger
-        case "SHIPPING": return .Transfer
-        case "DELIVERED": return .Secondary
-        case "RECEIVED": return .StatusPurple
-        case "CANCELLED": return .gray
-        default: return .gray.opacity(0.6)
-        }
-    }
-    
-    func statusBdColor(_ status: String) -> Color {
-        switch status {
-        case "ORDER_COMPLETED": return .StatusGreenBg
-        case "PENDING_SHIPPING": return .InvUseBg
-        case "REJECTED": return .DangerBg
-        case "SHIPPING": return .TransferBg
-        case "DELIVERED": return .LightBlue04
-        case "RECEIVED": return .StatusPurpleBg
-        case "CANCELLED": return Color(hex: "#EEEEEF")
-        default: return .gray.opacity(0.6)
-        }
-    }
 }

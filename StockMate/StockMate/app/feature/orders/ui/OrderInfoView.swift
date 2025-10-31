@@ -229,19 +229,6 @@ extension OrderInfoView {
                             .cornerRadius(20)
                     }
                     .padding(.trailing, 5)
-
-//                    Button {
-//                        depositViewModel.showChargeSheet = true
-//                    } label: {
-//                        Text("충전")
-//                            .foregroundColor(Color.Primary)
-//                            .font(.system(size: 14, weight: .bold))
-//                            .padding(.vertical, 6)
-//                            .padding(.horizontal, 14)
-//                            .background(Color.white)
-//                            .cornerRadius(20)
-//                    }
-//                    .padding(.trailing, 5)
                 }
                 .padding(.bottom, 25)
             }
