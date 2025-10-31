@@ -104,12 +104,19 @@ struct OrderItems: Encodable {
 }
 
 // Response
+//struct OrderCreateResponseData: Decodable {
+//    let orderId: Int
+//    let orderNumber: String
+//    let totalPrice: Int
+//    let orderStatus: String
+//}
 struct OrderCreateResponseData: Decodable {
     let orderId: Int
     let orderNumber: String
     let totalPrice: Int
-    let orderStatus: String
+    let paymentType: String // ✅ 서버 필드와 맞춤
 }
+
 
 
 // MARK: - API Call
