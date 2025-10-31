@@ -90,4 +90,17 @@ final class OrderRepositoryImpl: OrderRepositoryProtocol {
         }
     }
 
+    func receiveOrder(orderNumber: String) async -> AppResult<String> {
+        let request = OrderApi.receiveOrder(.init(orderNumber: orderNumber))
+        let result = await safeApi(request, decodeTo: ApiResponse<String>.self)
+
+        switch result {
+        case .success(let response):
+            print("✅ 입고 처리 성공:", response)
+            return .success(response.data ?? "입고 처리가 완료되었습니다.")
+        case .failure(let error):
+            print("❌ 입고 처리 실패:", error.message)
+            return .failure(error)
+        }
+    }
 }

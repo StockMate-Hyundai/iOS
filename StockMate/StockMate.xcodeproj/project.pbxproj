@@ -14,9 +14,22 @@
 		84BB0A132E91FE0E00A08CD6 /* StockMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StockMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		84BB0D3C2EB49C0900A08CD6 /* Exceptions for "StockMate" folder in "StockMate" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 84BB0A122E91FE0E00A08CD6 /* StockMate */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		84BB0A152E91FE0E00A08CD6 /* StockMate */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				84BB0D3C2EB49C0900A08CD6 /* Exceptions for "StockMate" folder in "StockMate" target */,
+			);
 			path = StockMate;
 			sourceTree = "<group>";
 		};
@@ -263,6 +276,8 @@
 				DEVELOPMENT_TEAM = 35TSG7VB2B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StockMate/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "QR 코드를 스캔하기 위해 카메라 접근이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -291,6 +306,8 @@
 				DEVELOPMENT_TEAM = 35TSG7VB2B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StockMate/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "QR 코드를 스캔하기 위해 카메라 접근이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

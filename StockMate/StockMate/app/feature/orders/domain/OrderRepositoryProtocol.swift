@@ -24,6 +24,9 @@ protocol OrderRepositoryProtocol {
     // 주문 생성
     func createOrder(request: OrderRequest) async -> AppResult<OrderCreateResponseData>
 
-    
+    // 주문 취소
     func cancelOrder(orderId: Int) async -> AppResult<String>
+    
+    // 입고 처리
+    func receiveOrder(orderNumber: String) async -> AppResult<String>
 }
