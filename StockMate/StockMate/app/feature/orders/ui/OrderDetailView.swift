@@ -25,27 +25,35 @@ struct OrderDetailView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                    
-                    // ✅ 주문 정보
+                   
                     VStack(alignment: .leading, spacing: 6) {
                         Text(formatDate(order.createdAt))
                             .font(.system(size: 15, weight: .semibold))
                             .padding(.bottom, 4)
                         
-                        infoRow("주문번호", order.orderNumber)
-                        
-                        HStack {
-                            Text("상태")
-                                .font(.system(size: 14))
-                            Spacer()
-                            Text(statusText(order.orderStatus))
-                                .font(.system(size: 13, weight: .semibold))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(statusBdColor(order.orderStatus))
-                                .foregroundColor(statusColor(order.orderStatus))
-                                .cornerRadius(12)
-                                .padding(.leading,4)
+                        // ✅ 주문 정보
+                        HStack(alignment: .top, spacing: 6){
+                            VStack(alignment: .leading){
+                                Text("주문번호")
+                                    .font(.system(size: 14))
+                                    .padding(.bottom, 4)
+                                
+                                Text("상태")
+                                    .font(.system(size: 14))
+                            }
+                            
+                            VStack(alignment: .leading){
+                                Text(order.orderNumber)
+                                    .font(.system(size: 14))
+                                
+                                Text(statusText(order.orderStatus))
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(statusBdColor(order.orderStatus))
+                                    .foregroundColor(statusColor(order.orderStatus))
+                                    .cornerRadius(12)
+                            }.padding(.leading)
                         }
                         
                     }
