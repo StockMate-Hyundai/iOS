@@ -7,70 +7,106 @@
 
 import SwiftUI
 import PDFKit
+import UIKit
 
 enum PDFType {
     case a4
     case receipt80mm
 }
-// TODO: API 연결 후 주문 상세 페이지와 연결
+
 struct ReceiptView: View {
+    let orderId: Int
     
+    @StateObject private var detailViewModel = OrderDetailViewModel()
     
-    @State var paymentType = "예치금"
-    @State var approvalNumber = "202510300743"
-    @State var date = "2025/10/30 07:43:54"
-    @State var orderNumber = "SMO-2"
-    @State var itemName = "배터리-트랜스미터"
-    @State var quantity = 1
-    @State var price = 5273
-    @State var sellerName = "박시영"
-    @State var businessNumber = "888777776666"
-    @State var phone = "010-2596-2352"
-    @State var address = "서울특별시 성동구 동일로 259 3층"
+    @State var sellerName = "홍길동"
+    @State var businessNumber = "215-87-12345"  // 형식만 맞춘 랜덤번호
+    @State var phone = "02-567-8901"
+    @State var address = "서울특별시 금천구 가산동 459-9"
 
-    var vat: Int { Int(Double(price) * 0.1) }
-    var total: Int { price + vat }
-
+    
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading) {
-                receiptContent
-                
-                HStack {
-                    pdfButton(type: .a4, title: "A4 PDF")
-                    pdfButton(type: .receipt80mm, title: "영수증 PDF")
+            if detailViewModel.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let order = detailViewModel.order {
+                VStack(alignment: .leading) {
+                    receiptContent(order: order)
+                    
+                    Button {
+                        generatePDF(type: .receipt80mm, order: order)
+                    } label: {
+                        Text("영수증 PDF 저장")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom)
+
                 }
-                .padding(.horizontal)
-                .padding(.bottom)
+                .background(Color.white)
+                .cornerRadius(12)
+                .padding()
             }
-            .background(Color.white)
-            .cornerRadius(12)
-            .padding()
         }
         .background(Color.Light)
         .navigationTitle("영수증")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await detailViewModel.fetchOrderDetail(orderId: orderId)
+        }
 
     }
-
-    private var receiptContent: some View {
-        VStack(alignment: .leading, spacing: 16) {
+    
+    private func receiptContent(order: OrderResponseItem) -> some View {
+        let total = order.totalPrice
+        let vat = Int(Double(total) * 10 / 110) // 부가세액
+        let supplyPrice = total - vat           // 공급가액
+        
+        return VStack(alignment: .leading, spacing: 16) {
             section("결제 정보") {
                 Divider()
-                row("거래종류", paymentType)
-                row("승인번호", approvalNumber)
-                row("거래일시", date)
+                if order.paymentType == "DEPOSIT" {
+                    row("거래종류", "예치금")
+                } else {
+                    row("결제수단", "신용카드")
+                }
+                row("승인번호", formattedApprovalNumber(order.createdAt))
+                row("거래일시", formattedDate(order.createdAt))
+
             }
             .padding(4)
             .padding(.top,5)
 
             section("구매정보") {
                 Divider()
-                row("주문번호", orderNumber)
-                row("상품명", "\(itemName), \(quantity)개")
-                row("공급가액", "\(price)원")
-                row("부가세액", "\(vat)원")
-                row("합계금액", "\(total)원", highlight: true)
+                VStack(spacing: 8){
+                    row("주문번호", order.orderNumber)
+                    VStack{
+                        // 상품명 라벨과 첫 번째 상품 같은 라인
+                        if let first = order.orderItems.first {
+                            HStack {
+                                Text("상품명")
+                                Spacer()
+                                Text("\(first.partDetail.korName) \(first.amount)개")
+                            }
+                        }
+                        // 나머지는 label 없이 아래에
+                        ForEach(order.orderItems.dropFirst(), id: \.partId) { item in
+                            HStack {
+                                Spacer() // label 영역만큼 들여쓰기 효과
+                                Text("\(item.partDetail.korName) \(item.amount)개")
+                            }
+                        }
+                    }
+                    row("공급가액", "\(formatPrice(supplyPrice))원")
+                    row("부가세액", "\(formatPrice(vat))원")
+                    row("합계금액", "\(formatPrice(total))원", highlight: true)
+                }
             }
             .padding(4)
             .padding(.top)
@@ -104,7 +140,7 @@ struct ReceiptView: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .lineSpacing(4)
-            .padding(.leading, 2) // ✅ 총알 뒤 문장 들여쓰기 추가
+            .padding(.leading, 2) // 문장 들여쓰기 추가
 
         }
         .padding()
@@ -129,54 +165,82 @@ struct ReceiptView: View {
         }
     }
 
-    private func pdfButton(type: PDFType, title: String) -> some View {
-        Button(action: {
-            generatePDF(type: type)
-        }) {
-            Text(title)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-        }
-    }
-
-    private func generatePDF(type: PDFType) {
-        let content = receiptContent
-        let renderer = ImageRenderer(content: content)
+    private func generatePDF(type: PDFType, order: OrderResponseItem) {
+        let view = receiptContent(order: order) // ✅ 실제 View 생성
+        let renderer = ImageRenderer(content: view)
 
         let width: CGFloat
-        let height: CGFloat = 2000
-
         switch type {
             case .a4: width = 595.2  // A4 width in pt
             case .receipt80mm: width = 226.77 // 80mm in pt
         }
 
         renderer.scale = UIScreen.main.scale
+        
+        // ✅ cgImage 기반 안전 처리
+         if let cgImage = renderer.cgImage {
+             let uiImage = UIImage(cgImage: cgImage)
+             let pdfDoc = PDFDocument()
+             if let pdfPage = PDFPage(image: uiImage) {
+                 pdfDoc.insert(pdfPage, at: 0)
+             }
 
-        if let image = renderer.uiImage {
-            let pdfDoc = PDFDocument()
-            let pdfPage = PDFPage(image: image)
-            pdfDoc.insert(pdfPage!, at: 0)
+             // ✅ 주문번호 기반 파일명
+             let fileName = "receipt_\(order.orderNumber).pdf"
+             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
 
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("receipt.pdf")
-            if pdfDoc.write(to: tempURL) {
-                let av = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let rootVC = windowScene.windows.first?.rootViewController {
-                    rootVC.present(av, animated: true)
-                }
-//                let av = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
-//                UIApplication.shared.windows.first?.rootViewController?.present(av, animated: true)
-            }
-        }
+             if pdfDoc.write(to: tempURL) {
+                 let av = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+
+                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                    let rootVC = windowScene.windows.first?.rootViewController {
+                     av.popoverPresentationController?.sourceView = rootVC.view
+                     rootVC.present(av, animated: true)
+                 }
+             }
+         }
+        
     }
 }
 
-struct ReceiptView_Previews: PreviewProvider {
-    static var previews: some View {
-        ReceiptView()
+//struct ReceiptView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ReceiptView()
+//    }
+//}
+
+func formattedDate(_ timestamp: String) -> String {
+    let inputFormatter = DateFormatter()
+    inputFormatter.locale = Locale(identifier: "ko_KR")
+    inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
+    inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+
+    guard let date = inputFormatter.date(from: timestamp) else {
+        return timestamp
     }
+
+    let outputFormatter = DateFormatter()
+    outputFormatter.locale = Locale(identifier: "ko_KR")
+    outputFormatter.timeZone = TimeZone.current
+    outputFormatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
+
+    return outputFormatter.string(from: date)
+}
+
+func formattedApprovalNumber(_ timestamp: String) -> String {
+    let inputFormatter = DateFormatter()
+    inputFormatter.locale = Locale(identifier: "ko_KR")
+    inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
+    inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+
+    guard let date = inputFormatter.date(from: timestamp) else {
+        return timestamp
+    }
+
+    let outputFormatter = DateFormatter()
+    outputFormatter.locale = Locale(identifier: "ko_KR")
+    outputFormatter.timeZone = TimeZone.current
+    outputFormatter.dateFormat = "yyyyMMddHHmm" // ✅ 승인번호 포맷
+
+    return outputFormatter.string(from: date)
 }

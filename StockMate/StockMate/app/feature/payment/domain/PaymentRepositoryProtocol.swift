@@ -1,0 +1,14 @@
+//
+//  PaymentRepositoryProtocol.swift
+//  StockMate
+//
+//  Created by Admin on 10/29/25.
+//
+
+import Foundation
+import Alamofire
+
+protocol PaymentRepositoryProtocol {
+    func fetchDepositAmount() async -> AppResult<PaymentAmount>
+    func chargeDeposit(amount: Int) async -> AppResult<String>
+}

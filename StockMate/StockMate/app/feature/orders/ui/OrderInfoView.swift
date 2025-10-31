@@ -20,6 +20,7 @@ enum ShippingDateOption {
 struct OrderInfoView: View {
     @ObservedObject var cartViewModel: CartViewModel
     @StateObject var orderViewModel = OrderViewModel()
+    @StateObject private var depositViewModel = DepositViewModel()
     
     @State private var paymentType: PaymentType = .deposit
     @State private var shippingDateOption: ShippingDateOption = .today
@@ -74,7 +75,10 @@ struct OrderInfoView: View {
         .background(Color.Light)
         .navigationTitle("주문/결제")
         .navigationBarTitleDisplayMode(.inline)
-        .task { await cartViewModel.fetchCart() }
+        .task {
+            await cartViewModel.fetchCart()
+            await depositViewModel.fetchDepositAmount()
+        }
         .edgesIgnoringSafeArea(.bottom)
         .onChange(of: orderViewModel.isOrderSuccess) { success in
             if success {
@@ -84,7 +88,16 @@ struct OrderInfoView: View {
                 }
             }
         }
+        // ✅ 충전 bottom sheet 연결
+       .sheet(isPresented: $depositViewModel.showChargeSheet) {
+           DepositChargeView(viewModel: depositViewModel)
+               .presentationDetents([.fraction(0.80)]) // 시트 높이 85%
+//               .presentationDragIndicator(.visible)
+       }
+
     }
+        
+
 }
 
 // MARK: - UI 구성 View
@@ -164,35 +177,67 @@ extension OrderInfoView {
             .cornerRadius(16)
         }
     }
-    
     private var paymentSection: some View {
-        VStack(alignment: .leading) {
-            Text("결제 수단")
-                .font(.headline)
-                .padding(.leading, 5)
+        ZStack {
+            // 배경 이미지 적용
+            Image("deposit_background") // ← 에셋에 넣은 이미지 이름
+                .resizable()
+                .scaledToFill()
+                .frame(height: 185)
+                .clipped()
+                .cornerRadius(16.39)
             
-            VStack(alignment: .leading, spacing: 5) {
-                HStack{
-                    RadioButtonRow(title: "예치금 (잔액 ₩1,200,000)", selected: paymentType == .deposit) {
-                        paymentType = .deposit
+            VStack(alignment: .leading, spacing: 12) {
+                VStack (alignment: .leading, spacing: 13){
+                    HStack {
+                        Text("사용 가능 예치금")
+                            .font(.system(size: 17, weight: .bold))
+                            .padding(.leading, 5)
+                            .padding(.top, 25)
+                            .foregroundColor(Color.white)
                     }
-                    Spacer()
-                }
-                .frame(height: 35)
-                HStack{
-                    RadioButtonRow(title: "직접 결제", selected: paymentType == .card) {
-                        paymentType = .card
+                    
+                    HStack {
+                        // 예치금 금액 표시
+                        if depositViewModel.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                        } else {
+                            Text("₩\(formatPrice(depositViewModel.balance))")
+                                .font(.system(size: 26, weight: .bold))
+                                .foregroundColor(Color.white)
+                        }
+
+                        // Text("₩\(cartViewModel.depositBalance?.formatted() ?? "0")")
+                        // .font(.system(size: 22, weight: .bold))
                     }
-                    Spacer()
                 }
-                .frame(height: 35)
+
+                Spacer()
+                
+                HStack {
+                    Spacer()
+                    Button {
+                        depositViewModel.showChargeSheet = true   // <-- $ 없이 할당
+                    } label: {
+                        Text("충전")
+                            .foregroundColor(Color.Primary)
+                            .font(.system(size: 14, weight: .bold))
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 14)
+                            .background(Color.white)
+                            .cornerRadius(20)
+                    }
+                    .padding(.trailing, 5)
+                }
+                .padding(.bottom, 25)
             }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.white)
-            .cornerRadius(16)
+            .frame(height: 185)
+            .padding(20)
         }
+        .frame(maxWidth: .infinity)
     }
+
     
     private var shippingDateSection: some View {
         VStack(alignment: .leading) {
