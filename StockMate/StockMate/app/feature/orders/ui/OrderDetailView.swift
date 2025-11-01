@@ -25,27 +25,21 @@ struct OrderDetailView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                   
+                    
+                    // ✅ 주문 정보
                     VStack(alignment: .leading, spacing: 6) {
                         Text(formatDate(order.createdAt))
                             .font(.system(size: 15, weight: .semibold))
                             .padding(.bottom, 4)
                         
-                        // ✅ 주문 정보
+                            infoRow("주문번호", order.orderNumber)
+                            .padding(.bottom, 4)
+
+                        
                         HStack(alignment: .top, spacing: 6){
-                            VStack(alignment: .leading){
-                                Text("주문번호")
-                                    .font(.system(size: 14))
-                                    .padding(.bottom, 4)
-                                
                                 Text("상태")
                                     .font(.system(size: 14))
-                            }
-                            
-                            VStack(alignment: .leading){
-                                Text(order.orderNumber)
-                                    .font(.system(size: 14))
-                                
+                            Spacer()
                                 Text(statusText(order.orderStatus))
                                     .font(.system(size: 13, weight: .semibold))
                                     .padding(.horizontal, 10)
@@ -53,7 +47,6 @@ struct OrderDetailView: View {
                                     .background(statusBdColor(order.orderStatus))
                                     .foregroundColor(statusColor(order.orderStatus))
                                     .cornerRadius(12)
-                            }.padding(.leading)
                         }
                         
                     }
@@ -63,7 +56,23 @@ struct OrderDetailView: View {
                     .cornerRadius(16)
                     .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
 
-
+                    // 승인 반려인 경우에만 반려메세지 칸 생성
+                    if order.orderStatus == "REJECTED" {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("반려 메세지")
+                                .font(.system(size: 15, weight: .semibold))
+                                .padding(.bottom, 4)
+                            Text(order.rejectedMessage ?? "-")
+                                .font(.system(size: 14))
+                            
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
+                        .padding(.all, 20)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
+                    }
+                    
                     // ✅ 배송 정보
                     VStack(alignment: .leading, spacing: 6) {
                         Text("배송정보")
@@ -83,15 +92,30 @@ struct OrderDetailView: View {
                             return "-"
                         }()
                         infoRow("운송장번호", trackingText)
-                        
-                        infoRow("요청사항", order.etc ?? "")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
                     .padding(.all, 20)
                     .background(Color.white)
                     .cornerRadius(16)
                     .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
-
+                    
+                    
+                    // 요청사항 따로 빼기
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("요청사항")
+                            .font(.system(size: 15, weight: .semibold))
+                            .padding(.bottom, 4)
+                            
+                        Text(order.etc ?? "")
+                            .font(.system(size: 14))
+                        
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
+                    .padding(.all, 20)
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
+                   
                     
                     // ✅ 주문 상품
                     OrderSectionCard {

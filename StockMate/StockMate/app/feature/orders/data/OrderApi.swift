@@ -104,12 +104,25 @@ struct OrderItems: Encodable {
 }
 
 // Response
+//struct OrderCreateResponseData: Decodable {
+//    let orderId: Int
+//    let orderNumber: String
+//    let totalPrice: Int
+//    let orderStatus: String
+//}
+
 struct OrderCreateResponseData: Decodable {
     let orderId: Int
     let orderNumber: String
     let totalPrice: Int
-    let orderStatus: String
+    let paymentType: String // ✅ 서버 필드와 맞춤
 }
+
+// ✅ 입고 처리 요청 API
+struct ReceiveOrderRequest: Encodable {
+    let orderNumber: String
+}
+
 
 
 // MARK: - API Call
@@ -164,5 +177,15 @@ enum OrderApi {
         return ApiClient.shared.request(url, method: .put)
             .validate() // ✅ 서버 상태코드 확인
     }
-
+    
+    // ✅ 입고 처리 API
+    static func receiveOrder(_ requestBody: ReceiveOrderRequest) -> DataRequest {
+        let url = ApiClient.baseURL + "api/v1/order/receive"
+        return ApiClient.shared.request(
+            url,
+            method: .post,
+            parameters: requestBody,
+            encoder: JSONParameterEncoder.default
+        )
+    }
 }

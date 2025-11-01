@@ -78,6 +78,35 @@ final class OrderViewModel: ObservableObject {
         }
         isLoading = false
     }
+    
+    func receiveOrder(orderNumber: String) async -> AppResult<String> {
+        isLoading = true
+        defer { isLoading = false }
+
+        let result = await repository.receiveOrder(orderNumber: orderNumber)
+        switch result {
+        case .success(let message):
+            print("✅ 입고 처리 성공:", message)
+            await loadOrders()
+            return .success(message)
+        case .failure(let error):
+            errorMessage = error.message
+            return .failure(error)
+        }
+    }
 
 
+//    func receiveOrder(orderNumber: String) async {
+//        isLoading = true
+//        defer { isLoading = false }
+//        
+//        let result = await repository.receiveOrder(orderNumber: orderNumber)
+//        switch result {
+//        case .success(let message):
+//            print("✅ 입고 처리 성공:", message)
+//            await loadOrders() // 리스트 갱신
+//        case .failure(let error):
+//            errorMessage = error.message
+//        }
+//    }
 }
