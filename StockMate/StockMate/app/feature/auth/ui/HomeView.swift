@@ -12,7 +12,12 @@ struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var userViewModel = UserViewModel()
     @StateObject private var inventoryViewModel = InventoryViewModel()
+    @StateObject private var dashboardViewModel = DashboardViewModel()
     
+    @State private var selectedMonth: String? = nil  // ✅ 추가
+//    @State private var selectedMonthIndex: Int? = nil
+
+
     var body: some View {
         ScrollView {
              VStack(alignment: .leading, spacing: 15) {
@@ -88,19 +93,29 @@ struct HomeView: View {
                  .cornerRadius(16)
                  .padding(.horizontal)
                  
-                 
-                 
                  // 막대그래프 섹션
                  VStack(alignment: .leading, spacing: 8) {
-                     Text("지출 현황")
+                     Text("원간 지출 현황")
                          .font(.headline)
                          .padding(4)
                      
-                     BarChartView()
-                         .frame(height: 150)
-//                         .padding()
+                     if dashboardViewModel.isLoading {
+                         ProgressView("데이터 불러오는 중...")
+                             .frame(height: 150)
+                     } else if dashboardViewModel.monthlySpendings.isEmpty {
+                         Text("최근 지출 내역이 없습니다.")
+                             .foregroundColor(.gray)
+                             .frame(height: 150)
+                     } else {
+                         BarChartView(
+                             values: dashboardViewModel.spendingRatios,
+                             labels: dashboardViewModel.monthLabels,
+                             amounts: dashboardViewModel.monthlySpendings.map { $0.totalAmount }, selectedMonth: $selectedMonth
+                         )
+                         .frame(height: 200)
                          .background(Color.white)
-                         .shadow(color: .gray.opacity(0.1), radius: 4)
+                         .cornerRadius(16)
+                     }
                  }
                  .padding()
                  .background(Color.white)
@@ -113,6 +128,7 @@ struct HomeView: View {
         .task {
             // 카테고리 데이터 로드
             await inventoryViewModel.loadLackCountByCategory()
+            await dashboardViewModel.fetchMonthlySpending() // ✅ 추가
         }
         .onAppear {
             Task { await userViewModel.loadUserInfo() }
@@ -234,23 +250,6 @@ struct DonutChartView: View {
     }
 }
 
-// MARK: - 막대그래프 (더미)
-struct BarChartView: View {
-    let values: [CGFloat] = [0.89, 0.5, 0.9, 0.3, 0.7]
-    let colors: [Color] = [
-        .LightBlue04, .Primary, .LightBlue04, .LightBlue04, .LightBlue04
-    ]
-    var body: some View {
-        HStack(alignment: .bottom, spacing: 33) {
-            ForEach(0..<values.count, id: \.self) { i in
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(colors[i])
-                    .frame(width: 30, height: 170 * values[i])
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
 
 #Preview {
     HomeView()
