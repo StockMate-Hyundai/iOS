@@ -27,9 +27,6 @@ struct OrderListView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     // 날짜별로 그룹화 (최신순)
-//                    let groupedOrders = Dictionary(grouping: orderViewModel.orders) { order in
-//                        order.createdAt.split(separator: "T").first ?? ""
-//                    }
                     let groupedOrders = Dictionary(grouping: orderViewModel.orders) { order in
                         order.createdAt.split(separator: "T").first.map(String.init) ?? ""
                     }
