@@ -86,7 +86,7 @@ struct InOutHistoryCard: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(firstItem.korName)
-                            .font(.headline)
+                            .font(.system(size: 15))
                             .lineLimit(1)
                         if history.items.count > 1 {
                             Text("외 \(history.items.count - 1)개 품목")
@@ -96,6 +96,8 @@ struct InOutHistoryCard: View {
                     }
                 }
             }
+            
+            Spacer()
             
           // 입출고 상태
             Text(statusText(history.status))

@@ -103,14 +103,6 @@ struct OrderItems: Encodable {
     let amount: Int
 }
 
-// Response
-//struct OrderCreateResponseData: Decodable {
-//    let orderId: Int
-//    let orderNumber: String
-//    let totalPrice: Int
-//    let orderStatus: String
-//}
-
 struct OrderCreateResponseData: Decodable {
     let orderId: Int
     let orderNumber: String

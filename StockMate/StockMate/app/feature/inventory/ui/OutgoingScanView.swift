@@ -92,12 +92,43 @@ struct OutgoingScanView: View {
     }
 
     // ✅ 스캔된 코드로 출고 API 호출
+//    private func handleScannedCode(_ code: String) async {
+//        await MainActor.run {
+//            partViewModel.isLoading = true
+//        }
+//
+//        let request = [ReleaseItemRequest(partCode: code, quantity: 1)] // 기본 1개로 설정
+//        let result = await partViewModel.releaseParts(items: request)
+//
+//        await MainActor.run {
+//            partViewModel.isLoading = false
+//            switch result {
+//            case .success(let message):
+//                alertMessage = message
+//            case .failure(let error):
+//                alertMessage = error.message
+//            }
+//            showAlert = true
+//        }
+//    }
+    // ✅ 스캔된 코드로 출고 API 호출
     private func handleScannedCode(_ code: String) async {
         await MainActor.run {
             partViewModel.isLoading = true
         }
 
-        let request = [ReleaseItemRequest(partCode: code, quantity: 1)] // 기본 1개로 설정
+        // ✅ 문자열 → Int 변환 (QR 코드가 숫자 아닐 경우 예외 처리)
+        guard let partId = Int(code) else {
+            await MainActor.run {
+                partViewModel.isLoading = false
+                alertMessage = "잘못된 QR 코드입니다. (숫자형 ID가 아닙니다)"
+                showAlert = true
+            }
+            return
+        }
+
+        // ✅ 요청 생성 및 API 호출
+        let request = [ReleaseItemRequest(partId: partId, quantity: 1)] // 기본 1개 사용
         let result = await partViewModel.releaseParts(items: request)
 
         await MainActor.run {
@@ -111,6 +142,7 @@ struct OutgoingScanView: View {
             showAlert = true
         }
     }
+
 }
 
 #Preview {

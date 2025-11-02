@@ -9,9 +9,9 @@
 import Foundation
 import Alamofire
 
-// ✅ 요청 모델
+// ✅ 요청 모델 (partCode → partId 로 변경)
 struct ReleaseItemRequest: Encodable {
-    let partCode: String
+    let partId: Int
     let quantity: Int
 }
 
@@ -20,7 +20,9 @@ enum PartApi {
     static func releaseParts(items: [ReleaseItemRequest]) -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/store/release"
         let body: [String: Any] = [
-            "items": items.map { ["partCode": $0.partCode, "quantity": $0.quantity] }
+//            "items": items.map { ["partId": $0.partId, "quantity": $0.quantity] }
+            "items": items.map { ["partId": $0.partId, "quantity": $0.quantity] }
+
         ]
         return ApiClient.shared.request(
             url,

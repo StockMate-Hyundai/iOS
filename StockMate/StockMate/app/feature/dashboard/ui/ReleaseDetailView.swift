@@ -69,11 +69,11 @@ struct ReleasePartCard: View {
                         .font(.system(size: 14, weight: .bold))
                         .lineLimit(1)
 
-                    Text("\(part.model) / \(part.trim) / \(part.price)원 / \(part.amount)개")
+                    Text("\(part.model) / \(part.trim) / \(part.price)원 / \(part.historyQuantity)개")
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
                     
-                    Text("\(part.price * part.amount)원")
+                    Text("\(part.price * part.historyQuantity)원")
                         .font(.system(size: 12))
                         .foregroundColor(.black)
                 }
