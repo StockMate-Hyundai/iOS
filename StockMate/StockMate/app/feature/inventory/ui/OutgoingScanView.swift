@@ -92,26 +92,6 @@ struct OutgoingScanView: View {
     }
 
     // ✅ 스캔된 코드로 출고 API 호출
-//    private func handleScannedCode(_ code: String) async {
-//        await MainActor.run {
-//            partViewModel.isLoading = true
-//        }
-//
-//        let request = [ReleaseItemRequest(partCode: code, quantity: 1)] // 기본 1개로 설정
-//        let result = await partViewModel.releaseParts(items: request)
-//
-//        await MainActor.run {
-//            partViewModel.isLoading = false
-//            switch result {
-//            case .success(let message):
-//                alertMessage = message
-//            case .failure(let error):
-//                alertMessage = error.message
-//            }
-//            showAlert = true
-//        }
-//    }
-    // ✅ 스캔된 코드로 출고 API 호출
     private func handleScannedCode(_ code: String) async {
         await MainActor.run {
             partViewModel.isLoading = true
