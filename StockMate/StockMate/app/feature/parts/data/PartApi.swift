@@ -15,8 +15,7 @@ struct ReleaseItemRequest: Encodable {
     let quantity: Int
 }
 
-// ✅ 부품 상세 정보 모델
-struct PartDetailResponse: Decodable {
+struct PartDetailResponse: Decodable, Identifiable {
     let id: Int
     let name: String
     let price: Int
@@ -31,6 +30,18 @@ struct PartDetailResponse: Decodable {
     let code: String
     let location: String
     let cost: Int
+}
+
+// 사용처리 임시 값
+struct PartDetail: Identifiable, Equatable {
+    let id: Int
+    let price: Int
+    let image: String
+    let trim: String
+    let model: String
+    let korName: String
+    let categoryName: String
+    var quantity: Int = 1
 }
 
 
@@ -50,18 +61,17 @@ enum PartApi {
             encoding: JSONEncoding.default
         )
     }
-    
+  
     // ✅ 부품 상세 조회 API
-      static func fetchPartDetail(partId: Int) -> DataRequest {
-          let url = ApiClient.baseURL + "api/v1/parts/detail"
-          let body: [String: Any] = ["partId": partId]
-
-          return ApiClient.shared.request(
-              url,
-              method: .post,
-              parameters: body,
-              encoding: JSONEncoding.default
-          )
-      }
-    
+    static func fetchPartDetail(partIds: [Int]) -> DataRequest {
+        let url = ApiClient.baseURL + "api/v1/parts/detail"
+        
+        // ✅ 요청 본문은 단순 배열 형태이므로 parameters 사용 X, 직접 body에 encode
+        return ApiClient.shared.request(
+            url,
+            method: .post,
+            parameters: partIds,
+            encoder: JSONParameterEncoder.default
+        )
+    }
 }

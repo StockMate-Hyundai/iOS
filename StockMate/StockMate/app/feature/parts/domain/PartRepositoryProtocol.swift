@@ -9,5 +9,5 @@ import Foundation
 
 protocol PartRepositoryProtocol {
     func releaseParts(items: [ReleaseItemRequest]) async -> AppResult<ApiResponse<String>>
-    func fetchPartDetail(partId: Int) async -> AppResult<ApiResponse<[PartDetailResponse]>>
+    func fetchPartDetail(partIds: [Int]) async -> AppResult<ApiResponse<[PartDetailResponse]>>
 }

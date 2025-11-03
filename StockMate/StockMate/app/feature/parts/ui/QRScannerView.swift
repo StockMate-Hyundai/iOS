@@ -16,8 +16,14 @@ struct QRScannerView: UIViewControllerRepresentable {
         return controller
     }
 
-    func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {}
-
+//    func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {
+        // ✅ scannedCode가 nil이면 다시 스캔 시작
+        if scannedCode == nil {
+            uiViewController.startScanning()
+        }
+    }
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }

@@ -47,13 +47,6 @@ struct CartCard: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.black)
 
-//                    Text("\(item.trim) / \(item.model)")
-//                        .font(.system(size: 13))
-//                        .foregroundColor(.gray)
-//
-//                    Text("\(item.price)원")
-//                        .font(.system(size: 13, weight: .semibold))
-//                        .foregroundColor(.black)
                 }
 
                 Spacer()

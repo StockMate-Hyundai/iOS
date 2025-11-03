@@ -14,9 +14,9 @@ final class PartRepositoryImpl: PartRepositoryProtocol {
         return await safeApi(dataReq, decodeTo: ApiResponse<String>.self)
     }
     
-    // ✅ 부품 상세 조회 API
-    func fetchPartDetail(partId: Int) async -> AppResult<ApiResponse<[PartDetailResponse]>> {
-        let dataReq = PartApi.fetchPartDetail(partId: partId)
+    func fetchPartDetail(partIds: [Int]) async -> AppResult<ApiResponse<[PartDetailResponse]>> {
+        let dataReq = PartApi.fetchPartDetail(partIds: partIds)
         return await safeApi(dataReq, decodeTo: ApiResponse<[PartDetailResponse]>.self)
     }
+
 }

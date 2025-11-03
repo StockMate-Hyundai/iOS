@@ -15,59 +15,16 @@ final class PartViewModel: ObservableObject {
     @Published var shouldGoToLogin = false
     
     
-    // ✅ 임시 저장 리스트
-    @Published var selectedParts: [PartDetailResponse] = []
-    @Published var quantities: [Int: Int] = [:]  // partId별 수량 관리
+    @Published var partDetails: [PartDetailResponse] = []
     
+    @Published var quantities: [Int: Int] = [:]  // partId별 수량 관리
     
     private let repo: PartRepositoryProtocol
     
     init(repo: PartRepositoryProtocol = PartRepositoryImpl()) {
         self.repo = repo
     }
-    
-    // ✅ 부품 상세 조회 (QR 스캔 후)
-    func fetchPartDetail(partId: Int) async {
-        isLoading = true
-        defer { isLoading = false }
 
-        let result = await repo.fetchPartDetail(partId: partId)
-        switch result {
-        case .success(let apiResp):
-            if let detail = apiResp.data?.first {
-                if !selectedParts.contains(where: { $0.id == detail.id }) {
-                    selectedParts.append(detail)
-                    quantities[detail.id] = 1
-                } else {
-                    quantities[detail.id, default: 1] += 1
-                }
-            }
-        case .failure(let error):
-            message = error.message
-        }
-    }
-
-    func increaseQuantity(for partId: Int) {
-        quantities[partId, default: 1] += 1
-    }
-
-    func decreaseQuantity(for partId: Int) {
-        quantities[partId] = max(1, (quantities[partId] ?? 1) - 1)
-    }
-
-    func removePart(partId: Int) {
-        selectedParts.removeAll { $0.id == partId }
-        quantities.removeValue(forKey: partId)
-    }
-
-    func makeReleasePayload() -> [ReleaseItemRequest] {
-        selectedParts.map { part in
-            ReleaseItemRequest(partId: part.id, quantity: quantities[part.id] ?? 1)
-        }
-    }
-    
-    
-    
     func releaseParts(items: [ReleaseItemRequest]) async -> AppResult<String> {
         isLoading = true
         defer { isLoading = false }
@@ -87,6 +44,26 @@ final class PartViewModel: ObservableObject {
                 shouldGoToLogin = true
             }
             return .failure(err)
+        }
+    }
+    
+    func fetchPartDetail(partId: Int) async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        let result = await repo.fetchPartDetail(partIds: [partId])
+        switch result {
+        case .success(let apiResp):
+            if apiResp.success, let data = apiResp.data {
+                partDetails = data
+                print("✅ 부품 상세 조회 성공:", data)
+            } else {
+                message = apiResp.message
+                print("⚠️ 서버 응답 실패:", apiResp.message)
+            }
+        case .failure(let err):
+            message = err.message
+            print("❌ 네트워크 오류:", err)
         }
     }
     
