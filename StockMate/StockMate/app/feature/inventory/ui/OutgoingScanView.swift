@@ -105,9 +105,14 @@ struct OutgoingScanView: View {
                        onAddPart: {
                            // ✅ 부품 추가 버튼 액션
                            partStore.addPart(part)
+                           
+                           // ✅ UI가 업데이트될 시간을 준 후 스캐너 리셋
+                               DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                   resetScanState()
+                               }
 
                            // ✅ 상태 초기화 (QR 다시 가능하도록)
-                           resetScanState()
+//                           resetScanState()
                        },
                        onUseParts: {
                            // ✅ 사용 처리 버튼 액션 (예: 서버 전송)
@@ -261,7 +266,7 @@ struct OutgoingScanView: View {
         scannedCode = nil
         partDetail = nil
         showBottomSheet = false
-        partViewModel.partDetails.removeAll()
+//        partViewModel.partDetails.removeAll()
         
         // ✅ 카메라 세션 재시작
         scannerRestartTrigger.toggle()

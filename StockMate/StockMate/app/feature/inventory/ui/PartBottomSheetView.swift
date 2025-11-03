@@ -24,179 +24,91 @@ struct PartBottomSheetView: View {
     var body: some View {
         VStack(spacing: 16) {
             
-            // MARK: - 방금 스캔한 부품 미리보기 (추가 전)
+            // ✅ 방금 스캔한 부품 미리보기
             HStack(spacing: 12) {
                 AsyncImage(url: URL(string: part.image)) { phase in
                     switch phase {
-                    case .success(let img):
-                        img.resizable().scaledToFill()
-                    default:
-                        Color.gray.opacity(0.3)
+                    case .success(let img): img.resizable().scaledToFill()
+                    default: Color.gray.opacity(0.3)
                     }
                 }
                 .frame(width: 48, height: 48)
-                .clipped()
                 .cornerRadius(6)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(part.korName)
-                        .font(.subheadline)
+                    Text(part.korName).font(.subheadline)
                     Text("\(part.model) / \(part.trim)")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                    Text("\(part.price) 원")
-                        .font(.subheadline)
+                        .font(.caption).foregroundColor(.gray)
+                    Text("\(part.price) 원").font(.subheadline)
                 }
 
                 Spacer()
-                
-                // ✅ 수정된 수량 조절 구역
+
                 HStack(spacing: 8) {
-                    Button(action: {
-                        if quantity > 1 { quantity -= 1 }
-                    }) {
+                    Button(action: { if quantity > 1 { quantity -= 1 } }) {
                         Image(systemName: "minus.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.blue)
+                            .font(.title2).foregroundColor(.blue)
                     }
-
-                    Text("\(quantity)")
-                        .font(.body)
-                        .frame(width: 44, alignment: .center)
-
-                    Button(action: {
-                        quantity += 1
-                    }) {
+                    Text("\(quantity)").frame(width: 44)
+                    Button(action: { quantity += 1 }) {
                         Image(systemName: "plus.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.blue)
+                            .font(.title2).foregroundColor(.blue)
                     }
-
-                    Spacer()
                 }
-                .padding(.horizontal)
             }
             .padding(.horizontal)
-            .padding()
+            .padding(.vertical, 8)
 
-            
-
+            // ✅ 현재까지 누적된 부품 리스트
             List {
-                ForEach(partStore.parts.indices, id: \.self) { idx in
-                    let p = partStore.parts[idx]
+                ForEach(partStore.parts) { p in
                     HStack {
                         AsyncImage(url: URL(string: p.image)) { phase in
                             switch phase {
-                            case .success(let img):
-                                img.resizable().scaledToFill()
-                            default:
-                                Color.gray.opacity(0.3)
+                            case .success(let img): img.resizable().scaledToFill()
+                            default: Color.gray.opacity(0.3)
                             }
                         }
                         .frame(width: 48, height: 48)
-                        .clipped()
                         .cornerRadius(6)
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(p.korName)
-                                .font(.subheadline)
+                            Text(p.korName).font(.subheadline)
                             Text("\(p.model) / \(p.trim)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                            Text("\(p.price) 원")
-                                .font(.subheadline)
+                                .font(.caption).foregroundColor(.gray)
                         }
 
                         Spacer()
 
-                        // ✅ 명확한 수량 표시 + +/- 버튼 (Stepper 대신 커스텀 컨트롤)
                         HStack(spacing: 8) {
-                            Button {
-                                let newQty = max(1, p.quantity - 1)
-                                partStore.updateQuantity(for: p.id, to: newQty)
-                            } label: {
-                                Image(systemName: "minus.circle")
-                                    .font(.title2)
+                            Button { partStore.updateQuantity(for: p.id, to: max(1, p.quantity - 1)) } label: {
+                                Image(systemName: "minus.circle").font(.title2)
                             }
-
-                            Text("\(p.quantity)")
-                                .font(.body)
-                                .frame(width: 44, alignment: .center)
-
-                            Button {
-                                let newQty = p.quantity + 1
-                                partStore.updateQuantity(for: p.id, to: newQty)
-                            } label: {
-                                Image(systemName: "plus.circle")
-                                    .font(.title2)
+                            Text("\(p.quantity)").frame(width: 44)
+                            Button { partStore.updateQuantity(for: p.id, to: p.quantity + 1) } label: {
+                                Image(systemName: "plus.circle").font(.title2)
                             }
                         }
-                        .buttonStyle(.plain)
                         .foregroundColor(.blue)
                     }
-                    .padding()
+                    .padding(.vertical, 4)
                 }
                 .onDelete { idxs in
-                    idxs.forEach { i in
-                        let id = partStore.parts[i].id
-                        partStore.removePart(id)
-                    }
+                    idxs.forEach { partStore.removePart(partStore.parts[$0].id) }
                 }
             }
             .frame(maxHeight: 240)
             .listStyle(.plain)
-//            List {
-//                ForEach(partStore.parts) { p in
-//                    HStack {
-//                        AsyncImage(url: URL(string: p.image)) { phase in
-//                            switch phase {
-//                            case .success(let img):
-//                                img.resizable().scaledToFill()
-//                            default:
-//                                Color.gray.opacity(0.3)
-//                            }
-//                        }
-//                        .frame(width: 48, height: 48)
-//                        .clipped()
-//                        .cornerRadius(6)
-//
-//                        VStack(alignment: .leading, spacing: 4) {
-//                            Text(p.korName)
-//                                .font(.subheadline)
-//                            Text("\(p.model) / \(p.trim)")
-//                                .font(.caption)
-//                                .foregroundColor(.gray)
-//                        }
-//
-//                        Spacer()
-//
-//                        Stepper("", value: Binding(
-//                            get: { p.quantity },
-//                            set: { newVal in partStore.updateQuantity(for: p.id, to: newVal) }
-//                        ), in: 1...999)
-//                        .labelsHidden()
-//                    }
-//                    .padding(.vertical, 6)
-//                }
-//                .onDelete { idxs in
-//                    idxs.forEach { i in
-//                        let id = partStore.parts[i].id
-//                        partStore.removePart(id)
-//                    }
-//                }
-//            }
-//            .frame(maxHeight: 240)
-//            .listStyle(.plain)
 
             Spacer()
 
-            // — 하단 버튼 —
+            // ✅ 하단 버튼
             HStack(spacing: 12) {
                 Button {
                     var newPart = part
                     newPart.quantity = quantity
                     partStore.addPart(newPart)
-                    onAddPart()
+//                    onAddPart()  // QR 다시 준비
                     dismiss()
                 } label: {
                     Text("부품 추가")
@@ -225,19 +137,16 @@ struct PartBottomSheetView: View {
             .padding(.bottom, 8)
         }
         .presentationDetents([.medium, .large])
-        .onAppear {
-            quantity = part.quantity
-        }
+        .onAppear { quantity = part.quantity }
         .alert("알림", isPresented: $showAlert) {
             Button("확인") {}
-        } message: {
-            Text(alertMessage)
-        }
+        } message: { Text(alertMessage) }
     }
 
     private func handleUseNow() async {
         await MainActor.run { isProcessing = true }
 
+        // ✅ 현재 부품이 아직 store에 없으면 추가
         if !partStore.parts.contains(where: { $0.id == part.id }) {
             var newPart = part
             newPart.quantity = quantity
@@ -265,6 +174,267 @@ struct PartBottomSheetView: View {
         }
     }
 }
+
+//import SwiftUI
+//
+//struct PartBottomSheetView: View {
+//    @EnvironmentObject var partStore: PartStore
+//    @Environment(\.dismiss) private var dismiss
+//    @StateObject private var partViewModel = PartViewModel()
+//
+//    let part: PartDetail
+//    let onAddPart: () -> Void
+//    let onUseParts: () -> Void
+//
+//    @State private var quantity: Int = 1
+//    @State private var isProcessing = false
+//    @State private var showAlert = false
+//    @State private var alertMessage = ""
+//
+//    var body: some View {
+//        VStack(spacing: 16) {
+//            
+//            // MARK: - 방금 스캔한 부품 미리보기 (추가 전)
+//            HStack(spacing: 12) {
+//                AsyncImage(url: URL(string: part.image)) { phase in
+//                    switch phase {
+//                    case .success(let img):
+//                        img.resizable().scaledToFill()
+//                    default:
+//                        Color.gray.opacity(0.3)
+//                    }
+//                }
+//                .frame(width: 48, height: 48)
+//                .clipped()
+//                .cornerRadius(6)
+//
+//                VStack(alignment: .leading, spacing: 4) {
+//                    Text(part.korName)
+//                        .font(.subheadline)
+//                    Text("\(part.model) / \(part.trim)")
+//                        .font(.caption)
+//                        .foregroundColor(.gray)
+//                    Text("\(part.price) 원")
+//                        .font(.subheadline)
+//                }
+//
+//                Spacer()
+//                
+//                // ✅ 수정된 수량 조절 구역
+//                HStack(spacing: 8) {
+//                    Button(action: {
+//                        if quantity > 1 { quantity -= 1 }
+//                    }) {
+//                        Image(systemName: "minus.circle.fill")
+//                            .font(.title2)
+//                            .foregroundColor(.blue)
+//                    }
+//
+//                    Text("\(quantity)")
+//                        .font(.body)
+//                        .frame(width: 44, alignment: .center)
+//
+//                    Button(action: {
+//                        quantity += 1
+//                    }) {
+//                        Image(systemName: "plus.circle.fill")
+//                            .font(.title2)
+//                            .foregroundColor(.blue)
+//                    }
+//
+//                    Spacer()
+//                }
+//                .padding(.horizontal)
+//            }
+//            .padding(.horizontal)
+//            .padding()
+//
+//            
+//
+//            List {
+//                ForEach(partStore.parts.indices, id: \.self) { idx in
+//                    let p = partStore.parts[idx]
+//                    HStack {
+//                        AsyncImage(url: URL(string: p.image)) { phase in
+//                            switch phase {
+//                            case .success(let img):
+//                                img.resizable().scaledToFill()
+//                            default:
+//                                Color.gray.opacity(0.3)
+//                            }
+//                        }
+//                        .frame(width: 48, height: 48)
+//                        .clipped()
+//                        .cornerRadius(6)
+//
+//                        VStack(alignment: .leading, spacing: 4) {
+//                            Text(p.korName)
+//                                .font(.subheadline)
+//                            Text("\(p.model) / \(p.trim)")
+//                                .font(.caption)
+//                                .foregroundColor(.gray)
+//                            Text("\(p.price) 원")
+//                                .font(.subheadline)
+//                        }
+//
+//                        Spacer()
+//
+//                        // ✅ 명확한 수량 표시 + +/- 버튼 (Stepper 대신 커스텀 컨트롤)
+//                        HStack(spacing: 8) {
+//                            Button {
+//                                let newQty = max(1, p.quantity - 1)
+//                                partStore.updateQuantity(for: p.id, to: newQty)
+//                            } label: {
+//                                Image(systemName: "minus.circle")
+//                                    .font(.title2)
+//                            }
+//
+//                            Text("\(p.quantity)")
+//                                .font(.body)
+//                                .frame(width: 44, alignment: .center)
+//
+//                            Button {
+//                                let newQty = p.quantity + 1
+//                                partStore.updateQuantity(for: p.id, to: newQty)
+//                            } label: {
+//                                Image(systemName: "plus.circle")
+//                                    .font(.title2)
+//                            }
+//                        }
+//                        .buttonStyle(.plain)
+//                        .foregroundColor(.blue)
+//                    }
+//                    .padding()
+//                }
+//                .onDelete { idxs in
+//                    idxs.forEach { i in
+//                        let id = partStore.parts[i].id
+//                        partStore.removePart(id)
+//                    }
+//                }
+//            }
+//            .frame(maxHeight: 240)
+//            .listStyle(.plain)
+////            List {
+////                ForEach(partStore.parts) { p in
+////                    HStack {
+////                        AsyncImage(url: URL(string: p.image)) { phase in
+////                            switch phase {
+////                            case .success(let img):
+////                                img.resizable().scaledToFill()
+////                            default:
+////                                Color.gray.opacity(0.3)
+////                            }
+////                        }
+////                        .frame(width: 48, height: 48)
+////                        .clipped()
+////                        .cornerRadius(6)
+////
+////                        VStack(alignment: .leading, spacing: 4) {
+////                            Text(p.korName)
+////                                .font(.subheadline)
+////                            Text("\(p.model) / \(p.trim)")
+////                                .font(.caption)
+////                                .foregroundColor(.gray)
+////                        }
+////
+////                        Spacer()
+////
+////                        Stepper("", value: Binding(
+////                            get: { p.quantity },
+////                            set: { newVal in partStore.updateQuantity(for: p.id, to: newVal) }
+////                        ), in: 1...999)
+////                        .labelsHidden()
+////                    }
+////                    .padding(.vertical, 6)
+////                }
+////                .onDelete { idxs in
+////                    idxs.forEach { i in
+////                        let id = partStore.parts[i].id
+////                        partStore.removePart(id)
+////                    }
+////                }
+////            }
+////            .frame(maxHeight: 240)
+////            .listStyle(.plain)
+//
+//            Spacer()
+//
+//            // — 하단 버튼 —
+//            HStack(spacing: 12) {
+//                Button {
+//                    var newPart = part
+//                    newPart.quantity = quantity
+//                    partStore.addPart(newPart)
+//                    onAddPart()
+//                    dismiss()
+//                } label: {
+//                    Text("부품 추가")
+//                        .frame(maxWidth: .infinity)
+//                        .padding(.vertical, 12)
+//                }
+//                .buttonStyle(.borderedProminent)
+//
+//                Button {
+//                    Task { await handleUseNow() }
+//                } label: {
+//                    if isProcessing {
+//                        ProgressView()
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.vertical, 12)
+//                    } else {
+//                        Text("사용 처리")
+//                            .frame(maxWidth: .infinity)
+//                            .padding(.vertical, 12)
+//                    }
+//                }
+//                .buttonStyle(.bordered)
+//                .disabled(isProcessing)
+//            }
+//            .padding(.horizontal)
+//            .padding(.bottom, 8)
+//        }
+//        .presentationDetents([.medium, .large])
+//        .onAppear {
+//            quantity = part.quantity
+//        }
+//        .alert("알림", isPresented: $showAlert) {
+//            Button("확인") {}
+//        } message: {
+//            Text(alertMessage)
+//        }
+//    }
+//
+//    private func handleUseNow() async {
+//        await MainActor.run { isProcessing = true }
+//
+//        if !partStore.parts.contains(where: { $0.id == part.id }) {
+//            var newPart = part
+//            newPart.quantity = quantity
+//            partStore.addPart(newPart)
+//        } else {
+//            partStore.updateQuantity(for: part.id, to: quantity)
+//        }
+//
+//        let items = partStore.parts.map { ReleaseItemRequest(partId: $0.id, quantity: $0.quantity) }
+//        let result = await partViewModel.releaseParts(items: items)
+//
+//        await MainActor.run {
+//            isProcessing = false
+//            switch result {
+//            case .success(let msg):
+//                alertMessage = msg
+//                showAlert = true
+//                partStore.clear()
+//                onUseParts()
+//                dismiss()
+//            case .failure(let err):
+//                alertMessage = err.message
+//                showAlert = true
+//            }
+//        }
+//    }
+//}
 //struct PartBottomSheetView: View {
 //    @EnvironmentObject var partStore: PartStore
 //    @Environment(\.dismiss) private var dismiss

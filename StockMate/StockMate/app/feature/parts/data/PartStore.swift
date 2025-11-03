@@ -14,9 +14,13 @@ final class PartStore: ObservableObject {
     func addPart(_ part: PartDetail) {
         if let index = parts.firstIndex(where: { $0.id == part.id }) {
             // 이미 있으면 수량만 1 증가
-            parts[index].quantity += 1
+//            parts[index].quantity += 1
         } else {
-            parts.append(part)
+            // ✅ 반드시 새로운 복사본 append
+            var newPart = part
+            newPart.quantity = 1
+            parts.append(newPart)
+//            parts.append(part)
         }
     }
 
