@@ -23,6 +23,12 @@ struct MonthlySpending: Decodable, Identifiable {
     let totalAmount: Int
 }
 
+struct CategorySpending: Decodable, Identifiable {
+    var id: String { categoryName }
+    let categoryName: String
+    let totalAmount: Int
+}
+
 
 enum PaymentApi {
     // 예치금 조회
@@ -48,6 +54,13 @@ enum PaymentApi {
     // ✅ 최근 5개월 소비 내역 조회
     static func getMonthlySpending() -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/payment/monthly-spending"
+        return ApiClient.shared.request(url, method: .get)
+    }
+    
+    
+    // ✅ 지난달 카테고리별 지출금액 조회
+    static func getCategorySpending() -> DataRequest {
+        let url = ApiClient.baseURL + "api/v1/order/category-spend"
         return ApiClient.shared.request(url, method: .get)
     }
 }

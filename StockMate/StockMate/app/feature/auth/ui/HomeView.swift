@@ -12,7 +12,8 @@ struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var userViewModel = UserViewModel()
     @StateObject private var inventoryViewModel = InventoryViewModel()
-    @StateObject private var dashboardViewModel = DashboardViewModel()
+    @EnvironmentObject var dashboardViewModel: DashboardViewModel
+//    @StateObject private var dashboardViewModel = DashboardViewModel()
     
     @State private var selectedMonth: String? = nil  // ✅ 추가
 //    @State private var selectedMonthIndex: Int? = nil
@@ -70,20 +71,29 @@ struct HomeView: View {
                  
                  lackStockSection
                  
-                 
                  // 도넛 차트 섹션
                  VStack(alignment: .leading, spacing: 18) {
                      Text("지난달 카테고리 별 지출")
                          .font(.headline)
                          .padding(4)
                      
-                     HStack{
-                         DonutChartView()
-                             .frame(height: 130)
-                             .padding()
-                             .background(Color.white)
-                             .cornerRadius(16)
-                             .shadow(color: .gray.opacity(0.1), radius: 4)
+                     HStack {
+                         if dashboardViewModel.isLoading {
+                             ProgressView("불러오는 중...")
+                                 .frame(height: 130)
+//                         } else if dashboardViewModel.categorySpendings.isEmpty {
+//                             Text("최근 지출 내역이 없습니다.")
+//                                 .foregroundColor(.gray)
+//                                 .frame(height: 150)
+                         } else {
+                             DonutChartView(data: dashboardViewModel.categorySpendings)
+                             
+                                 .frame(height: 180)
+                                 .padding()
+                                 .background(Color.white)
+                                 .cornerRadius(16)
+                                 .shadow(color: .gray.opacity(0.1), radius: 4)
+                         }
                          
                          Spacer()
                      }
@@ -92,10 +102,11 @@ struct HomeView: View {
                  .background(Color.white)
                  .cornerRadius(16)
                  .padding(.horizontal)
+
                  
                  // 막대그래프 섹션
                  VStack(alignment: .leading, spacing: 8) {
-                     Text("원간 지출 현황")
+                     Text("월간 지출 현황")
                          .font(.headline)
                          .padding(4)
                      
@@ -112,7 +123,7 @@ struct HomeView: View {
                              labels: dashboardViewModel.monthLabels,
                              amounts: dashboardViewModel.monthlySpendings.map { $0.totalAmount }, selectedMonth: $selectedMonth
                          )
-                         .frame(height: 200)
+                         .frame(height: 220)
                          .background(Color.white)
                          .cornerRadius(16)
                      }
@@ -122,13 +133,14 @@ struct HomeView: View {
                  .cornerRadius(16)
                  .padding(.horizontal)
              }
-             .padding(.vertical)
+             .padding(.vertical,5)
          }
         .background(Color.Light)
         .task {
             // 카테고리 데이터 로드
             await inventoryViewModel.loadLackCountByCategory()
             await dashboardViewModel.fetchMonthlySpending() // ✅ 추가
+            await dashboardViewModel.fetchCategorySpending() // ✅ 추가
         }
         .onAppear {
             Task { await userViewModel.loadUserInfo() }
@@ -228,29 +240,23 @@ struct StatusItem: View {
     }
 }
 
-// MARK: - 도넛 차트 (더미)
-struct DonutChartView: View {
-    var body: some View {
-        ZStack {
-            Circle()
-                .trim(from: 0, to: 0.521)
-                .stroke(Color.black, lineWidth: 40)
-            Circle()
-                .trim(from: 0.521, to: 0.749)
-                .stroke(Color(hex: "#7DBBFF"), lineWidth: 40)
-            Circle()
-                .trim(from: 0.749, to: 0.888)
-                .stroke(Color(hex: "#71DD8C"), lineWidth: 40)
-            Circle()
-                .trim(from: 0.888, to: 1)
-                .stroke(Color(hex: "#A0BCE8"), lineWidth: 40)
-        }
-        .rotationEffect(.degrees(-89.9))
-        .padding()
-    }
-}
 
+
+//#Preview {
+//    HomeView()
+//}
 
 #Preview {
-    HomeView()
+    let dashboardVM = DashboardViewModel()
+    dashboardVM.categorySpendings = [
+        CategorySpending(categoryName: "전기/램프", totalAmount: 450000),
+        CategorySpending(categoryName: "엔진/미션", totalAmount: 300000),
+        CategorySpending(categoryName: "하체/바디", totalAmount: 150000),
+        CategorySpending(categoryName: "내장/외장", totalAmount: 100000),
+        CategorySpending(categoryName: "기타소모품", totalAmount: 50000)
+    ]
+    
+    return HomeView()
+        .environmentObject(AuthViewModel())
+        .environmentObject(dashboardVM) // ✅ 이제 진짜 연결됨!
 }

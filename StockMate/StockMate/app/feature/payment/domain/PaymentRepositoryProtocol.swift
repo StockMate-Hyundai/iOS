@@ -14,4 +14,8 @@ protocol PaymentRepositoryProtocol {
     
     // ✅ 최근 5개월 소비 내역 조회
     func fetchMonthlySpending() async -> AppResult<[MonthlySpending]>
+   
+    // 지난달 카테고리별 지출
+    func fetchCategorySpending() async -> AppResult<[CategorySpending]>
+    
 }

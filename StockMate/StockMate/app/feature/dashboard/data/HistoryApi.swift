@@ -63,6 +63,8 @@ struct HistoryPart: Decodable, Identifiable {
     let cost: Int
     let historyQuantity: Int
 }
+
+
 // MARK: - API
 enum HistoryApi {
     // ✅ 가맹점별 입출고 히스토리 조회

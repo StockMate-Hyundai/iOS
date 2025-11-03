@@ -61,4 +61,21 @@ final class PaymentRepositoryImpl: PaymentRepositoryProtocol {
             return .failure(error)
         }
     }
+    
+    // ✅ 지난달 카테고리별 지출
+    func fetchCategorySpending() async -> AppResult<[CategorySpending]> {
+        let request = PaymentApi.getCategorySpending()
+        let result = await safeApi(request, decodeTo: ApiResponse<[CategorySpending]>.self)
+        switch result {
+        case .success(let response):
+            if let data = response.data {
+                return .success(data)
+            } else {
+                return .failure(.init(code: response.status, message: response.message, underlying: nil))
+            }
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+    
 }

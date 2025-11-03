@@ -29,18 +29,13 @@ struct BarChartView: View {
         }
 
         // ✅ 기본 선택: 최신월
-        let defaultMonth = displayLabels.first ?? ""
+        let defaultMonth = displayLabels.last ?? ""
         let activeMonth = selectedMonth ?? defaultMonth
 
         VStack(alignment: .leading, spacing: 14) {
-            // 제목
-            Text("월간 지출 현황")
-                .font(.headline)
-                .foregroundColor(.black)
-                .padding(.horizontal, 4)
-
             // ✅ 막대 그래프
             GeometryReader { geometry in
+                let chartHeight = geometry.size.height * 0.85 // 상하 여백 고려
                 let totalWidth = geometry.size.width
                 let barCount = CGFloat(reversedValues.count)
                 let barWidth: CGFloat = 28
@@ -49,11 +44,11 @@ struct BarChartView: View {
                 HStack(alignment: .bottom, spacing: spacing) {
                     ForEach(reversedValues.indices, id: \.self) { i in
                         VStack {
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: 8)
                                 .fill(activeMonth == displayLabels[i] ? Color.Primary : Color.LightBlue04)
-                                .frame(width: barWidth, height: 150 * reversedValues[i])
+                                // ✅ 막대 높이를 geometry 기준으로 조정
+                                .frame(width: barWidth, height: chartHeight * reversedValues[i])
                                 .onTapGesture {
-                                    // 선택/해제 처리
                                     selectedMonth = (selectedMonth == displayLabels[i]) ? nil : displayLabels[i]
                                 }
 
@@ -66,23 +61,23 @@ struct BarChartView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             }
-            .frame(height: 180)
-            .padding(.vertical)
+            .frame(height: 140) // ← 전체 그래프 영역 높이 확장
+            .padding(.vertical, 8)
 
             Divider()
 
             // ✅ 하단 "n월 지출금액 ooo원" 표시
             if let index = displayLabels.firstIndex(of: activeMonth) {
                 HStack {
-                    Text("\(displayLabels[index]) 지출금액")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+                    Text("\(displayLabels[index]) 지출 현황")
+                        .font(.system(size: 17, weight: .medium))
                     Spacer()
                     Text("\(reversedAmounts[index].formatted())원")
-                        .font(.headline)
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(Color.Primary)
                 }
                 .padding(.top, 6)
+                .padding(.horizontal,4)
             }
         }
         .frame(maxWidth: .infinity)
