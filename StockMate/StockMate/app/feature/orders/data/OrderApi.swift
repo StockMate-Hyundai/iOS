@@ -116,6 +116,13 @@ struct ReceiveOrderRequest: Encodable {
 }
 
 
+struct OrderSummary {
+    let firstPartName: String
+    let itemCount: Int
+    let totalPrice: Int
+    let createdAt: String
+}
+
 
 // MARK: - API Call
 
@@ -180,4 +187,31 @@ enum OrderApi {
             encoder: JSONParameterEncoder.default
         )
     }
+    
+    // 주문 상세 정보 preview 데이터 가지고 오기
+//    static func fetchOrderSummary(orderId: Int) async -> OrderSummary? {
+//        let result = await OrderRepositoryImpl().fetchOrderDetail(orderId: orderId)
+//        
+//        switch result {
+//        case .success(let order):       // order == OrderResponseItem
+//            guard let first = order.orderItems.first else { return nil }
+//            return OrderSummary(
+//                firstPartName: first.partDetail.korName,
+//                itemCount: order.orderItems.count,
+//                totalPrice: order.totalPrice,
+//                createdAt: order.createdAt
+//            )
+//        case .failure:
+//            return nil
+//        }
+//    }
+    static func fetchOrderSummary(orderId: Int) async -> OrderSummary? {
+         // 예시용 더미 데이터
+         return OrderSummary(
+             firstPartName: "실린더 어셈블리-브레이크 마스터",
+             itemCount: 4,
+             totalPrice: 49720,
+             createdAt: "2025.11.03 14:34:35"
+         )
+     }
 }

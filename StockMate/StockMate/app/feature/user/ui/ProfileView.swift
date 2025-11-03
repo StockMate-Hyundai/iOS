@@ -38,34 +38,14 @@ struct ProfileView: View {
                  
                  // MARK: - General Section
                  VStack(alignment: .leading, spacing: 12) {
-                     Text("General")
-                         .font(.system(size: 16, weight: .semibold))
-                         .padding(.leading)
-                     
                      VStack(spacing: 10) {
-                         SettingRow(icon: "person.crop.circle", title: "Edit Profile")
-                         SettingRow(icon: "lock.circle", title: "Change Password")
-                         SettingRow(icon: "bell", title: "Notifications")
-                         SettingRow(icon: "location.circle", title: "배송 현황")
-                         
+                         SettingRow(icon: "user", title: "프로필 수정")
+                         SettingRow(icon: "lock", title: "비밀번호 변경")
+                         SettingRow(icon: "notification", title: "알림")
+                         SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: DepositHistoryView())
+//                         SettingRow(icon: "credit", title: "예치금 히스토리")
                          SettingNavigationRow(icon: "bag", title: "주문 내역", destination: OrderListView())
-                     }
-                     .padding(3)
-                     .background(Color.Light)
-                     .cornerRadius(12)
-                     .padding(.horizontal)
-                 }
-                 
-                 // MARK: - Preferences Section
-                 VStack(alignment: .leading, spacing: 12) {
-                     Text("Preferences")
-                         .font(.system(size: 16, weight: .semibold))
-                         .padding(.leading)
-                     
-                     VStack(spacing: 10) {
-                         SettingRow(icon: "shield", title: "Legal and Policies")
-                         SettingRow(icon: "questionmark.circle", title: "Help & Support")
-                         SettingRow(icon: "arrow.right.circle", title: "Logout", iconColor: .red, textColor: .red)
+                         SettingRow(icon: "logout", title: "로그아웃")
                      }
                      .padding(3)
                      .background(Color.Light)
@@ -93,7 +73,7 @@ struct SettingRow: View {
 
     var body: some View {
         HStack {
-            Image(systemName: icon)
+            Image(icon)
                 .font(.system(size: 18))
                 .foregroundColor(iconColor)
                 .frame(width: 24)
@@ -124,7 +104,7 @@ struct SettingNavigationRow<Destination: View>: View {
     var body: some View {
         NavigationLink(destination: destination) {
             HStack {
-                Image(systemName: icon)
+                Image(icon)
                     .font(.system(size: 18))
                     .foregroundColor(iconColor)
                     .frame(width: 24)

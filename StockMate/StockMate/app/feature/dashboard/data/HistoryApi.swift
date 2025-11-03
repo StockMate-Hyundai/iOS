@@ -65,11 +65,50 @@ struct HistoryPart: Decodable, Identifiable {
 }
 
 
+// MARK: - 예치금 거래내역 데이터 구조
+struct PaymentTransactionPageData: Decodable {
+    let content: [PaymentTransactionItem]
+    let page: Int
+    let size: Int
+    let totalElements: Int
+    let totalPages: Int
+    let hasNext: Bool
+    let hasPrevious: Bool
+    let last: Bool
+    let first: Bool
+}
+
+//struct PaymentTransactionItem: Decodable, Identifiable {
+//    var id: UUID { UUID() } // 서버에서 id 제공 안하므로 로컬에서 생성
+//    let transactionType: String      // "CHARGE" or "PAY"
+//    let transactionTime: String
+//    let totalAmount: Int
+//    let orderId: Int
+//    let balance: Int
+//}
+
+struct PaymentTransactionItem: Decodable, Identifiable {
+    var id: UUID { UUID() } // 서버에서 id 제공 안하므로 로컬 생성
+    let transactionType: String    // "CHARGE" or "PAY"
+    let transactionTime: String?   // ✅ null 허용
+    let totalAmount: Int
+    let orderId: Int?              // ✅ null 허용
+    let balance: Int
+}
+
+
+
 // MARK: - API
 enum HistoryApi {
     // ✅ 가맹점별 입출고 히스토리 조회
     static func getInOutHistory(page: Int = 0, size: Int = 20) -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/information/order-history/my?page=\(page)&size=\(size)"
+        return ApiClient.shared.request(url, method: .get)
+    }
+    
+    // ✅ 예치금 거래내역 조회
+    static func getPaymentTransaction(page: Int = 0, size: Int = 20) -> DataRequest {
+        let url = ApiClient.baseURL + "api/v1/payment/transaction?page=\(page)&size=\(size)"
         return ApiClient.shared.request(url, method: .get)
     }
 }

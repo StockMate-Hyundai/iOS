@@ -81,7 +81,7 @@ struct HomeView: View {
                              ProgressView("불러오는 중...")
                                  .frame(height: 130)
                          } else if dashboardViewModel.categorySpendings.isEmpty {
-                             Text("최근 지출 내역이 없습니다.")
+                             Text("지난달 지출 내역이 없습니다.")
                                  .foregroundColor(.gray)
                                  .frame(height: 150)
                          } else {
