@@ -12,11 +12,10 @@ struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var userViewModel = UserViewModel()
     @StateObject private var inventoryViewModel = InventoryViewModel()
-    @EnvironmentObject var dashboardViewModel: DashboardViewModel
-//    @StateObject private var dashboardViewModel = DashboardViewModel()
+//    @EnvironmentObject var dashboardViewModel: DashboardViewModel   //preview 용
+    @StateObject private var dashboardViewModel = DashboardViewModel()
     
     @State private var selectedMonth: String? = nil  // ✅ 추가
-//    @State private var selectedMonthIndex: Int? = nil
 
 
     var body: some View {
@@ -81,18 +80,15 @@ struct HomeView: View {
                          if dashboardViewModel.isLoading {
                              ProgressView("불러오는 중...")
                                  .frame(height: 130)
-//                         } else if dashboardViewModel.categorySpendings.isEmpty {
-//                             Text("최근 지출 내역이 없습니다.")
-//                                 .foregroundColor(.gray)
-//                                 .frame(height: 150)
+                         } else if dashboardViewModel.categorySpendings.isEmpty {
+                             Text("최근 지출 내역이 없습니다.")
+                                 .foregroundColor(.gray)
+                                 .frame(height: 150)
                          } else {
                              DonutChartView(data: dashboardViewModel.categorySpendings)
-                             
-                                 .frame(height: 180)
-                                 .padding()
-                                 .background(Color.white)
-                                 .cornerRadius(16)
-                                 .shadow(color: .gray.opacity(0.1), radius: 4)
+                             .frame(height: 155)
+                             .background(Color.white)
+                             .cornerRadius(16)
                          }
                          
                          Spacer()
@@ -246,17 +242,17 @@ struct StatusItem: View {
 //    HomeView()
 //}
 
-#Preview {
-    let dashboardVM = DashboardViewModel()
-    dashboardVM.categorySpendings = [
-        CategorySpending(categoryName: "전기/램프", totalAmount: 450000),
-        CategorySpending(categoryName: "엔진/미션", totalAmount: 300000),
-        CategorySpending(categoryName: "하체/바디", totalAmount: 150000),
-        CategorySpending(categoryName: "내장/외장", totalAmount: 100000),
-        CategorySpending(categoryName: "기타소모품", totalAmount: 50000)
-    ]
-    
-    return HomeView()
-        .environmentObject(AuthViewModel())
-        .environmentObject(dashboardVM) // ✅ 이제 진짜 연결됨!
-}
+//#Preview {
+//    let dashboardVM = DashboardViewModel()
+//    dashboardVM.categorySpendings = [
+//        CategorySpending(categoryName: "전기/램프", totalAmount: 450000),
+//        CategorySpending(categoryName: "엔진/미션", totalAmount: 300000),
+//        CategorySpending(categoryName: "하체/바디", totalAmount: 150000),
+//        CategorySpending(categoryName: "내장/외장", totalAmount: 100000),
+//        CategorySpending(categoryName: "기타소모품", totalAmount: 50000)
+//    ]
+//    
+//    return HomeView()
+//        .environmentObject(AuthViewModel())
+//        .environmentObject(dashboardVM) // ✅ 이제 진짜 연결됨!
+//}

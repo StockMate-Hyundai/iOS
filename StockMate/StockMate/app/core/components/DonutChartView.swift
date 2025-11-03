@@ -28,6 +28,15 @@ struct DonutChartView: View {
         Color.Hstatus5
     ]
     
+    var gradients: [AngularGradient] = [
+        AngularGradient(gradient: Gradient(colors: [.pink, .orange]), center: .center),
+        AngularGradient(gradient: Gradient(colors: [.blue, .teal]), center: .center),
+        AngularGradient(gradient: Gradient(colors: [.green, .mint]), center: .center),
+        AngularGradient(gradient: Gradient(colors: [.purple, .indigo]), center: .center),
+        AngularGradient(gradient: Gradient(colors: [.gray, .black]), center: .center)
+    ]
+
+    
     var body: some View {
         HStack(alignment: .center, spacing: 24) {
             // ✅ 도넛 차트
@@ -39,35 +48,45 @@ struct DonutChartView: View {
                     ForEach(Array(data.enumerated()), id: \.offset) { index, item in
                         SectorMark(
                             angle: .value("지출", item.totalAmount),
-                            innerRadius: .ratio(0.56),
+                            innerRadius: .ratio(0.49),
                             angularInset: 1.9
                         )
-                        .foregroundStyle(colors[index % colors.count])
+                        .foregroundStyle(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    colors[index % colors.count],
+                                    colors[index % colors.count].opacity(0.5)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+//                        .foregroundStyle(colors[index % colors.count])
                         .cornerRadius(8.0)
                         // ✅ 도넛 안쪽에 비율 표시
                         .annotation(position: .overlay) {
                             let percentage = percentages[index]
                             Text("\(percentage, specifier: "%.1f")%")
-                                .font(.system(size: 10, weight: .semibold))
+                                .font(.system(size: 10, weight: .light))
                                 .foregroundColor(.black)
                                 .offset(y: -2)
                         }
                     }
                 }
-                .frame(height: 200)
+                .frame(height: 150)
                 .chartLegend(.hidden) // 기본 범례 숨김
             }
             
             // ✅ 오른쪽 커스텀 범례
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 18) {
                 ForEach(Array(data.enumerated()), id: \.offset) { index, item in
                     let percentage = percentages[index]
-                    HStack(spacing: 8) {
+                    HStack(spacing: 7) {
                         Circle()
                             .fill(colors[index % colors.count])
                             .frame(width: 10, height: 10)
                         Text(item.categoryName)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 12, weight: .light))
                             .frame(width: 70, alignment: .leading)
                         Text("\(percentage, specifier: "%.1f")%")
                             .font(.system(size: 12))
