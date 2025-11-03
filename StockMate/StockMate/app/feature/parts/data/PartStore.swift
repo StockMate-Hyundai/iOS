@@ -10,35 +10,34 @@ import Foundation
 @MainActor
 final class PartStore: ObservableObject {
     @Published var parts: [PartDetail] = []
-
+    
     func addPart(_ part: PartDetail) {
         if let index = parts.firstIndex(where: { $0.id == part.id }) {
-            // 이미 있으면 수량만 1 증가
-//            parts[index].quantity += 1
+            parts[index].quantity += 1  // 이미 존재하면 수량만 +1
         } else {
-            // ✅ 반드시 새로운 복사본 append
             var newPart = part
             newPart.quantity = 1
             parts.append(newPart)
-//            parts.append(part)
         }
-    }
-
-    func updateQuantity(for partId: Int, to quantity: Int) {
-        if let index = parts.firstIndex(where: { $0.id == partId }) {
-            parts[index].quantity = quantity
-        }
-    }
-
-    func removePart(_ partId: Int) {
-        parts.removeAll { $0.id == partId }
-    }
-
-    func makeRequestPayload() -> [[String: Any]] {
-        parts.map { ["partId": $0.id, "quantity": $0.quantity] }
     }
 
     func clear() {
         parts.removeAll()
+    }
+    
+    // ✅ 수량 변경용 메서드 추가
+    func increaseQuantity(for part: PartDetail) {
+        if let index = parts.firstIndex(where: { $0.id == part.id }) {
+            parts[index].quantity += 1
+            objectWillChange.send() // 수동 갱신 트리거
+        }
+    }
+
+    func decreaseQuantity(for part: PartDetail) {
+        if let index = parts.firstIndex(where: { $0.id == part.id }),
+           parts[index].quantity > 1 {
+            parts[index].quantity -= 1
+            objectWillChange.send()
+        }
     }
 }

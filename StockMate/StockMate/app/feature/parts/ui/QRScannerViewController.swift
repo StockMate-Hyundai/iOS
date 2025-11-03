@@ -76,6 +76,19 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
         }
     }
     
+    func startSession() {
+        if !captureSession.isRunning {
+            captureSession.startRunning()
+        }
+    }
+
+    func stopSession() {
+        if captureSession.isRunning {
+            captureSession.stopRunning()
+        }
+    }
+
+    
     // ✅ QR 감지 시 호출
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,

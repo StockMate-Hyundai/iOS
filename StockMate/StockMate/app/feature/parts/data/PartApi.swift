@@ -33,7 +33,7 @@ struct PartDetailResponse: Decodable, Identifiable {
 }
 
 // 사용처리 임시 값
-struct PartDetail: Identifiable, Equatable {
+struct PartDetail: Identifiable {
     let id: Int
     let price: Int
     let image: String
