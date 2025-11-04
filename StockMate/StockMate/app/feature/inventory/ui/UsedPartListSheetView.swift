@@ -21,7 +21,6 @@ struct UsedPartListSheetView: View {
     var onRescan: (() -> Void)? // ✅ 다시 스캔 콜백 추가
 
     var body: some View {
-//        NavigationStack {
             VStack (alignment: .center){
                 // ✅ 상단 헤더
                 ZStack {
@@ -31,9 +30,7 @@ struct UsedPartListSheetView: View {
 
                     HStack {
                         Spacer()
-                        Button("전체 삭제") {
-                            partStore.clear()
-                        }
+                        Button("전체 삭제") {partStore.clear()}
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.red)
                         .padding(.trailing, 20)
@@ -64,9 +61,7 @@ struct UsedPartListSheetView: View {
                             ) { $part in  // ✅ 바인딩으로 변경 ($ 붙임)
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(part.categoryName)
-                                        .font(
-                                            .system(size: 12, weight: .semibold)
-                                        )
+                                        .font(.system(size: 12, weight: .semibold))
                                         .foregroundColor(.black)
                                     
                                     Divider()
@@ -86,32 +81,17 @@ struct UsedPartListSheetView: View {
                                             RoundedRectangle(cornerRadius: 10)
                                         )
                                         
-                                        VStack(
-                                            alignment: .leading,
-                                            spacing: 6
-                                        ) {
+                                        VStack(alignment: .leading,spacing: 6) {
                                             Text(part.korName)
-                                                .font(
-                                                    .system(
-                                                        size: 13,
-                                                        weight: .bold
-                                                    )
-                                                )
+                                                .font( .system(size: 13, weight: .bold))
                                                 .foregroundColor(.black)
                                                 .lineLimit(2)
-                                            Text(
-                                                "\((part.trim)) / \((part.model))"
-                                            )
+                                            Text("\((part.trim)) / \((part.model))")
                                             .font(.system(size: 12))
                                             .foregroundColor(.black)
                                             .lineLimit(1)
                                             Text("\(part.price)원")
-                                                .font(
-                                                    .system(
-                                                        size: 15,
-                                                        weight: .semibold
-                                                    )
-                                                )
+                                                .font(.system(size: 15, weight: .semibold))
                                                 .foregroundColor(.black)
                                         }
                                         
@@ -125,77 +105,37 @@ struct UsedPartListSheetView: View {
                                                 }
                                             } label: {
                                                 Image(systemName: "minus")
-                                                    .font(
-                                                        .system(
-                                                            size: 14,
-                                                            weight: .regular
-                                                        )
-                                                    )
-                                                    .frame(
-                                                        width: 13,
-                                                        height: 13
-                                                    )
+                                                    .font(.system(size: 14, weight: .regular))
+                                                    .frame(width: 13,height: 13)
                                                     .foregroundColor(.black)
                                             }
-                                            
                                             Text("\(part.quantity)")
-                                                .font(
-                                                    .system(
-                                                        size: 14,
-                                                        weight: .medium
-                                                    )
-                                                )
+                                                .font(.system(size: 14,weight: .medium))
                                                 .frame(width: 19)
-                                            
                                             Button {
                                                 part.quantity += 1
                                             } label: {
                                                 Image(systemName: "plus")
-                                                    .font(
-                                                        .system(
-                                                            size: 14,
-                                                            weight: .regular
-                                                        )
-                                                    )
-                                                    .frame(
-                                                        width: 13,
-                                                        height: 13
-                                                    )
+                                                    .font(.system(size: 14, weight: .regular))
+                                                    .frame(width: 13,height: 13)
                                                     .foregroundColor(.black)
                                             }
                                         }
                                         .padding(.vertical, 6)
-                                        .padding(
-                                            .horizontal,
-                                            8
-                                        ) // 🔹 살짝 늘려서 버튼 안이 넓어 보이게
+                                        .padding(.horizontal, 8)
                                         .background(Color.white)
                                         .cornerRadius(10)
-                                        .overlay(
-                                            // ✅ 테두리 추가
+                                        .overlay(   // ✅ 테두리 추가
                                             RoundedRectangle(cornerRadius: 10)
-                                                .stroke(
-                                                    Color.LightBlue03,
-                                                    lineWidth: 1
-                                                )
+                                                .stroke( Color.LightBlue03, lineWidth: 1)
                                         )
-                                        .shadow(
-                                            color: .black.opacity(0.15),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 4
-                                        )
+                                        .shadow(color: .black.opacity(0.15), radius: 4, x: 0, y: 4 )
                                     }
                                 }
                                 .padding()
                                 .background(Color.white)
                                 .cornerRadius(14)
-                                .shadow(
-                                    color: .black.opacity(0.05),
-                                    radius: 4,
-                                    x: 0,
-                                    y: 4
-                                )
+                                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 4)
                                 
                             }
                             .onDelete { indexSet in
@@ -252,7 +192,6 @@ struct UsedPartListSheetView: View {
 }
 
 // MARK: - 프리뷰 (안전 버전)
-
 @MainActor
 struct UsedPartListSheetView_Previews: PreviewProvider {
     static var previewStore: PartStore = {

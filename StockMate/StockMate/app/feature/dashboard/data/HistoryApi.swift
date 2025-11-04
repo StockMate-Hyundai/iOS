@@ -78,15 +78,6 @@ struct PaymentTransactionPageData: Decodable {
     let first: Bool
 }
 
-//struct PaymentTransactionItem: Decodable, Identifiable {
-//    var id: UUID { UUID() } // 서버에서 id 제공 안하므로 로컬에서 생성
-//    let transactionType: String      // "CHARGE" or "PAY"
-//    let transactionTime: String
-//    let totalAmount: Int
-//    let orderId: Int
-//    let balance: Int
-//}
-
 struct PaymentTransactionItem: Decodable, Identifiable {
     var id: UUID { UUID() } // 서버에서 id 제공 안하므로 로컬 생성
     let transactionType: String    // "CHARGE" or "PAY"

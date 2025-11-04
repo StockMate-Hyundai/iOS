@@ -36,9 +36,6 @@ struct ReleaseDetailView: View {
         .navigationTitle("출고 상세")
         .navigationBarTitleDisplayMode(.inline)
     }
-//    func formatDate(_ iso: String) -> String {
-//        String(iso.prefix(10)).replacingOccurrences(of: "-", with: ".")
-//    }
 }
 
 struct ReleasePartCard: View {
@@ -109,24 +106,21 @@ struct ReleasePartCard: View {
     ))
 }
 
+
 func formattedDate3(_ timestamp: String) -> String {
-    // 가능한 입력 포맷들 (서버별 변형 대응)
     let inputFormats = [
         "yyyy-MM-dd'T'HH:mm:ss.SSSSSS",
         "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS",
         "yyyy-MM-dd'T'HH:mm:ss.SSS",
-        "yyyy-MM-dd'T'HH:mm:ss",
-        "yyyy-MM-dd'T'HH:mm:ssZ",
-        "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        "yyyy-MM-dd'T'HH:mm:ss"
     ]
 
     let trimmed = timestamp.trimmingCharacters(in: .whitespacesAndNewlines)
     let parser = DateFormatter()
     parser.locale = Locale(identifier: "en_US_POSIX")
-    parser.timeZone = TimeZone(abbreviation: "UTC")
+    parser.timeZone = TimeZone(identifier: "Asia/Seoul") // ✅ 서버 시간 기준으로 맞춤
 
     var date: Date? = nil
-
     for format in inputFormats {
         parser.dateFormat = format
         if let parsed = parser.date(from: trimmed) {
@@ -135,22 +129,13 @@ func formattedDate3(_ timestamp: String) -> String {
         }
     }
 
-    // ISO8601 fallback
-    if date == nil {
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        date = iso.date(from: trimmed) ?? ISO8601DateFormatter().date(from: trimmed)
-    }
+    guard let finalDate = date else { return timestamp }
 
-    guard let finalDate = date else {
-        return timestamp // 파싱 실패 시 원본 반환
-    }
-
+    // 출력도 한국시간으로
     let output = DateFormatter()
     output.locale = Locale(identifier: "ko_KR")
-    output.timeZone = TimeZone.current
+    output.timeZone = TimeZone(identifier: "Asia/Seoul")
     output.dateFormat = "yyyy.MM.dd HH:mm:ss"
 
     return output.string(from: finalDate)
 }
-
