@@ -31,10 +31,10 @@ struct OrderView: View {
                 
                 // 🔍 검색창
                 NavigationLink(destination:
-                                OrderRequestSearchView(
-                                    cartViewModel: cartViewModel
-                                    //inventoryViewModel: inventoryViewModel
-                                )
+                    OrderRequestSearchView(
+                        cartViewModel: cartViewModel
+                        //inventoryViewModel: inventoryViewModel
+                    )
                 ) {
                     HStack {
                         Image(systemName: "magnifyingglass")
@@ -49,7 +49,7 @@ struct OrderView: View {
                     .cornerRadius(9999)
                     .overlay(
                         RoundedRectangle(cornerRadius: 9999)
-                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                            .stroke(Color.GrayMordern400, lineWidth: 1)
                     )
                     .padding(.horizontal)
                 }
@@ -126,7 +126,3 @@ struct OrderView: View {
     }
 }
 
-//
-//#Preview {
-//    OrderView()
-//}

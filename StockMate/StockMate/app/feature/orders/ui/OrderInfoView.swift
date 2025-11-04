@@ -29,15 +29,31 @@ struct OrderInfoView: View {
     
     @State private var navigateToSuccessPage = false
     
+    // ✅ 모달 관련 상태
+    @State private var showOrderSuccessModal = false
+    @State private var navigateToOrderDetail = false
+    @State private var navigateToHome = false
+    
     private var destinationView: some View {
-        Group {
-            if let id = orderViewModel.createdOrderId {
-                OrderDetailView(orderId: id, orderViewModel: orderViewModel)
-            } else {
-                EmptyView()
-            }
-        }
+       Group {
+           if navigateToOrderDetail, let id = orderViewModel.createdOrderId {
+               OrderDetailView(orderId: id, orderViewModel: orderViewModel)
+           } else if navigateToHome {
+               HomeView()
+           } else {
+               EmptyView()
+           }
+       }
     }
+//    private var destinationView: some View {
+//        Group {
+//            if let id = orderViewModel.createdOrderId {
+//                OrderDetailView(orderId: id, orderViewModel: orderViewModel)
+//            } else {
+//                EmptyView()
+//            }
+//        }
+//    }
     
     func formattedShippingDate() -> String {
         let formatter = DateFormatter()
@@ -83,8 +99,12 @@ struct OrderInfoView: View {
         .onChange(of: orderViewModel.isOrderSuccess) { success in
             if success {
                 Task {
+                    // 1) 서버에 반영된 장바구니를 먼저 비운다 (await)
                     await cartViewModel.clearCart()
-                    navigateToSuccessPage = true
+//                    navigateToSuccessPage = true
+                    // 2) cart가 비워진 후에 모달을 띄운다
+                    // (모달을 띄우기 전에 createdOrderId는 orderViewModel에 이미 세팅되어 있어야 함)
+                    showOrderSuccessModal = true
                 }
             }
         }
@@ -92,8 +112,67 @@ struct OrderInfoView: View {
        .sheet(isPresented: $depositViewModel.showChargeSheet) {
            DepositChargeView(viewModel: depositViewModel)
                .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
-//               .presentationDragIndicator(.visible)
        }
+        // 모달 오버레이 (body 안)
+        .overlay {
+            if showOrderSuccessModal {
+                ZStack {
+                    Color.black.opacity(0.4).ignoresSafeArea()
+                        .onTapGesture {
+                            // 배경 탭으로도 모달 닫을 수 있게 하려면 uncomment
+                            // showOrderSuccessModal = false
+                        }
+
+                    AlertModal(
+                        icon: Image("SuccessIllust"),
+                        title: "주문완료!",
+                        message: "해당 부품 주문이 완료되었습니다.",
+                        primaryButtonTitle: "주문상세",
+                        primaryAction: {
+                            // 1) 모달 닫기
+                            showOrderSuccessModal = false
+
+                            // 2) 네비게이션 트리거 -> OrderDetail 로 이동
+                            // orderViewModel.createdOrderId 가 있어야 함
+                            navigateToOrderDetail = true
+                        },
+                        secondaryButtonTitle: "홈으로",
+                        secondaryAction: {
+                            // 모달 닫고 홈으로
+                            showOrderSuccessModal = false
+                            navigateToHome = true
+                        },
+                        buttonLayout: .vertical
+                    )
+                    .transition(.scale)
+                    .padding(.horizontal, 20)
+                }
+                .animation(.easeInOut, value: showOrderSuccessModal)
+            }
+        }
+
+        // 네비게이션 실행을 위한 숨은 링크 (body 밖 어디든)
+        .background(
+            Group {
+                // OrderDetail 우선 (OrderDetail은 createdOrderId 를 필요로 함)
+                NavigationLink(destination:
+                                Group {
+                                    if let id = orderViewModel.createdOrderId {
+                                        OrderDetailView(orderId: id, orderViewModel: orderViewModel)
+                                    } else {
+                                        EmptyView()
+                                    }
+                                },
+                               isActive: $navigateToOrderDetail) {
+                    EmptyView()
+                }
+
+                NavigationLink(destination: HomeView(), isActive: $navigateToHome) {
+                    EmptyView()
+                }
+            }
+        )
+
 
     }
         
@@ -238,7 +317,6 @@ extension OrderInfoView {
         .frame(maxWidth: .infinity)
     }
 
-    
     private var shippingDateSection: some View {
         VStack(alignment: .leading) {
             Text("배송 요청일")

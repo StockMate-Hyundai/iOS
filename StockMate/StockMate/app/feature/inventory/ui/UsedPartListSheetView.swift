@@ -110,8 +110,8 @@ struct UsedPartListSheetView: View {
                                                     .foregroundColor(.black)
                                             }
                                             Text("\(part.quantity)")
-                                                .font(.system(size: 14,weight: .medium))
-                                                .frame(width: 19)
+                                                .font(.system(size: 15, weight: .medium))
+                                                .frame(width: 20)
                                             Button {
                                                 part.quantity += 1
                                             } label: {

@@ -62,7 +62,7 @@ struct HomeView: View {
                      .cornerRadius(9999)
                      .overlay(
                         RoundedRectangle(cornerRadius: 9999)
-                            .stroke(Color.gray.opacity(0.4), lineWidth: 1)
+                            .stroke(Color.GrayMordern400, lineWidth: 1)
                      )
                      .padding(.horizontal)
                  }
@@ -73,17 +73,19 @@ struct HomeView: View {
                  // 도넛 차트 섹션
                  VStack(alignment: .leading, spacing: 18) {
                      Text("지난달 카테고리 별 지출")
-                         .font(.headline)
+                         .font(.system(size: 15, weight: .semibold))
                          .padding(4)
+                         .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬
                      
                      HStack {
                          if dashboardViewModel.isLoading {
                              ProgressView("불러오는 중...")
-                                 .frame(height: 130)
+                                 .frame(height: 155)
                          } else if dashboardViewModel.categorySpendings.isEmpty {
                              Text("지난달 지출 내역이 없습니다.")
                                  .foregroundColor(.gray)
-                                 .frame(height: 150)
+                                 .frame(maxWidth: .infinity)
+                                 .frame(height: 155, alignment: .center)
                          } else {
                              DonutChartView(data: dashboardViewModel.categorySpendings)
                              .frame(height: 155)
@@ -103,25 +105,32 @@ struct HomeView: View {
                  // 막대그래프 섹션
                  VStack(alignment: .leading, spacing: 8) {
                      Text("월간 지출 현황")
-                         .font(.headline)
+                         .font(.system(size: 15, weight: .semibold))
                          .padding(4)
+                         .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬
                      
-                     if dashboardViewModel.isLoading {
-                         ProgressView("데이터 불러오는 중...")
-                             .frame(height: 150)
-                     } else if dashboardViewModel.monthlySpendings.isEmpty {
-                         Text("최근 지출 내역이 없습니다.")
-                             .foregroundColor(.gray)
-                             .frame(height: 150)
-                     } else {
-                         BarChartView(
-                             values: dashboardViewModel.spendingRatios,
-                             labels: dashboardViewModel.monthLabels,
-                             amounts: dashboardViewModel.monthlySpendings.map { $0.totalAmount }, selectedMonth: $selectedMonth
-                         )
-                         .frame(height: 220)
-                         .background(Color.white)
-                         .cornerRadius(16)
+                     ZStack { // ✅ 크기 고정용 컨테이너
+                         RoundedRectangle(cornerRadius: 16)
+                             .fill(Color.white)
+                             .frame(height: 220) // ✅ 일정 높이 고정
+                         if dashboardViewModel.isLoading {
+                             ProgressView("데이터 불러오는 중...")
+                                 .frame(height: 220)
+                         } else if dashboardViewModel.monthlySpendings.isEmpty {
+                             Text("최근 지출 내역이 없습니다.")
+                                 .foregroundColor(.gray)
+                                 .frame(height: 220)
+                         } else {
+                             BarChartView(
+                                 values: dashboardViewModel.spendingRatios,
+                                 labels: dashboardViewModel.monthLabels,
+                                 amounts: dashboardViewModel.monthlySpendings.map { $0.totalAmount }, selectedMonth: $selectedMonth
+                             )
+                             .padding()
+    //                         .frame(height: 220)
+    //                         .background(Color.white)
+    //                         .cornerRadius(16)
+                         }
                      }
                  }
                  .padding()
@@ -154,18 +163,32 @@ struct HomeView: View {
     private var lackStockSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("재고 부족 조회")
-                .font(.headline)
+                .font(.system(size: 15, weight: .semibold))
+                .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬 유지
             HStack(spacing: 13) {
-                ForEach(inventoryViewModel.lackCounts, id: \.id) { item in
-                    NavigationLink {
-                        LackListView(selectedCategory: item.categoryName)
-                    } label: {
+                if inventoryViewModel.lackCounts.isEmpty {
+                    // ✅ 데이터가 없을 때도 공간 확보
+                    ForEach(0..<5) { _ in
                         StatusItem(
-                            title: item.categoryName,
-                            count: item.count,
-                            color: colorForCategory(item.categoryName),
-                            icon: iconForCategory(item.categoryName)
+                            title: "-",
+                            count: 0,
+                            color: .gray.opacity(0.1),
+                            icon: "questionmark"
                         )
+                    }
+                    .redacted(reason: .placeholder) // 로딩 중 효과 (선택사항)
+                } else {
+                    ForEach(inventoryViewModel.lackCounts, id: \.id) { item in
+                        NavigationLink {
+                            LackListView(selectedCategory: item.categoryName)
+                        } label: {
+                            StatusItem(
+                                title: item.categoryName,
+                                count: item.count,
+                                color: colorForCategory(item.categoryName),
+                                icon: iconForCategory(item.categoryName)
+                            )
+                        }
                     }
                 }
             }
@@ -223,7 +246,7 @@ struct StatusItem: View {
                 .clipShape(RoundedRectangle(cornerRadius: 100))
             
             Text(title)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(.black)
                 .padding(.top, 5)
                 .lineLimit(1)
@@ -242,17 +265,17 @@ struct StatusItem: View {
 //    HomeView()
 //}
 
-//#Preview {
-//    let dashboardVM = DashboardViewModel()
-//    dashboardVM.categorySpendings = [
-//        CategorySpending(categoryName: "전기/램프", totalAmount: 450000),
-//        CategorySpending(categoryName: "엔진/미션", totalAmount: 300000),
-//        CategorySpending(categoryName: "하체/바디", totalAmount: 150000),
-//        CategorySpending(categoryName: "내장/외장", totalAmount: 100000),
-//        CategorySpending(categoryName: "기타소모품", totalAmount: 50000)
-//    ]
-//    
-//    return HomeView()
-//        .environmentObject(AuthViewModel())
-//        .environmentObject(dashboardVM) // ✅ 이제 진짜 연결됨!
-//}
+#Preview {
+    let dashboardVM = DashboardViewModel()
+    dashboardVM.categorySpendings = [
+        CategorySpending(categoryName: "전기/램프", totalAmount: 450000),
+        CategorySpending(categoryName: "엔진/미션", totalAmount: 300000),
+        CategorySpending(categoryName: "하체/바디", totalAmount: 150000),
+        CategorySpending(categoryName: "내장/외장", totalAmount: 100000),
+        CategorySpending(categoryName: "기타소모품", totalAmount: 50000)
+    ]
+    
+    return HomeView()
+        .environmentObject(AuthViewModel())
+        .environmentObject(dashboardVM) // ✅ 이제 진짜 연결됨!
+}
