@@ -91,7 +91,7 @@ struct OrderInfoView: View {
         // ✅ 충전 bottom sheet 연결
        .sheet(isPresented: $depositViewModel.showChargeSheet) {
            DepositChargeView(viewModel: depositViewModel)
-               .presentationDetents([.fraction(0.80)]) // 시트 높이 85%
+               .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
 //               .presentationDragIndicator(.visible)
        }
 

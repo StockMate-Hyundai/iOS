@@ -131,6 +131,8 @@ struct OutgoingScanView: View {
                     resetScanState() // QR 다시 활성화
                 }
             )
+            .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
+            .presentationCornerRadius(28)           // ✅ 모서리 곡률
             .environmentObject(partStore)
         }
            .navigationTitle("부품 사용 처리")
