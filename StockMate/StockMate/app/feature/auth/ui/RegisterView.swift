@@ -30,6 +30,9 @@ struct RegisterView: View {
     @State private var isLoading = false
     @State private var showToast = false
 
+    @State private var showAddressSearch = false
+
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -83,19 +86,48 @@ struct RegisterView: View {
                         text: $storeName,
                         errorMessage: storeNameError
                     )
-                    CustomTextField(
-                        title: "주소",
-                        placeholder: "서울특별시 강남구 ...",
-                        text: $address,
-                        errorMessage: addressError
-                    )
+                    // ✅ 주소 입력 필드 + 버튼 추가 부분
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            CustomTextField(
+                                title: "주소",
+                                placeholder: "서울특별시 강남구 ...",
+                                text: $address,
+                                errorMessage: addressError,
+                                isReadOnly: true // ✅ 추가
+                            )
+                            .disabled(true) // 사용자가 직접 입력 못하게
+                            .onTapGesture {
+                                // 탭해도 검색창 열 수 있게 (선택사항)
+                                showAddressSearch.toggle()
+                            }
+
+                            Button(action: {
+                                showAddressSearch.toggle()
+                            }) {
+                                Text("주소 검색")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .frame(height: 43)
+                                    .padding(.horizontal, 12)
+                                    .background(Color.Primary)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                            }
+                            .sheet(isPresented: $showAddressSearch) {
+                                KakaoZipCodeView(address: $address)
+                            }
+                        }
+                    }
                     CustomTextField(
                         title: "사업자등록번호",
                         placeholder: "123-45-67890",
                         text: $bizNo,
                         errorMessage: bizNoError
                     )
-                    .keyboardType(.numbersAndPunctuation)
+                    .keyboardType(.numberPad)
+                    .onChange(of: bizNo) { newValue in
+                        formatBizNoInput(newValue)
+                    }
                 }
                 .padding(.horizontal, 24)
                 
@@ -138,10 +170,15 @@ struct RegisterView: View {
                     }
                 }
                 .padding(.bottom, 40)
+                
+                // ✅ 키보드 가림 방지용 여백
+                Spacer().frame(height: 300)
             }
         }
         .background(Color.Light)
         .ignoresSafeArea()
+        .scrollDismissesKeyboard(.interactively) // ✅ 손가락으로 스크롤하면 키보드 자동 내려감
+
     }
 
     // MARK: - 유효성 검사 함수
@@ -212,9 +249,42 @@ struct RegisterView: View {
                 owner: owner,
                 address: address,
                 storeName: storeName,
-                bizNo: bizNo
+                bizNo: bizNo.filter { $0.isNumber } // ← 여기서 숫자만 추출해서 전송
             )
             isLoading = false
         }
     }
+    
+    private func formatBizNoInput(_ input: String) {
+        // 1️⃣ 숫자만 남기기
+        let digitsOnly = input.filter { $0.isNumber }
+
+        // 2️⃣ 하이픈 자동 삽입
+        var formatted = ""
+        let length = digitsOnly.count
+
+        if length <= 3 {
+            formatted = digitsOnly
+        } else if length <= 5 {
+            formatted = "\(digitsOnly.prefix(3))-\(digitsOnly.suffix(from: digitsOnly.index(digitsOnly.startIndex, offsetBy: 3)))"
+        } else {
+            let first = digitsOnly.prefix(3)
+            let middleStart = digitsOnly.index(digitsOnly.startIndex, offsetBy: 3)
+            let middleEnd = digitsOnly.index(middleStart, offsetBy: 2, limitedBy: digitsOnly.endIndex) ?? digitsOnly.endIndex
+            let middle = digitsOnly[middleStart..<middleEnd]
+            let last = digitsOnly.suffix(from: middleEnd)
+            formatted = "\(first)-\(middle)-\(last)"
+        }
+
+        // 3️⃣ 10자리 이상은 자르기
+        if digitsOnly.count > 10 {
+            formatted = String(formatted.prefix(12)) // 하이픈 포함
+        }
+
+        // 4️⃣ 상태 업데이트
+        if formatted != bizNo {
+            bizNo = formatted
+        }
+    }
 }
+

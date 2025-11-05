@@ -24,6 +24,7 @@ struct AppNavHost: View {
                     RegisterView()
                 case .authenticated:
                     MainTabView()
+                    .environmentObject(authViewModel) 
                     .environmentObject(partStore)
             }
         }

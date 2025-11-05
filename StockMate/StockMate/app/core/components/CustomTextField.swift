@@ -13,6 +13,7 @@ struct CustomTextField: View {
     @Binding var text: String
     var isEmail: Bool = false
     var errorMessage: String? = nil
+    var isReadOnly: Bool = false   // ✅ 추가
     
     @FocusState private var isFocused: Bool
     
@@ -44,13 +45,27 @@ struct CustomTextField: View {
                         y: 2
                     )
                
+                if isReadOnly {
+                    // ✅ 가로 스크롤 가능한 읽기 전용 텍스트
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        Text(text.isEmpty ? placeholder : text)
+                            .font(.system(size: 15))
+                            .foregroundColor(text.isEmpty ? .gray : .black)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 12)
+                            .lineLimit(1)
+                    }
+                    .frame(height: 46)
+                    .contentShape(Rectangle())
+                    
+                } else {
                     TextField(placeholder, text: $text)
                         .focused($isFocused)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
-                
+                }                
             }
             .frame(height: 46) // 높이 일정하게 고정
             

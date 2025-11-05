@@ -9,8 +9,11 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var userViewModel = UserViewModel()
+    @EnvironmentObject var authViewModel: AuthViewModel  // 🔹 전역 Auth 상태 참조
+    @State private var showLogoutModal = false           // 🔹 로그아웃 모달 상태
      
      var body: some View {
+         ZStack{
              VStack(alignment: .leading, spacing: 24) {
                  
                  // MARK: - Profile Header
@@ -44,7 +47,13 @@ struct ProfileView: View {
                          SettingRow(icon: "notification", title: "알림")
                          SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: DepositHistoryView())
                          SettingNavigationRow(icon: "bag", title: "주문 내역", destination: OrderListView())
-                         SettingRow(icon: "logout", title: "로그아웃")
+                         //                         SettingRow(icon: "logout", title: "로그아웃")
+                         // 🔹 로그아웃 버튼
+                         Button {
+                             showLogoutModal = true
+                         } label: {
+                             SettingRow(icon: "logout", title: "로그아웃")
+                         }
                      }
                      .padding(3)
                      .background(Color.Light)
@@ -59,6 +68,33 @@ struct ProfileView: View {
              .onAppear {
                  Task { await userViewModel.loadUserInfo() }
              }
+             
+             // 🔹 AlertModal (ZStack 위에 오버레이로 표시)
+             if showLogoutModal {
+                 Color.black.opacity(0.3)
+                     .ignoresSafeArea()
+                     .transition(.opacity)
+                 
+                 AlertModal(
+                    title: "로그아웃",
+                    message: "정말 로그아웃 하시겠습니까?",
+                    primaryButtonTitle: "로그아웃",
+                    primaryAction: {
+                        authViewModel.logout()
+                        showLogoutModal = false
+                    },
+                    secondaryButtonTitle: "취소",
+                    secondaryAction: {
+                        showLogoutModal = false
+                    },
+                    buttonLayout: .horizontal
+                 )
+                 .transition(.scale)
+                 .zIndex(1)
+             }
+             
+         }
+         .animation(.easeInOut, value: showLogoutModal)
      }
  }
 
