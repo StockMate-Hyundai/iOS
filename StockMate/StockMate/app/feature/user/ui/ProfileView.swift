@@ -11,7 +11,6 @@ struct ProfileView: View {
     @StateObject private var userViewModel = UserViewModel()
      
      var body: some View {
-//         NavigationStack {
              VStack(alignment: .leading, spacing: 24) {
                  
                  // MARK: - Profile Header
@@ -39,11 +38,11 @@ struct ProfileView: View {
                  // MARK: - General Section
                  VStack(alignment: .leading, spacing: 12) {
                      VStack(spacing: 10) {
-                         SettingRow(icon: "user", title: "프로필 수정")
+                         SettingNavigationRow(icon: "user", title: "프로필 확인", destination: UserProfileView())
+                         
                          SettingRow(icon: "lock", title: "비밀번호 변경")
                          SettingRow(icon: "notification", title: "알림")
                          SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: DepositHistoryView())
-//                         SettingRow(icon: "credit", title: "예치금 히스토리")
                          SettingNavigationRow(icon: "bag", title: "주문 내역", destination: OrderListView())
                          SettingRow(icon: "logout", title: "로그아웃")
                      }
@@ -60,7 +59,6 @@ struct ProfileView: View {
              .onAppear {
                  Task { await userViewModel.loadUserInfo() }
              }
-//         }
      }
  }
 
