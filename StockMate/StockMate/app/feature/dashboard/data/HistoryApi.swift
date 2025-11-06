@@ -84,9 +84,17 @@ struct PaymentTransactionItem: Decodable, Identifiable {
     let transactionTime: String?   // ✅ null 허용
     let totalAmount: Int
     let orderId: Int?              // ✅ null 허용
+    let orderItems: [OrderItemHistory]?
     let balance: Int
 }
 
+struct OrderItemHistory: Decodable {
+    let id: Int
+    let name: String
+    let image: String
+    let korName: String
+    let categoryName: String
+}
 
 
 // MARK: - API

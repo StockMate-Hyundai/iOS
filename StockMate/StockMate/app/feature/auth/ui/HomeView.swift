@@ -224,7 +224,7 @@ private func iconForCategory(_ name: String) -> String {
         case "하체/바디": return "spanner"
         case "내장/외장": return "chair"
         case "기타소모품": return "package"
-        default: return "questionmark"
+        default: return "uploadprogress"
     }
 }
 

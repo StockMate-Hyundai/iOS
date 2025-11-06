@@ -45,7 +45,8 @@ struct ProfileView: View {
                          
                          SettingRow(icon: "lock", title: "비밀번호 변경")
                          SettingRow(icon: "notification", title: "알림")
-                         SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: DepositHistoryView())
+                         SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: TransactionTypeListView())
+//                         SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: PaymentTransactionView())
                          SettingNavigationRow(icon: "bag", title: "주문 내역", destination: OrderListView())
                          //                         SettingRow(icon: "logout", title: "로그아웃")
                          // 🔹 로그아웃 버튼

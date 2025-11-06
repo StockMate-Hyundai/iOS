@@ -209,10 +209,27 @@ struct ReceiptView: View {
 //    }
 //}
 
+//func formattedDate(_ timestamp: String) -> String {
+//    let inputFormatter = DateFormatter()
+//    inputFormatter.locale = Locale(identifier: "ko_KR")
+//    inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
+//    inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+//
+//    guard let date = inputFormatter.date(from: timestamp) else {
+//        return timestamp
+//    }
+//
+//    let outputFormatter = DateFormatter()
+//    outputFormatter.locale = Locale(identifier: "ko_KR")
+//    outputFormatter.timeZone = TimeZone.current
+//    outputFormatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
+//
+//    return outputFormatter.string(from: date)
+//}
 func formattedDate(_ timestamp: String) -> String {
     let inputFormatter = DateFormatter()
     inputFormatter.locale = Locale(identifier: "ko_KR")
-    inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
+    inputFormatter.timeZone = TimeZone.current // ✅ 실제 한국 시간 기준
     inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
 
     guard let date = inputFormatter.date(from: timestamp) else {
@@ -226,6 +243,7 @@ func formattedDate(_ timestamp: String) -> String {
 
     return outputFormatter.string(from: date)
 }
+
 
 func formattedApprovalNumber(_ timestamp: String) -> String {
     let inputFormatter = DateFormatter()
