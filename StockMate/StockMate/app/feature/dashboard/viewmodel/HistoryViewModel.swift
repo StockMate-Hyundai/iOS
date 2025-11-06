@@ -97,24 +97,15 @@ final class HistoryViewModel: ObservableObject {
      // MARK: - ✅ 무한 스크롤 (예치금 내역)
     func loadMoreTransactionsIfNeeded(currentItem item: PaymentTransactionItem?) async {
         guard let item = item else { return }
-        guard !isTransactionLoading else { return } // 이미 로딩 중이면 중복 호출 방지
-        guard transactionPage + 1 < transactionTotalPages else { return } // 더 불러올 페이지 없으면 종료
+        guard !isTransactionLoading else { return } // 중복 로드 방지
+        guard transactionPage + 1 < transactionTotalPages else { return } // 마지막 페이지 방지
         
-        // 안전하게 threshold 계산
+        // ✅ 안전한 threshold 계산
         let thresholdIndex = max(transactions.count - 5, 0)
-        if let currentIndex = transactions.firstIndex(where: { $0.id == item.id }),
+        if let currentIndex = transactions.firstIndex(where: { $0.transactionId == item.transactionId }),
            currentIndex >= thresholdIndex {
             await fetchPaymentTransactions(page: transactionPage + 1)
         }
     }
-
-//     func loadMoreTransactionsIfNeeded(currentItem item: PaymentTransactionItem?) async {
-//         guard let item = item else { return }
-//         let thresholdIndex = transactions.index(transactions.endIndex, offsetBy: -5)
-//         if transactions.firstIndex(where: { $0.id == item.id }) == thresholdIndex {
-//             if transactionPage + 1 < transactionTotalPages {
-//                 await fetchPaymentTransactions(page: transactionPage + 1)
-//             }
-//         }
-//     }
+    
 }
