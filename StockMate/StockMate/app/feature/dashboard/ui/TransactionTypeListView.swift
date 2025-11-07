@@ -50,17 +50,25 @@ struct TransactionCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .center, spacing: 12) {
-                // 대표 이미지
-                AsyncImage(
-                    url: URL(string: item.orderItems?.first?.image ?? "")
-                ) { image in
-                    image.resizable().scaledToFit()
-                } placeholder: {
-                    Image("exchange")
-                        .foregroundColor(Color.Primary)
-                }
-                .frame(width: 64, height: 64)
-                .cornerRadius(10)
+                
+                // PAY일 때만 부품 이미지 표시
+                 if item.transactionType == "PAY" {
+                     // 대표 이미지
+                     AsyncImage(url: URL(string: item.orderItems?.first?.image ?? "")) { image in
+                         image.resizable().scaledToFit()
+                     } placeholder: {
+                             Color.gray.opacity(0.2)
+                     }
+                     .frame(width: 64, height: 64)
+                     .cornerRadius(10)
+                 } else {
+                     Image("exchange")
+                         .foregroundColor(Color.Primary)
+                         .frame(width: 64, height: 64)
+                         .cornerRadius(10)
+                 }
+                
+               
 
                 VStack(alignment: .leading, spacing: 5) {
                     if item.transactionType == "PAY",

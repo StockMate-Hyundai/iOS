@@ -13,7 +13,7 @@ final class HistoryViewModel: ObservableObject {
     // MARK: - 입출고 히스토리 관련
     @Published var histories: [HistoryItem] = []
     @Published var isLoading = false
-    @Published var errorMessage: String? = nil // ✅ 추가
+    @Published var errorMessage: String?
     @Published var currentPage = 0
     @Published var totalPages = 1
 
