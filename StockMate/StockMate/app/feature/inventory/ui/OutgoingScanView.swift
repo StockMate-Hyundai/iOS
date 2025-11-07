@@ -154,7 +154,7 @@ struct OutgoingScanView: View {
         }
 
         // ✅ 부품 상세 조회 API 호출
-        await partViewModel.fetchPartDetail(partId: partId)
+        await partViewModel.fetchPartDetail(partIds: partId)
 
         // ✅ 결과 출력
         await MainActor.run {

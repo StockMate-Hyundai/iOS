@@ -24,6 +24,7 @@ struct OrderRequestCardView: View {
             Divider().frame(height: 0.2).background(Color.textGray2)
 
             HStack(alignment: .center, spacing: 12) {
+                // 부품 이미지
                 AsyncImage(url: URL(string: item.image)) { image in
                     image.resizable().scaledToFit()
                 } placeholder: {
@@ -32,6 +33,7 @@ struct OrderRequestCardView: View {
                 .frame(width: 64, height: 64)
                 .cornerRadius(10)
 
+                // 이름 및 정보
                 VStack(alignment: .leading, spacing: 6) {
                     Text(item.korName)
                         .font(.system(size: 14, weight: .bold))
@@ -49,6 +51,7 @@ struct OrderRequestCardView: View {
 
                 Spacer()
 
+                // 수량 컨트롤러
                 // 🪄 수량에 따른 3단계 분기
                 if quantity == 0 {
                     Button(action: onAddToCart) {

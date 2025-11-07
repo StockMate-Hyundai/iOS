@@ -87,7 +87,7 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
             captureSession.stopRunning()
         }
     }
-
+    
     
     // ✅ QR 감지 시 호출
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {

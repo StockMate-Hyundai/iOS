@@ -55,12 +55,6 @@ struct CartCard: View {
                 if quantity == 0 {
                     if let onAddToCart = onAddToCart {
                         Button(action: onAddToCart) {
-//                            Image(systemName: "cart.badge.plus")
-//                            .font(.system(size: 18))
-//                            .foregroundColor(.Primary)
-//                            .padding(10)
-//                            .background(Color.Primary.opacity(0.1))
-//                            .clipShape(Circle())
                             Image("add_shopping_cart")
                                 .resizable()
                                 .scaledToFit()

@@ -27,8 +27,6 @@ struct OrderInfoView: View {
     @State private var specificDate = Date()
     @State private var requestMessage: String = ""
     
-    @State private var navigateToSuccessPage = false
-    
     // ✅ 모달 관련 상태
     @State private var showOrderSuccessModal = false
     @State private var navigateToOrderDetail = false
@@ -45,15 +43,6 @@ struct OrderInfoView: View {
            }
        }
     }
-//    private var destinationView: some View {
-//        Group {
-//            if let id = orderViewModel.createdOrderId {
-//                OrderDetailView(orderId: id, orderViewModel: orderViewModel)
-//            } else {
-//                EmptyView()
-//            }
-//        }
-//    }
     
     func formattedShippingDate() -> String {
         let formatter = DateFormatter()
@@ -101,7 +90,6 @@ struct OrderInfoView: View {
                 Task {
                     // 1) 서버에 반영된 장바구니를 먼저 비운다 (await)
                     await cartViewModel.clearCart()
-//                    navigateToSuccessPage = true
                     // 2) cart가 비워진 후에 모달을 띄운다
                     // (모달을 띄우기 전에 createdOrderId는 orderViewModel에 이미 세팅되어 있어야 함)
                     showOrderSuccessModal = true
@@ -172,8 +160,6 @@ struct OrderInfoView: View {
                 }
             }
         )
-
-
     }
         
 
@@ -286,9 +272,6 @@ extension OrderInfoView {
                                 .font(.system(size: 26, weight: .bold))
                                 .foregroundColor(Color.white)
                         }
-
-                        // Text("₩\(cartViewModel.depositBalance?.formatted() ?? "0")")
-                        // .font(.system(size: 22, weight: .bold))
                     }
                 }
 
@@ -406,10 +389,6 @@ extension OrderInfoView {
                     .frame(height: 70)
                     .background(Color.Primary)
             }
-            
-            NavigationLink(destination: destinationView, isActive: $navigateToSuccessPage) {
-                EmptyView()
-            }
         }
     }
 }
@@ -424,7 +403,6 @@ struct RadioButtonRow: View {
             Image(systemName: selected ? "circle.inset.filled" : "circle")
                 .foregroundColor(selected ? .Primary : .gray)
             Text(title)
-            //            Spacer()
         }
         .onTapGesture { action() }
     }

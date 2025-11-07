@@ -59,11 +59,11 @@ final class HistoryViewModel: ObservableObject {
     /// ✅ 다음 페이지 로드 (무한 스크롤 등)
     func loadMoreIfNeeded(currentItem item: HistoryItem?) async {
         guard let item = item else { return }
-        let thresholdIndex = histories.index(histories.endIndex, offsetBy: -5)
-        if histories.firstIndex(where: { $0.id == item.id }) == thresholdIndex {
-            if currentPage + 1 < totalPages {
-                await fetchInOutHistory(page: currentPage + 1)
-            }
+        let threshold = max(histories.count - 5, 0)
+        if let currentIndex = histories.firstIndex(where: { $0.id == item.id }),
+            currentIndex >= threshold,
+            currentPage + 1 < totalPages {
+            await fetchInOutHistory(page: currentPage + 1)
         }
     }
     
@@ -107,5 +107,4 @@ final class HistoryViewModel: ObservableObject {
             await fetchPaymentTransactions(page: transactionPage + 1)
         }
     }
-    
 }

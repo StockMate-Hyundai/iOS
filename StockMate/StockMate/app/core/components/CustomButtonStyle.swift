@@ -26,10 +26,9 @@ struct CustomButtonStyle: ButtonStyle {
             configuration.label
                 .frame(maxWidth: .infinity, minHeight: height)
                 .background(color.opacity(configuration.isPressed ? 0.8 : 1))
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                 .foregroundColor(.white)
-                .cornerRadius(cornerRadius)
                 .font(.system(size: fontSize, weight: fontWeight))
-//                .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
                 .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
 
         case .outlined(let color):
@@ -37,13 +36,14 @@ struct CustomButtonStyle: ButtonStyle {
                 .frame(maxWidth: .infinity, minHeight: height)
                 .overlay(
                     RoundedRectangle(cornerRadius: cornerRadius)
-                        .stroke(color, lineWidth: 1.5)
+                        .stroke(color, lineWidth: 1)
                 )
                 .foregroundColor(color)
                 .font(.system(size: fontSize, weight: fontWeight))
-                .background(Color.white)
-                .cornerRadius(cornerRadius)
-//                .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+                .background(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(Color.white)
+                )
                 .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
         }
     }

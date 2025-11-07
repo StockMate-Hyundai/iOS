@@ -9,7 +9,7 @@ import SwiftUI
 
 struct BarChartView: View {
     let values: [CGFloat]       // 각 월별 비율값 (0~1)
-    let labels: [String]        // 예: ["06", "07", "08", "09", "10"]
+    let labels: [String]        // 예: ["10", "09", "08", "07", "06"]
     let amounts: [Int]          // 예: [230000, 250000, 310000, 280000, 400000]
     @Binding var selectedMonth: String?
 

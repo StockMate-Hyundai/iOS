@@ -56,9 +56,7 @@ struct UsedPartListSheetView: View {
                         .frame(maxWidth: .infinity, minHeight: 200)
                     } else {
                         LazyVStack {
-                            ForEach(
-                                $partStore.parts
-                            ) { $part in  // ✅ 바인딩으로 변경 ($ 붙임)
+                            ForEach($partStore.parts) { $part in  // ✅ 바인딩으로 변경 ($ 붙임)
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(part.categoryName)
                                         .font(.system(size: 12, weight: .semibold))
@@ -100,9 +98,7 @@ struct UsedPartListSheetView: View {
                                         // ✅ 수량 조절 버튼 (디자인 개선)
                                         HStack(spacing: 10) {
                                             Button {
-                                                if part.quantity > 1 {
-                                                    part.quantity -= 1
-                                                }
+                                                partStore.decreaseQuantityOrRemove(for: part)
                                             } label: {
                                                 Image(systemName: "minus")
                                                     .font(.system(size: 14, weight: .regular))
@@ -113,7 +109,7 @@ struct UsedPartListSheetView: View {
                                                 .font(.system(size: 15, weight: .medium))
                                                 .frame(width: 20)
                                             Button {
-                                                part.quantity += 1
+                                                partStore.increaseQuantity(for: part)
                                             } label: {
                                                 Image(systemName: "plus")
                                                     .font(.system(size: 14, weight: .regular))

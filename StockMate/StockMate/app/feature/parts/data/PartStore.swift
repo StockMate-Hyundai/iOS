@@ -40,4 +40,15 @@ final class PartStore: ObservableObject {
             objectWillChange.send()
         }
     }
+    
+    func decreaseQuantityOrRemove(for part: PartDetail) {
+        if let index = parts.firstIndex(where: { $0.id == part.id }) {
+            if parts[index].quantity > 1 {
+                parts[index].quantity -= 1
+            } else {
+                parts.remove(at: index)
+            }
+            objectWillChange.send()
+        }
+    }
 }

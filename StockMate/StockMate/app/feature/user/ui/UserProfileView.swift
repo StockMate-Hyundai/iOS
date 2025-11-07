@@ -41,7 +41,7 @@ struct UserProfileView: View {
                 .padding(.horizontal, 10)
                 .padding(.bottom, 10)
                 
-                Text("이에일")
+                Text("이메일")
                     .font(.system(size: 14, weight: .medium))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 10)

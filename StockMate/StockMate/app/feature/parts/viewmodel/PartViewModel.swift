@@ -47,11 +47,11 @@ final class PartViewModel: ObservableObject {
         }
     }
     
-    func fetchPartDetail(partId: Int) async {
+    func fetchPartDetail(partIds: Int) async {
         isLoading = true
         defer { isLoading = false }
         
-        let result = await repo.fetchPartDetail(partIds: [partId])
+        let result = await repo.fetchPartDetail(partIds: [partIds])
         switch result {
         case .success(let apiResp):
             if apiResp.success, let data = apiResp.data {
