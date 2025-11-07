@@ -366,7 +366,7 @@ func statusText(_ status: String) -> String {
         
     // 본사에서 "결제 완료"에 대해서 주문을 반려 or 승인
     case "REJECTED": return "결제 실패"             // 주문 반려
-    case "APPROVAL_ORDER": return "출고 대기"       // 주문 승인
+    case "APPROVAL_ORDER": return "주문 승인"       // 주문 승인
         
     // 창고관리자가 "주문 승인"에 대해서 송장(인보이스)를 뽑으면 출고 대기
     case "PENDING_SHIPPING": return "출고 대기"     // 출고 대기
