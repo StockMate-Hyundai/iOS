@@ -33,6 +33,10 @@ extension Color {
     static let Dark = Color(hex: "#04150C")
     static let Light = Color(hex: "#F7F7F7")
     
+    static let GrayMordern300 = Color(hex: "#CDD5DF")
+    static let GrayMordern400 = Color(hex: "#9AA4B2")
+    
+    
     
     // Text
     static let textBlack = Color(hex: "#152C07")
@@ -81,8 +85,8 @@ extension Color {
     
     //DFF6FC
     // Home Status
-    static let Hstatus1   = Color(hex: "#DFF6FC")
-    static let Hstatus2 = Color(hex: "#DBDFF3")
+    static let Hstatus1   = Color(hex: "#08C2EB")
+    static let Hstatus2 = Color(hex: "#1F40AE")
     static let Hstatus3  = Color(hex: "#EB5032")
     static let Hstatus4  = Color(hex: "#8DDB55")
     static let Hstatus5  = Color(hex: "#8892A2")

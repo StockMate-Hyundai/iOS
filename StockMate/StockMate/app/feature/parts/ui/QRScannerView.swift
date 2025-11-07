@@ -9,6 +9,7 @@ import SwiftUI
 
 struct QRScannerView: UIViewControllerRepresentable {
     @Binding var scannedCode: String?
+    var isActive: Bool = true // ✅ 추가: 카메라 활성화 상태
 
     func makeUIViewController(context: Context) -> QRScannerViewController {
         let controller = QRScannerViewController()
@@ -16,8 +17,22 @@ struct QRScannerView: UIViewControllerRepresentable {
         return controller
     }
 
-    func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {}
-
+//    func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {}
+//    func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {
+//        // ✅ scannedCode가 nil이면 다시 스캔 시작
+//        if scannedCode == nil {
+//            uiViewController.startScanning()
+//        }
+//    }
+    
+    func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {
+            if isActive {
+                uiViewController.startSession()   // ✅ 바텀시트 닫혔을 때 다시 스캔 시작
+            } else {
+                uiViewController.stopSession()    // ✅ 바텀시트 열렸을 때 스캔 일시정지
+            }
+        }
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }

@@ -13,4 +13,10 @@ final class PartRepositoryImpl: PartRepositoryProtocol {
         let dataReq = PartApi.releaseParts(items: items)
         return await safeApi(dataReq, decodeTo: ApiResponse<String>.self)
     }
+    
+    func fetchPartDetail(partIds: [Int]) async -> AppResult<ApiResponse<[PartDetailResponse]>> {
+        let dataReq = PartApi.fetchPartDetail(partIds: partIds)
+        return await safeApi(dataReq, decodeTo: ApiResponse<[PartDetailResponse]>.self)
+    }
+
 }

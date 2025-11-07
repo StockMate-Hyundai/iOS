@@ -124,9 +124,9 @@ struct InventoryView: View {
 struct GridMenuView: View {
     let menuItems = [
         ("재고 조회", true, "InvStock", AnyView(InventorySearchView())),
-        ("입출고 히스토리", false, "InvTrans", AnyView(IncomingScanView())),
+        ("입출고 히스토리", false, "InvTrans", AnyView(InOutHistoryView())),
         ("입고 처리", false, "InvIncoming", AnyView(IncomingScanView())),
-        ("사용 처리", true, "InvUse", AnyView(OutgoingScanView())),
+        ("사용 처리", true, "InvUse", AnyView(OutgoingScanView().environmentObject(PartStore()))),
     ]
     
     var body: some View {

@@ -203,8 +203,7 @@ struct OrderDetailView: View {
 
                         // 오른쪽 버튼: 주문 상태에 따라 변경
                         if order.orderStatus == "ORDER_COMPLETED" ||
-                           order.orderStatus == "PAY_COMPLETED" ||
-                           order.orderStatus == "PENDING_APPROVAL" {
+                           order.orderStatus == "PAY_COMPLETED" {
                             // "주문취소" → 주문완료/결제완료/승인대기
                             Button(action: {
                                 Task {
@@ -220,8 +219,7 @@ struct OrderDetailView: View {
                                     .cornerRadius(10)
                             }
                            
-                        } else if order.orderStatus == "PENDING_RECEIVING" ||
-                                    order.orderStatus == "DELIVERED"  {
+                        } else if order.orderStatus == "SHIPPING" {
                             // "입고 하기" → 입고대기/배송완료
                             Button(action: {
                                 // TODO: 입고 처리 버튼
@@ -319,22 +317,30 @@ func formatDateOrDash(_ isoDate: String?) -> String {
 }
 
 func deliveryStep(for status: String) -> Int {
-    //6 -> 전체 회색
-    //4 -> 전체 파란색
+    // 6 -> 전체 회색
+    // 4 -> 전체 파란색
     switch status {
     case "ORDER_COMPLETED": return 0    // 주문 완료
-    case "PAY_COMPLETED": return 0      // 결제 완료
-    case "PENDING_APPROVAL": return 1   // 승인 대기
+        
+    // 결제 후 결과에 따라 결제 실패 or 완료
     case "FAILED": return 6             // 결제 실패
-    case "PENDING_SHIPPING": return 2   // 출고 대기
-    case "SHIPPING": return 3           // 배송중
-    case "PENDING_RECEIVING": return 4  // 입고 대기
-    case "REJECTED": return 6           // 승인 반려
-    case "DELIVERED": return 4          // 배송 완료
-    case "RECEIVED": return 4           // 입고 완료
-    case "REFUNDED": return 6           // 환불 완료
-    case "REFUND_REJECTED": return 6    // 환불 반려
+    case "PAY_COMPLETED": return 0      // 결제 완료
+        
+    // 결제 완료 상태에서 지점이 주문 취소
     case "CANCELLED": return 6          // 주문 취소
+        
+    // 본사에서 "결제 완료"에 대해서 주문을 반려 or 승인
+    case "REJECTED": return 6           // 주문 반려
+    case "APPROVAL_ORDER": return 1     // 주문 승인
+    
+    // 창고관리자가 "주문 승인"에 대해서 송장(인보이스)를 뽑으면 출고 대기
+    case "PENDING_SHIPPING": return 2   // 출고 대기
+    
+    // 창고관리자가 QR을 스캔하여 출고처리 하면 배송중
+    case "SHIPPING": return 3           // 배송중
+    
+    // 지점에서 QR을 스캔하여 입고 완료 처리
+    case "RECEIVED": return 4          // 입고 완료
     default: return 6
     }
 }
@@ -345,21 +351,31 @@ func formatDate(_ isoDate: String) -> String {
     return "\(comps[0])년 \(comps[1])월 \(comps[2])일"
 }
 
+// 0: 초록, 1: 빨강, 2: 주황, 3: 노랑, 4: 파랑, 5: 보라
+
 func statusText(_ status: String) -> String {
     switch status {
     case "ORDER_COMPLETED": return "주문 완료"      // 주문 완료
-    case "PAY_COMPLETED": return "결제 완료"        // 결제 완료
-    case "PENDING_APPROVAL": return "승인 대기"     // 승인대기
+        
+    // 결제 후 결과에 따라 결제 실패 or 완료
     case "FAILED": return "결제 실패"               // 결제 실패
-    case "PENDING_SHIPPING": return "출고 대기"     // 출고 대기
-    case "SHIPPING": return "배송중"               // 배송중
-    case "PENDING_RECEIVING": return "배송 완료"    // 입고대기
-    case "REJECTED": return "승인 반려"             // 이론상 출고 반려
-    case "DELIVERED": return "배송 완료"            // 배송 완료
-    case "RECEIVED": return "입고 완료"             // 입고 완료
-    case "REFUNDED": return "환불 완료"             // 환불 완료
-    case "REFUND_REJECTED": return "환불 반려"      // 환불 반려
+    case "PAY_COMPLETED": return "결제 완료"        // 결제 완료
+        
+    // 결제 완료 상태에서 지점이 주문 취소
     case "CANCELLED": return "주문 취소"            // 주문 취소
+        
+    // 본사에서 "결제 완료"에 대해서 주문을 반려 or 승인
+    case "REJECTED": return "결제 실패"             // 주문 반려
+    case "APPROVAL_ORDER": return "주문 승인"       // 주문 승인
+        
+    // 창고관리자가 "주문 승인"에 대해서 송장(인보이스)를 뽑으면 출고 대기
+    case "PENDING_SHIPPING": return "출고 대기"     // 출고 대기
+    
+    // 창고관리자가 QR을 스캔하여 출고처리 하면 배송중
+    case "SHIPPING": return "배송중"               // 배송중
+    
+    // 지점에서 QR을 스캔하여 입고 완료 처리
+    case "RECEIVED": return "입고 완료"             // 입고 완료
     default: return "알 수 없음"
     }
 }
@@ -367,18 +383,19 @@ func statusText(_ status: String) -> String {
 func statusColor(_ status: String) -> Color {
     switch status {
     case "ORDER_COMPLETED": return .StatusGreen
-    case "PAY_COMPLETED": return .StatusGreen
-    case "PENDING_APPROVAL": return .Warning
+        
     case "FAILED": return .Danger
-    case "PENDING_SHIPPING": return .InvUse
-    case "SHIPPING": return .Transfer
-    case "PENDING_RECEIVING": return .Secondary
+    case "PAY_COMPLETED": return .StatusGreen
+        
+    case "CANCELLED": return .Danger
+        
     case "REJECTED": return .Danger
-    case "DELIVERED": return .Secondary
+    case "APPROVAL_ORDER": return .Warning
+        
+    case "PENDING_SHIPPING": return .InvUse
+    case "SHIPPING": return .Secondary
+        
     case "RECEIVED": return .StatusPurple
-    case "REFUNDED": return .Gray
-    case "REFUND_REJECTED": return .Gray
-    case "CANCELLED": return .Gray
     default: return .gray.opacity(0.6)
     }
 }
@@ -386,18 +403,19 @@ func statusColor(_ status: String) -> Color {
 func statusBdColor(_ status: String) -> Color {
     switch status {
     case "ORDER_COMPLETED": return .StatusGreenBg
-    case "PAY_COMPLETED": return .StatusGreenBg
-    case "PENDING_APPROVAL": return .WarningBg
+        
     case "FAILED": return .DangerBg
-    case "PENDING_SHIPPING": return .InvUseBg
-    case "SHIPPING": return .TransferBg
-    case "PENDING_RECEIVING": return .LightBlue04
+    case "PAY_COMPLETED": return .StatusGreenBg
+        
+    case "CANCELLED": return .DangerBg
+        
     case "REJECTED": return .DangerBg
-    case "DELIVERED": return .LightBlue04
+    case "APPROVAL_ORDER": return .WarningBg
+        
+    case "PENDING_SHIPPING": return .InvUseBg
+    case "SHIPPING": return .LightBlue04
+        
     case "RECEIVED": return .StatusPurpleBg
-    case "REFUNDED": return Color(hex: "#EEEEEF")
-    case "REFUND_REJECTED": return Color(hex: "#EEEEEF")
-    case "CANCELLED": return Color(hex: "#EEEEEF")
     default: return .gray.opacity(0.6)
     }
 }

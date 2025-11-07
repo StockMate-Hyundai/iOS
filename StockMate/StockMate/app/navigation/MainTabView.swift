@@ -22,7 +22,12 @@ struct MainTabView: View {
                 case 1: NavigationStack{ OrderView(cartViewModel: cartVM) } //, inventoryViewModel: inventoryVM) }
 //                case 1: NavigationStack{ OrderView() }
                 case 2:
-                NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
+                    InventoryView(
+                         selectedTab: $selectedTab,
+                         tabTappedTrigger: $tabTappedTrigger
+                     )
+                     
+//                NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
 //                case 3: NavigationStack{ ContentView() }
 //                case 3: NavigationStack{ ReceiptView() }
                 case 3: NavigationStack{ ProfileView() }

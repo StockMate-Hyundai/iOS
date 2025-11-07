@@ -18,12 +18,16 @@ struct ProfileCircleView: View {
     }
 
     var body: some View {
-        Text(initials)
-            .font(.headline)
-            .foregroundColor(Color(hex: "#374EAF"))
-            .frame(width: size, height: size)
-            .background(Color(hex: "#DCE0F1")) // 고정 색상
-            .clipShape(Circle())
+        GeometryReader { geometry in
+            let minSide = min(geometry.size.width, geometry.size.height)
+            Text(initials)
+                .font(.system(size: minSide * 0.35, weight: .regular)) // ✅ 내부 크기 비례
+                .foregroundColor(Color(hex: "#374EAF"))
+                .frame(width: geometry.size.width, height: geometry.size.height)
+                .background(Color(hex: "#DCE0F1"))
+                .clipShape(Circle())
+        }
+        .frame(width: size, height: size)
     }
 }
 

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AppNavHost: View {
     @EnvironmentObject var authViewModel: AuthViewModel
+    @StateObject private var partStore = PartStore()
+    
     
     var body: some View {
         NavigationStack {
@@ -22,6 +24,8 @@ struct AppNavHost: View {
                     RegisterView()
                 case .authenticated:
                     MainTabView()
+                    .environmentObject(authViewModel) 
+                    .environmentObject(partStore)
             }
         }
     }

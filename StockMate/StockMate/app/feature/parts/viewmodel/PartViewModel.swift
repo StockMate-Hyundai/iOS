@@ -14,12 +14,17 @@ final class PartViewModel: ObservableObject {
     @Published var message: String = ""
     @Published var shouldGoToLogin = false
     
+    
+    @Published var partDetails: [PartDetailResponse] = []
+    
+    @Published var quantities: [Int: Int] = [:]  // partId별 수량 관리
+    
     private let repo: PartRepositoryProtocol
     
     init(repo: PartRepositoryProtocol = PartRepositoryImpl()) {
         self.repo = repo
     }
-    
+
     func releaseParts(items: [ReleaseItemRequest]) async -> AppResult<String> {
         isLoading = true
         defer { isLoading = false }
@@ -41,4 +46,26 @@ final class PartViewModel: ObservableObject {
             return .failure(err)
         }
     }
+    
+    func fetchPartDetail(partIds: Int) async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        let result = await repo.fetchPartDetail(partIds: [partIds])
+        switch result {
+        case .success(let apiResp):
+            if apiResp.success, let data = apiResp.data {
+                partDetails = data
+                print("✅ 부품 상세 조회 성공:", data)
+            } else {
+                message = apiResp.message
+                print("⚠️ 서버 응답 실패:", apiResp.message)
+            }
+        case .failure(let err):
+            message = err.message
+            print("❌ 네트워크 오류:", err)
+        }
+    }
+    
+    
 }

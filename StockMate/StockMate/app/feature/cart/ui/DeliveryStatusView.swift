@@ -16,8 +16,8 @@ struct DeliveryStep {
 struct DeliveryStatusView: View {
     let steps: [DeliveryStep] = [
         DeliveryStep(title: "결제완료", iconName: "check"),
-        DeliveryStep(title: "승인대기중", iconName: "hourglass"),
         DeliveryStep(title: "상품준비중", iconName: "uploadprogress"),
+        DeliveryStep(title: "배송시작", iconName: "flag"),
         DeliveryStep(title: "배송중", iconName: "rocket"),
         DeliveryStep(title: "배송완료", iconName: "pindrop")
     ]

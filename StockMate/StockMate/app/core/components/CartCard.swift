@@ -47,13 +47,6 @@ struct CartCard: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.black)
 
-//                    Text("\(item.trim) / \(item.model)")
-//                        .font(.system(size: 13))
-//                        .foregroundColor(.gray)
-//
-//                    Text("\(item.price)원")
-//                        .font(.system(size: 13, weight: .semibold))
-//                        .foregroundColor(.black)
                 }
 
                 Spacer()
@@ -62,61 +55,77 @@ struct CartCard: View {
                 if quantity == 0 {
                     if let onAddToCart = onAddToCart {
                         Button(action: onAddToCart) {
-                            Image(systemName: "cart.badge.plus")
-                                .font(.system(size: 18))
-                                .foregroundColor(.Primary)
+                            Image("add_shopping_cart")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
                                 .padding(10)
-                                .background(Color.Primary.opacity(0.1))
+                                .background(Color.white)
                                 .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 4)
                         }
                     }
                 } else if quantity == 1 {
                     HStack(spacing: 10) {
                         Button(action: onRemoveFromCart) {
                             Image(systemName: "trash")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.red)
+                                .font(.system(size: 14, weight: .regular))
+                                .frame(width: 13,height: 13)
+                                .foregroundColor(.black)
                         }
                         
                         Text("1")
-                            .font(.system(size: 15, weight: .semibold))
-                            .frame(width: 24)
+                            .font(.system(size: 15, weight: .medium))
+                            .frame(width: 20)
 
                         Button(action: onIncrease) {
                             Image(systemName: "plus")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.Primary)
+                                .font(.system(size: 14, weight: .regular))
+                                .frame(width: 13,height: 13)
+                                .foregroundColor(.black)
                         }
                     }
                     .padding(.vertical, 6)
                     .padding(.horizontal, 10)
                     .background(Color.white)
                     .cornerRadius(10)
-                    .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 4)
+                    .overlay(   // ✅ 테두리 추가
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke( Color.LightBlue03, lineWidth: 2)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
 
                 } else {
                     HStack(spacing: 10) {
                         Button(action: onDecrease) {
                             Image(systemName: "minus")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.gray)
+                                .font(.system(size: 14, weight: .regular))
+                                .frame(width: 13,height: 13)
+                                .foregroundColor(.black)
                         }
 
                         Text("\(quantity)")
-                            .font(.system(size: 15, weight: .semibold))
-                            .frame(width: 24)
+                            .font(.system(size: 15, weight: .medium))
+                            .frame(width: 20)
 
                         Button(action: onIncrease) {
                             Image(systemName: "plus")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.Primary)
+                                .font(.system(size: 14, weight: .regular))
+                                .frame(width: 13,height: 13)
+                                .foregroundColor(.black)
                         }
                     }
                     .padding(.vertical, 6)
                     .padding(.horizontal, 10)
                     .background(Color.white)
                     .cornerRadius(10)
-                    .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 4)
+                    .overlay(   // ✅ 테두리 추가
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke( Color.LightBlue03, lineWidth: 2)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
                 }
             }
         }
