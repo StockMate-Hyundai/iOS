@@ -55,7 +55,6 @@ struct OrderInfoView: View {
         case .tomorrow:
             let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
             return formatter.string(from: tomorrow)
-//            return formatter.string(from: Calendar.current.date(byAdding: .day, value: 1, to: Date())!)
         case .specific(let date):
             return formatter.string(from: date)
         }
