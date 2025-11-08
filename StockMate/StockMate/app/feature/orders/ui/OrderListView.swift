@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OrderListView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var orderViewModel = OrderViewModel()
 
     var body: some View {
@@ -54,6 +55,20 @@ struct OrderListView: View {
             }
             .background(Color.Light)
             .navigationTitle("주문 내역")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
             .task {
                 await orderViewModel.loadOrders()
             }

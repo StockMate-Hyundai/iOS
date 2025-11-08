@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct LackListView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var inventoryViewModel = InventoryViewModel()
     @State private var isFirstAppear = true
     
@@ -82,6 +83,20 @@ struct LackListView: View {
         .background(Color.Light)
         .navigationTitle("부족 재고")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .task {
             if isFirstAppear {
                 isFirstAppear = false
@@ -92,26 +107,3 @@ struct LackListView: View {
     }
 }
 
-struct CategoryButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 13, weight: .regular))
-                .foregroundColor(isSelected ? .Primary : .black)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.Light)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(isSelected ? Color.Primary : Color.GrayStroke, lineWidth: 1)
-                )
-        }
-    }
-}

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InOutHistoryView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = HistoryViewModel()
 
     var body: some View {
@@ -55,6 +56,20 @@ struct InOutHistoryView: View {
         }
         .background(Color.Light)
         .navigationTitle("입출고 내역")
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .task {
             await viewModel.fetchInOutHistory()
         }

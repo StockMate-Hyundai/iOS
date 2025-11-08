@@ -44,21 +44,21 @@ struct IncomingScanView: View {
 
                 Spacer()
 
-                // ✅ 직접 등록 버튼
-                Button(action: {
-                    dismiss()
-                }) {
-                    Text("직접 등록 하기")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
-                }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 40)
+//                // ✅ 직접 등록 버튼
+//                Button(action: {
+//                    dismiss()
+//                }) {
+//                    Text("직접 등록 하기")
+//                        .fontWeight(.semibold)
+//                        .foregroundColor(.black)
+//                        .frame(maxWidth: .infinity)
+//                        .padding()
+//                        .background(Color.white)
+//                        .cornerRadius(10)
+//                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
+//                }
+//                .padding(.horizontal, 40)
+//                .padding(.bottom, 40)
             }
 
             // ✅ 로딩 표시
@@ -85,6 +85,20 @@ struct IncomingScanView: View {
         }
         .navigationTitle("입고 부품 등록")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
     }
     
     private func handleScannedCode(_ code: String) async {

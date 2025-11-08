@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct InventorySearchView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var inventoryViewModel = InventoryViewModel()
     @State private var searchText = ""
     
@@ -152,6 +153,20 @@ struct InventorySearchView: View {
             }
             .background(Color.Light)
             .navigationTitle("재고 조회")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
             .task {
                 await inventoryViewModel.loadInventoryList(reset: true)
             }

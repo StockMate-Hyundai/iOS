@@ -28,8 +28,6 @@ struct OutgoingScanView: View {
     var body: some View {
         ZStack {
             // ✅ 카메라 미리보기 (QR 스캐너)
-//            QRScannerView(scannedCode: $scannedCode)
-//                .ignoresSafeArea()
             QRScannerView(scannedCode: $scannedCode, isActive: !showBottomSheet)
                 .ignoresSafeArea()
 
@@ -51,7 +49,7 @@ struct OutgoingScanView: View {
                         .frame(width: 250, height: 250)
                     
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.green, lineWidth: 3)
+                        .stroke(Color.Primary, lineWidth: 3)
                         .frame(width: 220, height: 220)
                 }
                 .padding(.bottom, 180)
@@ -59,20 +57,20 @@ struct OutgoingScanView: View {
                 Spacer()
                 
                 // 📦 직접 입력 버튼
-                Button(action: {
-                    dismiss()
-                }) {
-                    Text("직접 입력 하기")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
-                }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 40)
+//                Button(action: {
+//                    dismiss()
+//                }) {
+//                    Text("직접 입력 하기")
+//                        .fontWeight(.semibold)
+//                        .foregroundColor(.black)
+//                        .frame(maxWidth: .infinity)
+//                        .padding()
+//                        .background(Color.white)
+//                        .cornerRadius(10)
+//                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
+//                }
+//                .padding(.horizontal, 40)
+//                .padding(.bottom, 40)
             }
             
             // ✅ 로딩 인디케이터
@@ -137,6 +135,20 @@ struct OutgoingScanView: View {
         }
            .navigationTitle("부품 사용 처리")
            .navigationBarTitleDisplayMode(.inline)
+           .navigationBarBackButtonHidden(true)
+           .toolbar {
+               ToolbarItem(placement: .navigationBarLeading) {
+                   Button {
+                       dismiss()
+                   } label: {
+                       HStack(spacing: 4) {
+                           Image(systemName: "arrow.left")
+                               .font(.system(size: 15, weight: .medium))
+                       }
+                       .foregroundColor(.black)
+                   }
+               }
+           }
     }
     
     // ✅ 스캔된 코드로 부품 상세 조회만 수행 (출고 X)

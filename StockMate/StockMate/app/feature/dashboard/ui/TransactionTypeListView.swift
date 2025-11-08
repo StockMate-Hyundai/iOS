@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TransactionTypeListView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = HistoryViewModel()
 
     var body: some View {
@@ -29,6 +30,20 @@ struct TransactionTypeListView: View {
             .background(Color.Light.ignoresSafeArea())
             .navigationTitle("예치금 히스토리")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
             .overlay {
                 if viewModel.isTransactionLoading && viewModel.transactions.isEmpty {
                     ProgressView("불러오는 중...")

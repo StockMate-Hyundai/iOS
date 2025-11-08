@@ -15,6 +15,7 @@ enum PDFType {
 }
 
 struct ReceiptView: View {
+    @Environment(\.dismiss) private var dismiss
     let orderId: Int
     
     @StateObject private var detailViewModel = OrderDetailViewModel()
@@ -56,6 +57,20 @@ struct ReceiptView: View {
         .background(Color.Light)
         .navigationTitle("영수증")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .task {
             await detailViewModel.fetchOrderDetail(orderId: orderId)
         }
@@ -203,29 +218,6 @@ struct ReceiptView: View {
     }
 }
 
-//struct ReceiptView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ReceiptView()
-//    }
-//}
-
-//func formattedDate(_ timestamp: String) -> String {
-//    let inputFormatter = DateFormatter()
-//    inputFormatter.locale = Locale(identifier: "ko_KR")
-//    inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
-//    inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
-//
-//    guard let date = inputFormatter.date(from: timestamp) else {
-//        return timestamp
-//    }
-//
-//    let outputFormatter = DateFormatter()
-//    outputFormatter.locale = Locale(identifier: "ko_KR")
-//    outputFormatter.timeZone = TimeZone.current
-//    outputFormatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
-//
-//    return outputFormatter.string(from: date)
-//}
 func formattedDate(_ timestamp: String) -> String {
     let inputFormatter = DateFormatter()
     inputFormatter.locale = Locale(identifier: "ko_KR")

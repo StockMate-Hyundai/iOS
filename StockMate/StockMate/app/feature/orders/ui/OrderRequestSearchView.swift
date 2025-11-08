@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OrderRequestSearchView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var cartViewModel: CartViewModel
     
     @StateObject var inventoryViewModel = InventoryViewModel()
@@ -166,6 +167,20 @@ struct OrderRequestSearchView: View {
             }
             .background(Color.Light)
             .navigationTitle("직접 발주")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
             .task {
                 await inventoryViewModel.loadInventoryList(reset: true)
                 await cartViewModel.fetchCart()

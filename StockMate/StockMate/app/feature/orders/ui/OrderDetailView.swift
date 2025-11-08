@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OrderDetailView: View {
     let orderId: Int
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var orderViewModel: OrderViewModel
     @StateObject private var viewModel = OrderDetailViewModel()
 
@@ -264,6 +265,20 @@ struct OrderDetailView: View {
         .background(Color.Light)
         .navigationTitle("주문 내역 상세")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .task {
             await viewModel.fetchOrderDetail(orderId: orderId)
         }

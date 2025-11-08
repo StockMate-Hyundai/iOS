@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OrderCartView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var cartViewModel: CartViewModel
     
     var body: some View {
@@ -54,6 +55,20 @@ struct OrderCartView: View {
         .background(Color.Light)
         .navigationTitle("장바구니 확인")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .task {
             await cartViewModel.fetchCart()
         }
