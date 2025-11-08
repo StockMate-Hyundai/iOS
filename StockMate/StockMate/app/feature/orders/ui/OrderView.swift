@@ -31,10 +31,7 @@ struct OrderView: View {
                 
                 // 🔍 검색창
                 NavigationLink(destination:
-                    OrderRequestSearchView(
-                        cartViewModel: cartViewModel
-                        //inventoryViewModel: inventoryViewModel
-                    )
+                    OrderRequestSearchView(cartViewModel: cartViewModel)
                 ) {
                     HStack {
                         Image(systemName: "magnifyingglass")
@@ -71,26 +68,9 @@ struct OrderView: View {
                         OrderRequestCardView(
                             item: item,
                             quantity: qty,
-                            onIncrease: {
-                                Task {
-                                    await cartViewModel.increaseQuantity(for: item.id)
-                                }
-                            },
-                            onDecrease: {
-                                Task {
-                                    await cartViewModel.decreaseQuantity(for: item.id)
-                                }
-                            },
-                            onAddToCart: {
-                                Task {
-                                    await cartViewModel.addToCart(partId: item.id, amount: 1)
-                                }
-                            },
-                            onRemoveFromCart: {
-                                Task {
-                                    await cartViewModel.decreaseQuantity(for: item.id)
-                                }
-                            }
+                            onIncrease: { Task { await cartViewModel.increaseQuantity(for: item.id) } },
+                            onDecrease: { Task { await cartViewModel.decreaseQuantity(for: item.id) } },
+                            onAddToCart: { Task { await cartViewModel.addToCart(partId: item.id, amount: 1) } }
                         )
                         .onAppear {
                             if item.id == inventoryViewModel.underLimitItems.last?.id {

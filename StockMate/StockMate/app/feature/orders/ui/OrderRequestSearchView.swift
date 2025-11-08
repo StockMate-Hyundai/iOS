@@ -9,8 +9,8 @@ import SwiftUI
 
 struct OrderRequestSearchView: View {
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject var cartViewModel: CartViewModel
     
+    @ObservedObject var cartViewModel: CartViewModel
     @StateObject var inventoryViewModel = InventoryViewModel()
     @State private var searchText = ""
     
@@ -135,8 +135,7 @@ struct OrderRequestSearchView: View {
                                       quantity: qty,
                                       onIncrease: { Task { await cartViewModel.increaseQuantity(for: item.id) } },
                                       onDecrease: { Task { await cartViewModel.decreaseQuantity(for: item.id) }},
-                                      onAddToCart: { Task { await cartViewModel.addToCart(partId: item.id, amount: 1) }},
-                                      onRemoveFromCart: { Task { await cartViewModel.decreaseQuantity(for: item.id) }}
+                                      onAddToCart: { Task { await cartViewModel.addToCart(partId: item.id, amount: 1) }}
                                   )
                                 .padding(.horizontal)
                                 .onAppear {

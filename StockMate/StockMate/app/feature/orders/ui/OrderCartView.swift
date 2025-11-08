@@ -26,12 +26,6 @@ struct OrderCartView: View {
                             },
                             onDecrease: {
                                 Task { await cartViewModel.decreaseQuantity(for: cartItem.partId) }
-                            },
-                            onAddToCart: nil,
-                            onRemoveFromCart: {
-                                Task {
-                                    await cartViewModel.decreaseQuantity(for: cartItem.partId)
-                                }
                             }
                         )
                         .padding(.horizontal)

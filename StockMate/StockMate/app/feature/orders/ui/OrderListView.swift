@@ -12,7 +12,6 @@ struct OrderListView: View {
     @StateObject private var orderViewModel = OrderViewModel()
 
     var body: some View {
-//        NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 
                 if orderViewModel.isLoading {
@@ -72,7 +71,6 @@ struct OrderListView: View {
             .task {
                 await orderViewModel.loadOrders()
             }
-//        }
     }
 
     func formatDate(_ dateString: String) -> String {
