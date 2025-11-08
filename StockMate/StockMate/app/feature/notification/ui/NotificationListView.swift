@@ -7,17 +7,17 @@
 import SwiftUI
 
 struct NotificationListView: View {
-    @StateObject private var viewModel = NotificationViewModel()
+    @StateObject private var notificationViewModel = NotificationViewModel()
     @State private var selectedOrderId: Int? = nil
 
     var body: some View {
         VStack {
             ScrollView {
                 LazyVStack(spacing: 12) {
-                    ForEach(viewModel.notifications) { notification in
+                    ForEach(notificationViewModel.notifications) { notification in
                         NotificationCardView(item: notification) {
                             Task {
-                                await viewModel.markAsRead(notification.id)
+                                await notificationViewModel.markAsRead(notification.id)
                                 selectedOrderId = notification.orderId
                             }
                         }
@@ -32,7 +32,7 @@ struct NotificationListView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("전체 읽음") {
-                    Task { await viewModel.markAllAsRead() }
+                    Task { await notificationViewModel.markAllAsRead() }
                 }
                 .foregroundColor(.red)
                 .font(.subheadline)
@@ -42,7 +42,7 @@ struct NotificationListView: View {
             OrderDetailView(orderId: orderId, orderViewModel: OrderViewModel())
         }
         .task {
-            await viewModel.fetchNotifications()
+            await notificationViewModel.fetchNotifications()
         }
     }
 }

@@ -40,12 +40,8 @@ struct HomeView: View {
                      }
                      
                      Spacer()
-                     
-//                     Image("notification")
-//                         .font(.system(size: 20))
-//                         .foregroundColor(.gray)
-                     NavigationLink(destination: NotificationListView()
-                            .environmentObject(notificationViewModel)) { // 🔴 전달
+                    
+                     NavigationLink(destination: NotificationListView()) { // 🔴 전달
                             ZStack(alignment: .topTrailing) {
                                 Image("notification")
                                     .resizable()

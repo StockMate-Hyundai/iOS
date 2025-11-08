@@ -23,7 +23,8 @@ final class NotificationViewModel: ObservableObject {
         let result = await repository.getAllNotifications()
         switch result {
         case .success(let response):
-            notifications = response.data!.sorted { $0.createdAt > $1.createdAt }
+              notifications = (response.data ?? []).sorted { $0.createdAt > $1.createdAt }
+//            notifications = response.data!.sorted { $0.createdAt > $1.createdAt }
         case .failure(let error):
             print("❌ 알림 조회 실패:", error.localizedDescription)
         }

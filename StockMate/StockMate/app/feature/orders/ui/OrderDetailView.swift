@@ -11,7 +11,6 @@ struct OrderDetailView: View {
     let orderId: Int
     @ObservedObject var orderViewModel: OrderViewModel
     @StateObject private var viewModel = OrderDetailViewModel()
-    @State private var didFetch = false // ✅ 한 번만 fetch
 
     var body: some View {
         ScrollView {
