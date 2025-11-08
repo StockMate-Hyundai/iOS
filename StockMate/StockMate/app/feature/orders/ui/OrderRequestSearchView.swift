@@ -101,17 +101,21 @@ struct OrderRequestSearchView: View {
                         onTap: { inventoryViewModel.toggleModel($0) }
                     )
                             
-                    // 🔄 초기화 버튼
+                    // 초기화 버튼
                     Button(action: {
                         inventoryViewModel.resetFilters(with: searchText)
                     }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.counterclockwise")
-                            Text("초기화")
-                        }
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.blue)
-                        .padding(.trailing, 8)
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(
+                                inventoryViewModel.selectedCategories.isEmpty &&
+                                inventoryViewModel.selectedTrims.isEmpty &&
+                                inventoryViewModel.selectedModels.isEmpty
+                                ? .black
+                                : .Primary
+                            )
+                            .padding(.trailing, 8)
+                            .rotationEffect(.degrees(35))
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                          
@@ -119,7 +123,7 @@ struct OrderRequestSearchView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 16)
 
-                // 📋 재고 리스트
+                // 재고 리스트
                 ScrollView {
                     LazyVStack(spacing: 10) {
 

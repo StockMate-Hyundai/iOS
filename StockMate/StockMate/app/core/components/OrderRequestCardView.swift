@@ -61,7 +61,6 @@ struct OrderRequestCardView: View {
                             .background(Color.white)
                             .clipShape(Circle())
                             .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
-
                     }
                 } else {
                     QuantityControlView(
