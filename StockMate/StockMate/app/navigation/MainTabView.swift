@@ -18,7 +18,7 @@ struct MainTabView: View {
             // 메인 화면
             ZStack {
                 switch selectedTab {
-                case 0: NavigationStack{ HomeView() }
+                case 0: HomeView()
                 case 1: NavigationStack{ OrderView(cartViewModel: cartVM) } //, inventoryViewModel: inventoryVM) }
 //                case 1: NavigationStack{ OrderView() }
                 case 2:
@@ -30,7 +30,8 @@ struct MainTabView: View {
 //                NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
 //                case 3: NavigationStack{ ContentView() }
 //                case 3: NavigationStack{ ReceiptView() }
-                case 3: NavigationStack{ ProfileView() }
+//                case 3: NavigationStack{ NotificationListView() }
+                case 3: ProfileView()
                 default: NavigationStack{ ContentView() }
                 }
             }

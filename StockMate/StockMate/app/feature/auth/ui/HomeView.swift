@@ -14,6 +14,7 @@ struct HomeView: View {
     @StateObject private var inventoryViewModel = InventoryViewModel()
 //    @EnvironmentObject var dashboardViewModel: DashboardViewModel   //preview 용
     @StateObject private var dashboardViewModel = DashboardViewModel()
+    @StateObject private var notificationViewModel = NotificationViewModel() // 🔴 추가
     
     @State private var selectedMonth: String? = nil  // ✅ 추가
 
@@ -40,10 +41,32 @@ struct HomeView: View {
                      
                      Spacer()
                      
-                     Image("notification")
-                         .font(.system(size: 20))
-                         .foregroundColor(.gray)
+//                     Image("notification")
+//                         .font(.system(size: 20))
+//                         .foregroundColor(.gray)
+                     NavigationLink(destination: NotificationListView()
+                            .environmentObject(notificationViewModel)) { // 🔴 전달
+                            ZStack(alignment: .topTrailing) {
+                                Image("notification")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.gray)
+                                
+                                if notificationViewModel.unreadCount > 0 {
+                                    Text("\(notificationViewModel.unreadCount)")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(5)
+                                        .background(Color.red)
+                                        .clipShape(Circle())
+                                        .offset(x: 5, y: -5)
+                                }
+                            }
+                        }
                          .padding(.trailing, 5)
+                     
+                     
                  }
                  .padding(.horizontal)
                  
@@ -146,6 +169,7 @@ struct HomeView: View {
             await inventoryViewModel.loadLackCountByCategory()
             await dashboardViewModel.fetchMonthlySpending() // ✅ 추가
             await dashboardViewModel.fetchCategorySpending() // ✅ 추가
+            await notificationViewModel.fetchUnreadCount() // 🔴 추가
         }
         .onAppear {
             Task { await userViewModel.loadUserInfo() }
@@ -259,11 +283,6 @@ struct StatusItem: View {
     }
 }
 
-
-
-//#Preview {
-//    HomeView()
-//}
 
 #Preview {
     let dashboardVM = DashboardViewModel()

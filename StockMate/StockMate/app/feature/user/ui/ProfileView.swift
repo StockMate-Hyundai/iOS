@@ -42,7 +42,8 @@ struct ProfileView: View {
                  VStack(alignment: .leading, spacing: 12) {
                      VStack(spacing: 10) {
                          SettingNavigationRow(icon: "user", title: "프로필 확인", destination: UserProfileView())
-                         SettingRow(icon: "notification", title: "알림")
+                         SettingNavigationRow(icon: "notification", title: "알림", destination: NotificationListView())
+//                         SettingRow(icon: "notification", title: "알림")
                          SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: TransactionTypeListView())
 //                         SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: PaymentTransactionView())
                          SettingNavigationRow(icon: "bag", title: "주문 내역", destination: OrderListView())
