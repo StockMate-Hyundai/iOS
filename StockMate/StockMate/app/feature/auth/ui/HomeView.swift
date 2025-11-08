@@ -14,9 +14,9 @@ struct HomeView: View {
     @StateObject private var inventoryViewModel = InventoryViewModel()
 //    @EnvironmentObject var dashboardViewModel: DashboardViewModel   //preview 용
     @StateObject private var dashboardViewModel = DashboardViewModel()
-    @StateObject private var notificationViewModel = NotificationViewModel() // 🔴 추가
+    @StateObject private var notificationViewModel = NotificationViewModel()
     
-    @State private var selectedMonth: String? = nil  // ✅ 추가
+    @State private var selectedMonth: String? = nil
 
 
     var body: some View {
@@ -128,29 +128,20 @@ struct HomeView: View {
                          .padding(4)
                          .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬
                      
-                     ZStack { // ✅ 크기 고정용 컨테이너
-                         RoundedRectangle(cornerRadius: 16)
-                             .fill(Color.white)
-                             .frame(height: 220) // ✅ 일정 높이 고정
                          if dashboardViewModel.isLoading {
                              ProgressView("데이터 불러오는 중...")
-                                 .frame(height: 220)
+                                 .frame(height: 163)
                          } else if dashboardViewModel.monthlySpendings.isEmpty {
                              Text("최근 지출 내역이 없습니다.")
                                  .foregroundColor(.gray)
-                                 .frame(height: 220)
+                                 .frame(height: 163)
                          } else {
                              BarChartView(
                                  values: dashboardViewModel.spendingRatios,
                                  labels: dashboardViewModel.monthLabels,
                                  amounts: dashboardViewModel.monthlySpendings.map { $0.totalAmount }, selectedMonth: $selectedMonth
                              )
-                             .padding()
-    //                         .frame(height: 220)
-    //                         .background(Color.white)
-    //                         .cornerRadius(16)
                          }
-                     }
                  }
                  .padding()
                  .background(Color.white)
@@ -220,8 +211,6 @@ struct HomeView: View {
         .cornerRadius(16)
         .padding(.horizontal)
     }
-    
-
 }
 
 
