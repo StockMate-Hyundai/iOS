@@ -62,7 +62,6 @@ struct BarChartView: View {
             .frame(height: 163) // ← 전체 그래프 영역 높이 확장
             .padding(.bottom, 7)
 
-//            Divider()
             Rectangle()
                 .fill(Color.textGray2)
                 .frame(height: 0.8)   // Divider보다 살짝 두껍게

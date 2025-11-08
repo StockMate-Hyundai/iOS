@@ -175,7 +175,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("재고 부족 조회")
                 .font(.system(size: 15, weight: .semibold))
-                .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬 유지
+                .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 13) {
                 if inventoryViewModel.lackCounts.isEmpty {
                     // ✅ 데이터가 없을 때도 공간 확보
