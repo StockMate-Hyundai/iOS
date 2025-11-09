@@ -14,7 +14,7 @@ enum PaymentType: String {
 enum ShippingDateOption {
     case today
     case tomorrow
-    case specific(Date)
+    case specific(Date?)
 }
 
 struct OrderInfoView: View {
@@ -26,7 +26,7 @@ struct OrderInfoView: View {
     
     @State private var paymentType: PaymentType = .deposit
     @State private var shippingDateOption: ShippingDateOption = .today
-    @State private var specificDate = Date()
+    @State private var specificDate: Date? = nil
     @State private var requestMessage: String = ""
     
     // ✅ 모달 관련 상태
@@ -58,7 +58,7 @@ struct OrderInfoView: View {
             let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
             return formatter.string(from: tomorrow)
         case .specific(let date):
-            return formatter.string(from: date)
+            return formatter.string(from: date ?? Date())       // nil이면 오늘 날짜로 fallback
         }
     }
     
@@ -195,6 +195,8 @@ extension OrderInfoView {
             paymentSection
             shippingDateSection
             totalPriceSection
+            
+            Spacer().frame(height: 10)
         }
     }
     
@@ -224,18 +226,34 @@ extension OrderInfoView {
                     }
                     
                     TextEditor(text: $requestMessage)
-                        .font(.system(size: 14))
-                        .padding(.top, 4)
-                        .padding(.leading, 6)
-                        .scrollContentBackground(.hidden)
-                        .background(Color.clear)
+                       .font(.system(size: 14))
+                       .padding(.top, 4)
+                       .padding(.horizontal, 6)
+                       .onChange(of: requestMessage) { newValue in
+                           if newValue.count > 50 {     // 50자 제한
+                               requestMessage = String(newValue.prefix(50))
+                           }
+                       }
+                       .scrollContentBackground(.hidden)
+                       .background(Color.clear)
                 }
                 .frame(height: 70)
                 .background(Color.white)
-                .overlay(RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color(.systemGray4), lineWidth: 1))
+                .overlay(
+                   RoundedRectangle(cornerRadius: 10)
+                       .stroke(requestMessage.isEmpty ? Color(.systemGray4) : Color.Primary, lineWidth: 1) // ✅ 입력 시 Primary로 변경
+                )
+                HStack {
+                    Spacer()
+                    Text("\(requestMessage.count)/50")
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                        .padding(.trailing, 4)
+                        .padding(.bottom, -15) // 박스보다 살짝 아래로
+                }
             }
             .padding()
+            .padding(.bottom,7)
             .background(Color.white)
             .cornerRadius(16)
         }
@@ -244,7 +262,7 @@ extension OrderInfoView {
     
     private var orderListSection: some View {
         VStack(alignment: .leading) {
-            Text("주문 목록")
+            Text("주문 목록 (\(cartViewModel.items.count))")
                 .font(.headline)
                 .padding(.leading, 5)
             
@@ -266,7 +284,7 @@ extension OrderInfoView {
             Image("deposit_background") // ← 에셋에 넣은 이미지 이름
                 .resizable()
                 .scaledToFill()
-                .frame(height: 185)
+                .frame(height: 190)
                 .clipped()
                 .cornerRadius(16.39)
             
@@ -302,8 +320,8 @@ extension OrderInfoView {
                     } label: {
                         Text("충전")
                             .foregroundColor(Color.Primary)
-                            .font(.system(size: 14, weight: .bold))
-                            .padding(.vertical, 6)
+                            .font(.system(size: 14, weight: .semibold))
+                            .padding(.vertical, 8)
                             .padding(.horizontal, 14)
                             .background(Color.white)
                             .cornerRadius(20)
@@ -351,17 +369,18 @@ extension OrderInfoView {
                         if case .specific(_) = shippingDateOption { return true }
                         return false
                     }()) {
-                        shippingDateOption = .specific(specificDate)
+                        shippingDateOption = .specific(nil)
                     }
                     .padding(.trailing, 5)
                     
-                    if case .specific(_) = shippingDateOption {
-                        CustomDatePickerField(date: Binding {
-                            specificDate
-                        } set: { newValue in
-                            specificDate = newValue
-                            shippingDateOption = .specific(newValue)
-                        })
+                    if case .specific(let selectedDate) = shippingDateOption {
+                        CustomDatePickerField(date: Binding(
+                            get: { selectedDate ?? Date() },
+                            set: { newValue in
+                                specificDate = newValue
+                                shippingDateOption = .specific(newValue)
+                            }
+                        ), isDateSelected: selectedDate != nil)
                     }
                 }
                 .frame(height: 35)
@@ -400,12 +419,17 @@ extension OrderInfoView {
                     await orderViewModel.createOrder(request: orderRequest)
                 }
             } label: {
-                Text("결제하기")
+                Text("\(cartViewModel.cart?.totalPrice ?? 0)원 결제하기")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 70)
-                    .background(Color.Primary)
+                    .frame(height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(cartViewModel.items.isEmpty ? Color.gray.opacity(0.3) : Color.Primary)
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 30)
             }
         }
     }
@@ -426,31 +450,32 @@ struct RadioButtonRow: View {
     }
 }
 
-
 struct CustomDatePickerField: View {
     @Binding var date: Date
+    var isDateSelected: Bool
     @State private var showPicker: Bool = false
-    
-    // 날짜 포맷 변환용 Formatter
+
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }
-    
+
     var body: some View {
         Button {
             showPicker.toggle()
         } label: {
             HStack {
-                Text(dateFormatter.string(from: date))
+                Text(isDateSelected ? dateFormatter.string(from: date) : "선택하세요")
                     .font(.system(size: 14))
-                    .foregroundColor(.black)
-                
+                    .foregroundColor(isDateSelected ? .black : .gray)
+
                 Spacer()
-                
-                Image(systemName: "calendar")
-                    .foregroundColor(.gray)
+
+                Image("cal")
+                    .resizable()
+                    .frame(width: 15, height: 15)
+                    .scaledToFit()
             }
             .padding(10)
             .frame(width: 140, height: 30)
@@ -469,7 +494,7 @@ struct CustomDatePickerField: View {
                 )
                 .datePickerStyle(.graphical)
                 .padding()
-                
+
                 Button("완료") {
                     showPicker = false
                 }
@@ -481,4 +506,3 @@ struct CustomDatePickerField: View {
         }
     }
 }
-
