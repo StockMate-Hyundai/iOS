@@ -43,22 +43,6 @@ struct IncomingScanView: View {
                 .padding(.bottom, 180)
 
                 Spacer()
-
-//                // ✅ 직접 등록 버튼
-//                Button(action: {
-//                    dismiss()
-//                }) {
-//                    Text("직접 등록 하기")
-//                        .fontWeight(.semibold)
-//                        .foregroundColor(.black)
-//                        .frame(maxWidth: .infinity)
-//                        .padding()
-//                        .background(Color.white)
-//                        .cornerRadius(10)
-//                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
-//                }
-//                .padding(.horizontal, 40)
-//                .padding(.bottom, 40)
             }
 
             // ✅ 로딩 표시

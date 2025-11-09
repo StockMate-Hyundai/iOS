@@ -12,7 +12,12 @@ struct OrderDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var orderViewModel: OrderViewModel
     @StateObject private var viewModel = OrderDetailViewModel()
-
+    
+    // ✅ 입고처리 버튼 + 모달 + 리프레시
+    @State private var showSuccessModal = false // 모달 표시용 상태
+    @State private var refreshTrigger = UUID()  // 화면 리프레시 트리거
+    
+    
     var body: some View {
         ScrollView {
             if viewModel.isLoading {
@@ -117,24 +122,6 @@ struct OrderDetailView: View {
                         .cornerRadius(16)
                         .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
                     }
-
-                    
-                    // 요청사항 따로 빼기
-//                    VStack(alignment: .leading, spacing: 6) {
-//                        Text("요청사항")
-//                            .font(.system(size: 15, weight: .semibold))
-//                            .padding(.bottom, 4)
-//                            
-//                        Text(order.etc ?? "")
-//                            .font(.system(size: 14))
-//                        
-//                    }
-//                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
-//                    .padding(.all, 20)
-//                    .background(Color.white)
-//                    .cornerRadius(16)
-//                    .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
-                   
                     
                     // ✅ 주문 상품
                     OrderSectionCard {
@@ -202,73 +189,91 @@ struct OrderDetailView: View {
                         }
                     }
 
-                    // ✅ 하단 버튼
-                    HStack(spacing: 12) {
-                        // 왼쪽: 영수증 확인
-                        NavigationLink(destination: ReceiptView(orderId: order.id)) {
-                            Text("영수증 확인")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(Color.Primary)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 48)
-                                .background(Color.white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.Primary, lineWidth: 1.5)
-                                )
-                                .cornerRadius(10)
-                        }
+                    // 오른쪽 버튼: 주문 상태에 따라 변경
+                    if order.orderStatus == "ORDER_COMPLETED" ||
+                        order.orderStatus == "PAY_COMPLETED" ||
+                        order.orderStatus == "SHIPPING"{
+                        
+                        HStack(spacing: 12) {
+                            // 왼쪽: 영수증 확인
+                            NavigationLink(destination: ReceiptView(orderId: order.id)) {
+                                Text("영수증 확인")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(Color.Primary)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(Color.white)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color.Primary, lineWidth: 1.5)
+                                    )
+                                    .cornerRadius(10)
+                            }
 
 
-                        // 오른쪽 버튼: 주문 상태에 따라 변경
-                        if order.orderStatus == "ORDER_COMPLETED" ||
-                           order.orderStatus == "PAY_COMPLETED" {
-                            // "주문취소" → 주문완료/결제완료/승인대기
-                            Button(action: {
-                                Task {
-                                    await orderViewModel.cancelOrder(orderId: orderId)
+                            // 오른쪽 버튼: 주문 상태에 따라 변경
+                            if order.orderStatus == "ORDER_COMPLETED" ||
+                               order.orderStatus == "PAY_COMPLETED" {
+                                // "주문취소" → 주문완료/결제완료/승인대기
+                                Button(action: {
+                                    Task {
+                                        await orderViewModel.cancelOrder(orderId: orderId)
+                                    }
+                                }) {
+                                    Text("주문 취소")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 48)
+                                        .background(Color(hex: "#1D4ED8"))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
                                 }
-                            }) {
-                                Text("주문 취소")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
-                                    .background(Color(hex: "#1D4ED8"))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                            }
-                           
-                        } else if order.orderStatus == "SHIPPING" {
-                            // "입고 하기" → 입고대기/배송완료
-                            Button(action: {
-                                // TODO: 입고 처리 버튼
-                            }) {
-                                Text("입고 처리")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
-                                    .background(Color(hex: "#1D4ED8"))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                            }
-                           
-                        } else {
-                            // 👉 나머지 상태 → "재주문하기" 버튼
-                            Button(action: {
-                                // TODO: 평가 액션 처리
-                            }) {
-                                Text("재주문하기")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
-                                    .background(Color(hex: "#1D4ED8"))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                            }
+                               
+                            } else {
+                                // "입고 하기" → 배송중
+                                Button(action: {
+                                    Task {
+                                        let result = await orderViewModel.receiveOrder(orderNumber: order.orderNumber)
+                                        switch result {
+                                        case .success(let message):
+                                            showSuccessModal = true         // ✅ 입고 처리 성공 시 모달 표시
+                                            print("입고 처리 성공: \(message)")
+                                        case .failure(let error):
+                                            print("입고 처리 실패: \(error.message)")
+                                            // 실패 토스트 띄우기 등
+                                        }
+                                    }
+                                }) {
+                                    Text("입고 처리")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 48)
+                                        .background(Color(hex: "#1D4ED8"))
+                                        .foregroundColor(.white)
+                                        .cornerRadius(10)
+                                }
 
+                               
+                            }
                         }
+                        .padding(.top, 5)
+                    } else{
+                        // 👉 나머지 상태: 영수증 확인 버튼만 하나
+                          NavigationLink(destination: ReceiptView(orderId: order.id)) {
+                              Text("영수증 확인")
+                                  .font(.system(size: 15, weight: .semibold))
+                                  .foregroundColor(Color.Primary)
+                                  .frame(maxWidth: .infinity)
+                                  .frame(height: 48)
+                                  .background(Color.white)
+                                  .overlay(
+                                      RoundedRectangle(cornerRadius: 10)
+                                          .stroke(Color.Primary, lineWidth: 1.5)
+                                  )
+                                  .cornerRadius(10)
+                          }
+                          .padding(.top, 5)
                     }
-                    .padding(.top, 5)
 
                 }
                 .padding(.horizontal, 20) // ✅ 전체 섹션 동일 여백
@@ -280,6 +285,31 @@ struct OrderDetailView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .overlay(
+            Group {
+                if showSuccessModal {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .overlay(
+                            AlertModal(
+                                icon: Image("SuccessIllust"),
+                                title: "입고 처리 완료!",
+                                message: "입고 부품 등록이 완료되었습니다.",
+                                primaryButtonTitle: "확인",
+                                primaryAction: {
+                                    showSuccessModal = false
+                                    // ✅ 화면 리프레시 트리거
+                                    refreshTrigger = UUID()
+                                    Task {
+                                        await viewModel.fetchOrderDetail(orderId: orderId)
+                                    }
+                                }
+                            )
+                        )
+                }
+            }
+        )
+        .animation(.easeInOut, value: showSuccessModal)
         .background(Color.Light)
         .navigationTitle("주문 내역 상세")
         .navigationBarTitleDisplayMode(.inline)
@@ -300,6 +330,8 @@ struct OrderDetailView: View {
         .task {
             await viewModel.fetchOrderDetail(orderId: orderId)
         }
+        .id(refreshTrigger)
+        
     }
 
     // MARK: - Helper
