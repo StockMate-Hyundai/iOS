@@ -196,5 +196,8 @@ struct OrderRequestSearchView: View {
             .ignoresSafeArea(edges: .bottom)
             
         }
+        .onTapGesture {
+            UIApplication.shared.hideKeyboard()
+        }
     }
 }

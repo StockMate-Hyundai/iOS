@@ -177,6 +177,9 @@ struct RegisterView: View {
         }
         .background(Color.Light)
         .ignoresSafeArea()
+        .onTapGesture {
+            UIApplication.shared.hideKeyboard()
+        }
         .scrollDismissesKeyboard(.interactively) // ✅ 손가락으로 스크롤하면 키보드 자동 내려감
 
     }

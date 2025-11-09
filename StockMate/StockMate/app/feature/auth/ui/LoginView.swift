@@ -114,6 +114,9 @@ struct LoginView: View {
             Spacer()
         }
         .background(Color.Light)
+        .onTapGesture {
+            UIApplication.shared.hideKeyboard()
+        }
         .ignoresSafeArea()
     }
     

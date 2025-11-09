@@ -18,9 +18,11 @@ enum ShippingDateOption {
 }
 
 struct OrderInfoView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var cartViewModel: CartViewModel
     @StateObject var orderViewModel = OrderViewModel()
     @StateObject private var depositViewModel = DepositViewModel()
+    @StateObject private var userViewModel = UserViewModel()
     
     @State private var paymentType: PaymentType = .deposit
     @State private var shippingDateOption: ShippingDateOption = .today
@@ -71,6 +73,9 @@ struct OrderInfoView: View {
             ScrollView {
                 contentView
             }
+            .onTapGesture {
+                UIApplication.shared.hideKeyboard() // ✅ 화면 아무데나 탭하면 키보드 내려감
+            }
             .padding(.horizontal)
             .padding(.top)
             
@@ -79,9 +84,25 @@ struct OrderInfoView: View {
         .background(Color.Light)
         .navigationTitle("주문/결제")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .task {
             await cartViewModel.fetchCart()
             await depositViewModel.fetchDepositAmount()
+            await userViewModel.loadUserInfo()
+            
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
         }
         .edgesIgnoringSafeArea(.bottom)
         .onChange(of: orderViewModel.isOrderSuccess) { success in
@@ -183,11 +204,9 @@ extension OrderInfoView {
                 .font(.headline)
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("홍길동").font(.system(size: 15, weight: .medium))
-                Text("서울특별시 강남구 테헤란로114길")
-                    .font(.system(size: 14))
-                    .foregroundColor(.textGray1)
-                Text("010-1111-2222")
+                Text(userViewModel.userInfo?.owner ?? "이름 없음")
+                    .font(.system(size: 15, weight: .medium))
+                Text(userViewModel.userInfo?.address ?? "주소 없음")
                     .font(.system(size: 14))
                     .foregroundColor(.textGray1)
                 

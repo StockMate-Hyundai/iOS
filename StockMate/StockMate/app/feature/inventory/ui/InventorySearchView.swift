@@ -170,6 +170,9 @@ struct InventorySearchView: View {
                     }
                 }
             }
+            .onTapGesture {
+                UIApplication.shared.hideKeyboard()
+            }
             .task {
                 await inventoryViewModel.loadInventoryList(reset: true)
             }
