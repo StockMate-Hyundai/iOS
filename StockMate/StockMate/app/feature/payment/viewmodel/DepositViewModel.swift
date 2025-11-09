@@ -15,6 +15,9 @@ final class DepositViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var showChargeSheet: Bool = false
     
+    @Published var depositAmount: Int = 0
+    @Published var isChargeSuccess: Bool = false
+    
     /// ✅ 예치금 조회
     func fetchDepositAmount() async {
         isLoading = true
@@ -37,6 +40,7 @@ final class DepositViewModel: ObservableObject {
          switch result {
          case .success(_):
              await fetchDepositAmount()
+             isChargeSuccess = true
              return true
          case .failure(let error):
              print("❌ 충전 실패:", error.message)

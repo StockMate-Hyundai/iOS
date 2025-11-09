@@ -29,6 +29,11 @@ struct OrderInfoView: View {
     @State private var specificDate: Date? = nil
     @State private var requestMessage: String = ""
     
+    // 토스트 메세지 관련
+    @State private var showDepositToast = false      // 예치금 부족
+    @State private var showChargeToast = false       // 충전 완료
+
+
     // ✅ 모달 관련 상태
     @State private var showOrderSuccessModal = false
     @State private var navigateToOrderDetail = false
@@ -74,13 +79,26 @@ struct OrderInfoView: View {
                 contentView
             }
             .onTapGesture {
-                UIApplication.shared.hideKeyboard() // ✅ 화면 아무데나 탭하면 키보드 내려감
+                UIApplication.shared.hideKeyboard() // 화면 아무데나 탭하면 키보드 내려감
             }
             .padding(.horizontal)
             .padding(.top)
             
             bottomOrderButton
         }
+        .toast(
+            isPresented: $showChargeToast,
+            message: "충전이 완료되었습니다.",
+            iconName: "checkmark",
+            iconColor: .green
+        )
+        // ✅ 예치금 부족 토스트
+       .toast(
+           isPresented: $showDepositToast,
+           message: "예치금이 부족합니다. (부족: \(formatPrice((cartViewModel.cart?.totalPrice ?? 0) - depositViewModel.balance))원)",
+           iconName: "info.circle",
+           iconColor: .LightBlue04
+       )
         .background(Color.Light)
         .navigationTitle("주문/결제")
         .navigationBarTitleDisplayMode(.inline)
@@ -116,11 +134,15 @@ struct OrderInfoView: View {
                 }
             }
         }
-        // ✅ 충전 bottom sheet 연결
-       .sheet(isPresented: $depositViewModel.showChargeSheet) {
-           DepositChargeView(viewModel: depositViewModel)
-               .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
-       }
+        .sheet(isPresented: $depositViewModel.showChargeSheet) {
+            DepositChargeView(viewModel: depositViewModel) {
+                // ✅ 충전 성공 시 토스트 표시
+                withAnimation {
+                    showChargeToast = true
+                }
+            }
+            .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
+        }
         // 모달 오버레이 (body 안)
         .overlay {
             if showOrderSuccessModal {
@@ -409,15 +431,26 @@ extension OrderInfoView {
     private var bottomOrderButton: some View {
         VStack {
             Button {
-                Task {
-                    let orderRequest = OrderRequest(
-                        orderItems: makeOrderItems(),
-                        requestedShippingDate: formattedShippingDate(),
-                        paymentType: paymentType.rawValue,
-                        etc: requestMessage
-                    )
-                    await orderViewModel.createOrder(request: orderRequest)
+               let totalPrice = cartViewModel.cart?.totalPrice ?? 0
+               let deposit = depositViewModel.balance
+                           
+               if totalPrice > deposit {
+                   // ✅ 예치금 부족
+                   withAnimation {
+                       showDepositToast = true
+                   }
+               } else {
+                    Task {
+                        let orderRequest = OrderRequest(
+                            orderItems: makeOrderItems(),
+                            requestedShippingDate: formattedShippingDate(),
+                            paymentType: paymentType.rawValue,
+                            etc: requestMessage
+                        )
+                        await orderViewModel.createOrder(request: orderRequest)
+                    }
                 }
+               
             } label: {
                 Text("\(cartViewModel.cart?.totalPrice ?? 0)원 결제하기")
                     .font(.system(size: 16, weight: .bold))

@@ -6,6 +6,10 @@ struct DepositChargeView: View {
     @State private var amountText: String = ""
     @State private var isCharging: Bool = false
     
+//    @State private var showToast = false
+    var onChargeSuccess: (() -> Void)?
+    
+    
     let keypad: [[String]] = [
         ["1","2","3"],
         ["4","5","6"],
@@ -45,15 +49,6 @@ struct DepositChargeView: View {
                 .font(.system(size: 38, weight: .bold))
                 .padding(.top, 35)
             
-            // 아래 작은 라벨
-//            Text("\(formattedNumberString)원")
-//                .font(.system(size: 15))
-//                .foregroundColor(.textGray1)
-//                .padding(.horizontal, 10)
-//                .padding(.vertical, 4)
-//                .background(Color.white.opacity(0.9))
-//                .cornerRadius(12)
-            
             Spacer().frame(height: 80)
             
             // 키패드
@@ -67,7 +62,6 @@ struct DepositChargeView: View {
                             .font(.system(size: 20))
                             .frame(width: 50, height: 45)
                             .foregroundColor(Color.black)
-//                            .background(Color.red.opacity(0.5))
                             .padding(.horizontal, 4)
                             .background(Color.white)
                     }
@@ -88,6 +82,9 @@ struct DepositChargeView: View {
                     if success {
                         viewModel.showChargeSheet = false
                         dismiss()
+                        onChargeSuccess?()
+                    } else {
+                        
                     }
                 }
             } label: {
@@ -104,14 +101,19 @@ struct DepositChargeView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-            .background(Color.Primary)
+            .background(
+                (Int(amountText) ?? 0) > 0 && !isCharging
+                    ? Color.Primary     // ✅ 활성 상태
+                    : Color.gray.opacity(0.4)  // ✅ 비활성(회색)
+            )
             .cornerRadius(28)
             .padding(.top, 28)
             .padding(.horizontal, 10)
-            .disabled(isCharging)
+            .disabled(isCharging || (Int(amountText) ?? 0) == 0)
+//            .disabled(isCharging)
         }
         .padding(.horizontal, 20)
-//        .padding(.top, 20)
         .background(Color.white)
+
     }
 }
