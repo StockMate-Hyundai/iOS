@@ -6,9 +6,8 @@ struct DepositChargeView: View {
     @State private var amountText: String = ""
     @State private var isCharging: Bool = false
     
-//    @State private var showToast = false
     var onChargeSuccess: (() -> Void)?
-    
+
     
     let keypad: [[String]] = [
         ["1","2","3"],
@@ -41,34 +40,38 @@ struct DepositChargeView: View {
             
             // Title
             Text("예치금 충전")
-                .font(.system(size: 20, weight: .semibold))
-                .padding(.top, 35)
+                .font(.system(size: 18, weight: .semibold))
+                .padding(.top, 42)
             
             // 금액
             Text(formattedAmount)
-                .font(.system(size: 38, weight: .bold))
-                .padding(.top, 35)
-            
-            Spacer().frame(height: 80)
+                .font(.system(size: 32, weight: .bold))
             
             // 키패드
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 3),
-                      spacing: 1) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 11), count: 3),
+                      spacing: 16) {
                 ForEach(keypad.flatMap { $0 }, id: \.self) { key in
                     Button {
                         buttonAction(key)
                     } label: {
-                        Text(key)
-                            .font(.system(size: 20))
-                            .frame(width: 50, height: 45)
-                            .foregroundColor(Color.black)
-                            .padding(.horizontal, 4)
-                            .background(Color.white)
+                        if key == "⌫" {
+                              Image("backspace")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                                .frame(width: 60, height: 45)
+                                .background(Color.white)
+                          } else {
+                              Text(key)
+                                  .font(.system(size: 19))
+                                  .foregroundColor(Color.black)
+                                  .frame(width: 60, height: 45)
+                                  .background(Color.white)
+                          }
                     }
                 }
             }
             .padding(.horizontal,16)
-            .padding(.top, 28)
             
             
             // 충전 버튼
@@ -95,25 +98,25 @@ struct DepositChargeView: View {
                         .frame(maxWidth: .infinity)
                 } else {
                     Text("충전")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
-                        .frame(height: 59)
+                        .frame(height: 49)
                         .frame(maxWidth: .infinity)
                 }
             }
             .background(
                 (Int(amountText) ?? 0) > 0 && !isCharging
                     ? Color.Primary     // ✅ 활성 상태
-                    : Color.gray.opacity(0.4)  // ✅ 비활성(회색)
+                    : Color.gray.opacity(0.3)  // ✅ 비활성(회색)
             )
-            .cornerRadius(28)
-            .padding(.top, 28)
+            .cornerRadius(18)
+            .padding(.bottom, 25)
             .padding(.horizontal, 10)
             .disabled(isCharging || (Int(amountText) ?? 0) == 0)
-//            .disabled(isCharging)
         }
         .padding(.horizontal, 20)
         .background(Color.white)
+        
 
     }
 }

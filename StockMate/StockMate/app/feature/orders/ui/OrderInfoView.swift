@@ -141,7 +141,8 @@ struct OrderInfoView: View {
                     showChargeToast = true
                 }
             }
-            .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
+            .presentationDetents([.fraction(0.58)]) // 시트 높이 80%
+            .presentationCornerRadius(20)
         }
         // 모달 오버레이 (body 안)
         .overlay {
