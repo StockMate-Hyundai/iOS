@@ -91,15 +91,15 @@ struct InventoryView: View {
                                         Circle()
                                             .fill(Color.Primary) // 배경색
                                             .frame(width: 50, height: 50)
-                                        Image(systemName: "arrow.up")
+                                        Image(systemName: "chevron.up")
                                             .font(
-                                                .system(size: 24, weight: .bold)
+                                                .system(size: 14, weight: .semibold)
                                             )
                                             .foregroundColor(.white) // 화살표 색
                                     }
                                 }
                                 .padding(.trailing, 20)
-                                .padding(.bottom, 20)
+                                .padding(.bottom, 15)
                             }
                         }
                         .transition(.opacity)
@@ -171,8 +171,7 @@ struct GridMenuView: View {
                         .background(
                             RoundedRectangle(cornerRadius: 24)
                                 .fill(item.1 ? Color.Primary : Color.white)
-                                // 카드 그림자 (Figma 스펙: y=4, blur=4, opacity=25%, black)
-                                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 4)
+                                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 4) // 카드 그림자 (Figma 스펙: y=4, blur=4, opacity=25%, black)
                         )
                     }
                     .buttonStyle(.plain)
