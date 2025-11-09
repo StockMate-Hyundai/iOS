@@ -168,40 +168,36 @@ struct ReceiptView: View {
     }
 
     private func generatePDF(type: PDFType, order: OrderResponseItem) {
-        let view = receiptContent(order: order) // ✅ 실제 View 생성
+        // ✅ 아이폰 화면 비율로 렌더링 (디바이스 폭 고정)
+        let screenWidth = UIScreen.main.bounds.width
+        let view = receiptContent(order: order)
+            .frame(width: screenWidth) // 폭 고정 (문장 길이에 따라 늘어나지 않음)
+            .background(Color.white)
+
         let renderer = ImageRenderer(content: view)
-
-        let width: CGFloat
-        switch type {
-            case .a4: width = 595.2  // A4 width in pt
-            case .receipt80mm: width = 226.77 // 80mm in pt
-        }
-
         renderer.scale = UIScreen.main.scale
-        
-        // ✅ cgImage 기반 안전 처리
-         if let cgImage = renderer.cgImage {
-             let uiImage = UIImage(cgImage: cgImage)
-             let pdfDoc = PDFDocument()
-             if let pdfPage = PDFPage(image: uiImage) {
-                 pdfDoc.insert(pdfPage, at: 0)
-             }
 
-             // ✅ 주문번호 기반 파일명
-             let fileName = "receipt_\(order.orderNumber).pdf"
-             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        if let cgImage = renderer.cgImage {
+            let uiImage = UIImage(cgImage: cgImage)
+            let pdfDoc = PDFDocument()
+            if let pdfPage = PDFPage(image: uiImage) {
+                pdfDoc.insert(pdfPage, at: 0)
+            }
 
-             if pdfDoc.write(to: tempURL) {
-                 let av = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+            // ✅ 파일명: 주문번호 기반
+            let fileName = "receipt_\(order.orderNumber).pdf"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
 
-                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                    let rootVC = windowScene.windows.first?.rootViewController {
-                     av.popoverPresentationController?.sourceView = rootVC.view
-                     rootVC.present(av, animated: true)
-                 }
-             }
-         }
-        
+            if pdfDoc.write(to: tempURL) {
+                let av = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let rootVC = windowScene.windows.first?.rootViewController {
+                    av.popoverPresentationController?.sourceView = rootVC.view
+                    rootVC.present(av, animated: true)
+                }
+            }
+        }
     }
 }
 
