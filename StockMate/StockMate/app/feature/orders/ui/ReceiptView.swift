@@ -34,24 +34,27 @@ struct ReceiptView: View {
             } else if let order = detailViewModel.order {
                 VStack(alignment: .leading) {
                     receiptContent(order: order)
-                    
-                    Button {
-                        generatePDF(type: .receipt80mm, order: order)
-                    } label: {
-                        Text("영수증 PDF 저장")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom)
-
                 }
                 .background(Color.white)
                 .cornerRadius(12)
-                .padding()
+                .padding(.horizontal)
+                .padding(.top)
+                .padding(.bottom,4)
+                
+                Button {
+                    generatePDF(type: .receipt80mm, order: order)
+                } label: {
+                    Text("PDF 저장")
+                        .font(.system(size: 13, weight: .semibold)) // ✅ 글씨 약간 작게
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 8)
+                        .background(Color.Primary)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
             }
         }
         .background(Color.Light)
@@ -138,24 +141,8 @@ struct ReceiptView: View {
 
             Divider()
             
-            Text("""
-            • 비현금성으로 지급되는 예치금 사용 금액의 경우 현금 영수증 발행 대상에서
-              제외될 수 있습니다.
-            • 발생 정보는 구매확정 또는 거래 완료 이후 전달되기 때문에 국세청 사이트에서
-              즉시 확인되지 않을 수 있습니다.
-            • 이 영수증은 조세특례제한법 제 126조 3항에 의거 연말정산 시 소득공제혜택
-              부여 목적으로 발행됩니다. (국세청 회원가입 필수)
-            • 현금 영수증은 구매확정 또는 거래 완료 후 48시간 내로 국세청에서 확인 작업 
-              후 최종 확정됩니다.
-            • 국세청 확인: 홈택스 홈페이지(https://www.hometax.go.kr/) 또는 국세청
-              상담센터(현금영수증 문의 ☎️126-1-1)
-            """)
-            .font(.system(size: 10.5))
-            .foregroundColor(.textGray1)
-            .multilineTextAlignment(.leading)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .lineSpacing(4)
-            .padding(.leading, 2) // 문장 들여쓰기 추가
+            NoticeTextView()
+                .padding(.top, 4)
 
         }
         .padding()
@@ -176,7 +163,7 @@ struct ReceiptView: View {
             Spacer()
             Text(value)
                 .fontWeight(highlight ? .bold : .regular)
-                .foregroundColor(highlight ? .blue : .primary)
+                .foregroundColor(highlight ? .Primary : .primary)
         }
     }
 
@@ -253,4 +240,36 @@ func formattedApprovalNumber(_ timestamp: String) -> String {
     outputFormatter.dateFormat = "yyyyMMddHHmm" // ✅ 승인번호 포맷
 
     return outputFormatter.string(from: date)
+}
+
+struct NoticeTextView: View {
+    let notices = [
+        "본 영수증은 거래완료 후 국세청 반영까지 시간이 소요될 수 있습니다.",
+        "현금영수증/지출증빙 여부는 국세청 홈페이지 또는 상담센터(126)에서 확인하세요.",
+        "비현금성으로 지급되는 포인트로 결제한 금액은 현금영수증 발행 대상에서 제외될 수 있습니다.",
+        "발행 방법이 자진 발급인 경우 국세청 사이트에서 자진발급분을 사용자 등록 후 소득공제 등 혜택을 받으실 수 있습니다.",
+        "발행 정보는 구매확정 또는 거래 완료 후 전달되며, 국세청 사이트에 즉시 반영되지 않을 수 있습니다.",
+        "이 영수증은 조세특례제한법 제126조 3항에 의거, 연말정산 시 소득공제 혜택 부여 목적 등으로 발행됩니다. (국세청 회원가입 필요)",
+        "현금 영수증은 구매 확정 또는 거래 완료 후 48시간 내에 국세청에서 확인 작업 후 최종 확정됩니다.",
+        "국세청 확인: 홈택스 홈페이지(https://www.hometax.go.kr/) 또는 국세청 상담센터(현금영수증 문의 ☎️126-1-1)."
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            ForEach(notices, id: \.self) { text in
+                HStack(alignment: .top, spacing: 3) {
+                    Text("•")
+                        .font(.system(size: 11))
+                        .foregroundColor(.gray)
+                    Text(text)
+                        .font(.system(size: 11.5))
+                        .foregroundColor(.textGray1)
+                        .lineSpacing(4)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 2)
+    }
 }
