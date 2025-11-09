@@ -101,21 +101,39 @@ struct OrderDetailView: View {
                     .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
                     
                     
-                    // 요청사항 따로 빼기
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("요청사항")
-                            .font(.system(size: 15, weight: .semibold))
-                            .padding(.bottom, 4)
+                    // 요청사항이 있는 경우에만 표시
+                    if let etc = order.etc, !etc.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("요청사항")
+                                .font(.system(size: 15, weight: .semibold))
+                                .padding(.bottom, 4)
                             
-                        Text(order.etc ?? "")
-                            .font(.system(size: 14))
-                        
+                            Text(etc)
+                                .font(.system(size: 14))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.all, 20)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
-                    .padding(.all, 20)
-                    .background(Color.white)
-                    .cornerRadius(16)
-                    .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
+
+                    
+                    // 요청사항 따로 빼기
+//                    VStack(alignment: .leading, spacing: 6) {
+//                        Text("요청사항")
+//                            .font(.system(size: 15, weight: .semibold))
+//                            .padding(.bottom, 4)
+//                            
+//                        Text(order.etc ?? "")
+//                            .font(.system(size: 14))
+//                        
+//                    }
+//                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
+//                    .padding(.all, 20)
+//                    .background(Color.white)
+//                    .cornerRadius(16)
+//                    .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
                    
                     
                     // ✅ 주문 상품
