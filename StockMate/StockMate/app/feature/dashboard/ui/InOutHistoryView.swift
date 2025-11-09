@@ -40,7 +40,7 @@ struct InOutHistoryView: View {
                                 Text(formatDate(String(date)))
                                     .font(.headline)
                                     .padding(.leading, 25)
-                                    .padding(.top)
+                                    .padding(.top, 8)
 
                                 // ✅ 해당 날짜의 히스토리 카드들
                                 ForEach(histories) { history in
@@ -96,7 +96,7 @@ struct InOutHistoryCard: View {
                     } placeholder: {
                         Color.gray.opacity(0.2)
                     }
-                    .frame(width: 64, height: 64)
+                    .frame(width: 60, height: 60)
                     .cornerRadius(10)
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -104,7 +104,7 @@ struct InOutHistoryCard: View {
                             .font(.system(size: 15))
                             .lineLimit(1)
                         if history.items.count > 1 {
-                            Text("외 \(history.items.count - 1)개 품목")
+                            Text("외 \(history.items.count - 1)개")
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         }
@@ -121,7 +121,7 @@ struct InOutHistoryCard: View {
                 .padding(.vertical, 4)
                 .background(statusBgColor(history.status))
                 .foregroundColor(statusTextColor(history.status))
-                .cornerRadius(8)
+                .cornerRadius(12)
             
             if history.status == "RECEIVED", let orderId = history.orderId {
                 NavigationLink(
@@ -143,9 +143,9 @@ struct InOutHistoryCard: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding()
+        .padding(9)
         .background(Color.white)
-        .cornerRadius(12)
+        .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .padding(.horizontal)
     }
@@ -156,8 +156,8 @@ struct InOutHistoryCard: View {
 
     func statusText(_ status: String) -> String {
         switch status {
-        case "RECEIVED": return "입고 완료"
-        case "RELEASED": return "출고 완료"
+        case "RECEIVED": return "입고"
+        case "RELEASED": return "출고"
         default: return status
         }
     }

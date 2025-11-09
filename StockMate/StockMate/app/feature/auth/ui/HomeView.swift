@@ -56,7 +56,7 @@ struct HomeView: View {
                                         .padding(5)
                                         .background(Color.red)
                                         .clipShape(Circle())
-                                        .offset(x: 5, y: -5)
+                                        .offset(x: 2, y: -9)
                                 }
                             }
                         }

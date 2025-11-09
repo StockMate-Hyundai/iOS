@@ -47,7 +47,7 @@ struct InventoryView: View {
                             GridMenuView()
 
                             Text("얼마 남지 않았어요!")
-                                .font(.system(size: 22, weight: .semibold))
+                                .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 25)
                                 .padding(.top)
@@ -145,27 +145,30 @@ struct GridMenuView: View {
                                 Spacer()
                                 ZStack {
                                     // 타원 배경
-                                    Rectangle()
-                                        .fill(item.1 ? Color.white.opacity(0.2) : Color.Primary)
-                                        .frame(width: 35, height: 26)
-                                        .cornerRadius(80)
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(item.1 ? Color.white.opacity(0.28) : Color.Primary.opacity(0.15))
+                                        .frame(width: 32, height: 32)
                                     
                                     // 아이콘
                                     Image(item.2)
                                         .renderingMode(.template)
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 14, height: 14)
-                                        .foregroundColor(.white)
+                                        .frame(width: 19, height: 19)
+                                        .foregroundColor(item.1 ? .white : .Primary)
                                 }
                             }
+                            .padding(.top, 34)
+                            
                             
                             Text(item.0)
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(item.1 ? .white : Color.Primary)
+                                .padding(.leading, 5)
+                                .padding(.top, 5)
+                                .padding(.bottom, 40)
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 20)
+                        .padding(12)
                         .frame(height: 99)
                         .frame(maxWidth: .infinity)
                         .background(

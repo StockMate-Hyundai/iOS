@@ -24,7 +24,7 @@ struct OrderDetailView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let order = viewModel.order {
-                VStack(spacing: 16) {
+                VStack(spacing: 10) {
                     VStack {
                         DeliveryStatusView(currentStep: deliveryStep(for: order.orderStatus))
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -93,7 +93,7 @@ struct OrderDetailView: View {
                                let trackingNo = order.trackingNumber,
                                !carrier.isEmpty,
                                !trackingNo.isEmpty {
-                                return "\(carrier): \(trackingNo)"
+                                return "(\(carrier): \(trackingNo))"
                             }
                             return "-"
                         }()
