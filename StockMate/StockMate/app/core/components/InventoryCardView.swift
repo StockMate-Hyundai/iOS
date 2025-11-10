@@ -55,7 +55,7 @@ struct InventoryCardView: View {
                     VStack(alignment: .center, spacing: 6) {
                         if item.isLack {
                             Text("수량 부족")
-                                .font(.system(size: 13, weight: .regular))
+                                .font(.system(size: 13, weight: .semibold))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
                                 .background(Color.DangerBg)
@@ -63,7 +63,7 @@ struct InventoryCardView: View {
                                 .cornerRadius(12)
                         } else {
                             Text("수량 여유")
-                                .font(.system(size: 13, weight: .regular))
+                                .font(.system(size: 13, weight: .semibold))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
                                 .background(Color.StatusGreenBg)

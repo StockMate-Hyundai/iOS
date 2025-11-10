@@ -228,52 +228,44 @@ extension OrderInfoView {
             Text("배송 정보")
                 .font(.headline)
             
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(userViewModel.userInfo?.owner ?? "이름 없음")
                     .font(.system(size: 15, weight: .medium))
+                    .padding(.bottom, 4)
                 Text(userViewModel.userInfo?.address ?? "주소 없음")
                     .font(.system(size: 14))
+                    .padding(.bottom, 4)
                     .foregroundColor(.textGray1)
                 
                 Text("요청사항")
                     .font(.system(size: 14, weight: .medium))
                     .padding(.top, 5)
-                
-                ZStack(alignment: .topLeading) {
-                    if requestMessage.isEmpty {
-                        Text("요청사항을 입력하세요")
-                            .foregroundColor(.gray)
-                            .font(.system(size: 14))
-                            .padding(.top, 12)
-                            .padding(.leading, 10)
+         
+                TextEditor(text: $requestMessage)
+                    .font(.system(size: 14))
+                    .padding(10)
+                    .onChange(of: requestMessage) { newValue in
+                        if newValue.count > 50 { // 50자 제한
+                            requestMessage = String(newValue.prefix(50))
+                        }
                     }
-                    
-                    TextEditor(text: $requestMessage)
-                       .font(.system(size: 14))
-                       .padding(.top, 4)
-                       .padding(.horizontal, 6)
-                       .onChange(of: requestMessage) { newValue in
-                           if newValue.count > 50 {     // 50자 제한
-                               requestMessage = String(newValue.prefix(50))
-                           }
-                       }
-                       .scrollContentBackground(.hidden)
-                       .background(Color.clear)
-                }
-                .frame(height: 70)
-                .background(Color.white)
-                .overlay(
-                   RoundedRectangle(cornerRadius: 10)
-                       .stroke(requestMessage.isEmpty ? Color(.systemGray4) : Color.Primary, lineWidth: 1) // ✅ 입력 시 Primary로 변경
-                )
+                    .scrollContentBackground(.hidden)
+                    .background(Color.white)
+                    .frame(height: 93) // ✅ 높이 기존 70 → 110 으로 확대
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(requestMessage.isEmpty ? Color(.systemGray4) : Color.Primary, lineWidth: 1)
+                    )
+
+                
                 HStack {
                     Spacer()
                     Text("\(requestMessage.count)/50")
                         .font(.system(size: 12))
                         .foregroundColor(.gray)
-                        .padding(.trailing, 4)
-                        .padding(.bottom, -15) // 박스보다 살짝 아래로
+                        .padding(.trailing, 2)
                 }
+                .padding(.bottom, -8)
             }
             .padding()
             .padding(.bottom,7)

@@ -15,7 +15,7 @@ struct OrderView: View {
         ZStack{
             ScrollView {
                 // 타이틀
-                Text("재고 관리")
+                Text("발주 요청")
                     .font(.title2)
                     .bold()
                     .padding(.top, 13)

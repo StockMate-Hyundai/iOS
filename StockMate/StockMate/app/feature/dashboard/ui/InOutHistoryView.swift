@@ -55,7 +55,7 @@ struct InOutHistoryView: View {
             }
         }
         .background(Color.Light)
-        .navigationTitle("입출고 내역")
+        .navigationTitle("입출고 히스토리")
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {

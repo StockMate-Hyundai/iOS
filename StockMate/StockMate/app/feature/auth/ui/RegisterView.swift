@@ -82,45 +82,32 @@ struct RegisterView: View {
                     )
                     CustomTextField(
                         title: "지점 이름",
-                        placeholder: "서울 1호점",
+                        placeholder: "강남점",
                         text: $storeName,
                         errorMessage: storeNameError
                     )
                     // ✅ 주소 입력 필드 + 버튼 추가 부분
                     VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            CustomTextField(
-                                title: "주소",
-                                placeholder: "서울특별시 강남구 ...",
-                                text: $address,
-                                errorMessage: addressError,
-                                isReadOnly: true // ✅ 추가
-                            )
-                            .disabled(true) // 사용자가 직접 입력 못하게
-                            .onTapGesture {
-                                // 탭해도 검색창 열 수 있게 (선택사항)
-                                showAddressSearch.toggle()
-                            }
-
-                            Button(action: {
-                                showAddressSearch.toggle()
-                            }) {
-                                Text("주소 검색")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .frame(height: 43)
-                                    .padding(.horizontal, 12)
-                                    .background(Color.Primary)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(8)
-                            }
-                            .sheet(isPresented: $showAddressSearch) {
-                                KakaoZipCodeView(address: $address)
-                            }
+                        CustomTextField(
+                            title: "주소",
+                            placeholder: "도로명 주소를 검색하세요",
+                            text: $address,
+                            errorMessage: addressError,
+                            isReadOnly: true // ✅ 추가
+                        )
+                        .disabled(true) // 사용자가 직접 입력 못하게
+                        .onTapGesture {
+                            // 탭해도 검색창 열 수 있게 (선택사항)
+                            showAddressSearch.toggle()
+                        }
+                        .sheet(isPresented: $showAddressSearch) {
+                            KakaoZipCodeView(address: $address)
                         }
                     }
+                    
                     CustomTextField(
                         title: "사업자등록번호",
-                        placeholder: "123-45-67890",
+                        placeholder: "000-00-00000",
                         text: $bizNo,
                         errorMessage: bizNoError
                     )
@@ -157,7 +144,7 @@ struct RegisterView: View {
                 // MARK: - Login Link
                 HStack(spacing: 4) {
                     Text("이미 계정이 있으신가요?")
-                        .foregroundColor(Color.Secondary)
+                        .foregroundColor(Color.gray)
                         .font(.system(size: 13))
                     Button(action: {
                         viewModel.goToLogin()
@@ -166,7 +153,7 @@ struct RegisterView: View {
                         Text("로그인")
                             .fontWeight(.semibold)
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color.Secondary)
+                            .foregroundColor(Color.Primary)
                     }
                 }
                 .padding(.bottom, 40)

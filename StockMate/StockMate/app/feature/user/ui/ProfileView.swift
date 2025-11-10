@@ -21,16 +21,13 @@ struct ProfileView: View {
                      ProfileCircleView(name: userViewModel.userInfo?.owner ?? "사용자", size: 50)
                      
                      VStack(alignment: .leading, spacing: 4) {
-                         HStack {
-                             Image("location")
-                                 .foregroundColor(.gray)
-                             Text(userViewModel.userInfo?.storeName ?? "가게명 없음")
-                                 .foregroundColor(.gray)
-                                 .font(.subheadline)
-                         }
                          Text(userViewModel.userInfo?.owner ?? "이름 없음")
                              .font(.title3.bold())
                              .foregroundColor(Color(hex: "#2B3A1A"))
+                         
+                         Text(userViewModel.userInfo?.email ?? "이메일 없음")
+                             .foregroundColor(.gray)
+                             .font(.subheadline)
                      }
                      
                      Spacer()

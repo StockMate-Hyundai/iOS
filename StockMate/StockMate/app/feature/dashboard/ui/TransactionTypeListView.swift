@@ -117,7 +117,7 @@ struct TransactionCard: View {
                     let sign = isPay ? "-" : "+"
                     let color: Color = isPay ? .Danger : .Primary
 
-                    Text("\(sign) \(formatPrice(item.totalAmount))")
+                    Text("\(sign) \(formatPrice(item.totalAmount))원")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(color)
                     
@@ -137,7 +137,7 @@ struct TransactionCard: View {
         }
         .padding()
         .background(Color.white)
-        .cornerRadius(10)
+        .cornerRadius(13)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 4)
     }
 }

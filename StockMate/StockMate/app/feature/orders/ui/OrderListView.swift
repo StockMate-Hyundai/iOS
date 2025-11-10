@@ -116,9 +116,11 @@ struct OrderListCardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     if let first = order.orderItems.first {
                         Text(first.partDetail.korName)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(.black)
-                            .lineLimit(1)
+                            .lineLimit(nil) // ✅ 줄 제한 해제
+                            .fixedSize(horizontal: false, vertical: true)
+//                            .lineLimit(2)
 
                         if order.orderItems.count > 1 {
                             Text("외 \(order.orderItems.count - 1)개")
