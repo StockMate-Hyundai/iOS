@@ -78,7 +78,7 @@ final class AuthViewModel: ObservableObject {
         address: String,
         storeName: String,
         bizNo: String
-    ) async {
+    ) async -> Bool {
 
         print(
             """
@@ -107,8 +107,10 @@ final class AuthViewModel: ObservableObject {
         case .success(let apiResp):
             message = apiResp.message
             authState = .unauthenticated
+            return true
         case .failure(let err):
             message = err.message
+            return false
         }
     }
 

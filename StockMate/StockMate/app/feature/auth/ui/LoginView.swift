@@ -121,7 +121,7 @@ struct LoginView: View {
                     Button(action: { onClickRegister() }) {
                         Text("회원가입")
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color.Secondary)
+                            .foregroundColor(Color.Primary)
                     }
                 }
                 
@@ -151,13 +151,15 @@ struct LoginView: View {
             .ignoresSafeArea()
             
             // ✅ 오버레이로 위에 띄움 (맨 위에 고정)
-//          TopToast(message: topToastMessage, isVisible: $showTopToast)
-//              .zIndex(1) // 다른 뷰 위로
+//                      TopToast(message: topToastMessage, isVisible: $showTopToast)
+//                          .zIndex(1) // 다른 뷰 위로
             TopToast(message: topToastMessage,
                      isVisible: $showTopToast,
                      iconName: "exclamationmark.circle",
                      iconColor: .black)
-                      .zIndex(1) // 다른 뷰 위로
+            .zIndex(1) // 다른 뷰 위로
+ 
+            
         }
     }
     

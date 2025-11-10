@@ -17,6 +17,18 @@ struct CustomTextField: View {
     
     @FocusState private var isFocused: Bool
     
+    // ✅ 테두리 색상 계산 로직
+    private var borderColor: Color {
+        if let error = errorMessage, !error.isEmpty {
+            return .red
+        } else if isFocused {
+            return .Primary
+        } else {
+            return .LightBlue04
+        }
+    }
+    
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
@@ -25,12 +37,14 @@ struct CustomTextField: View {
             
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(
-                        isFocused
-                            ? Color.Primary
-                            : (errorMessage == nil ? Color.LightBlue04 : .red),
-                        lineWidth: 1
-                    )
+//                    .strokeBorder(
+//                        isFocused
+//                            ? Color.Primary
+//                            : (errorMessage == nil ? Color.LightBlue04 : .red),
+//                        lineWidth: 1
+//                    )
+                
+                    .strokeBorder(borderColor, lineWidth: 1)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.white)
