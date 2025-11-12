@@ -15,10 +15,10 @@ func isValidEmail(_ email: String) -> Bool {
 func isValidPassword(_ pw: String) -> Bool {
     guard pw.count >= 8 else { return false }
     return pw.range(of: "[A-Za-z]", options: .regularExpression) != nil &&
-           pw.range(of: "[0-9]", options: .regularExpression) != nil
+    pw.range(of: "[0-9]", options: .regularExpression) != nil
 }
 
 func isValidBizNo(_ no: String) -> Bool {
-    let pattern = #"^\d{3}-\d{2}-\d{5}$"#
-    return no.range(of: pattern, options: .regularExpression) != nil
+    let regex = "^\\d{3}-\\d{2}-\\d{5}$"
+    return NSPredicate(format: "SELF MATCHES %@", regex).evaluate(with: no)
 }

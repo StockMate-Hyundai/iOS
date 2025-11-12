@@ -8,5 +8,6 @@
 import Foundation
 
 protocol UserRepositoryProtocol {
+    // 사용자 정보 조회
     func getUserInfo() async -> AppResult<ApiResponse<UserInfo>>
 }

@@ -7,12 +7,14 @@
 
 import SwiftUI
 
+// 인증 상태를 나타내는 enum
 enum AuthState {
     case unauthenticated
     case registering
     case authenticated
 }
 
+// 인증 관련 로직(ViewModel)
 @MainActor
 final class AuthViewModel: ObservableObject {
     @Published var email = ""
@@ -20,14 +22,16 @@ final class AuthViewModel: ObservableObject {
     @Published var message: String = ""
     @Published var authState: AuthState = .unauthenticated
 
+    // MARK: - Dependencies
     private let repo: AuthRepositoryProtocol
 
+    // MARK: - Init
     init(repo: AuthRepositoryProtocol = AuthRepositoryImpl()) {
         self.repo = repo
     }
 
     // MARK: - 로그인
-    func login() async {
+    func login() async  -> Bool{
         print("로그인 시도 - email: \(email), password: \(password)")
         let req = LoginRequest(email: email, password: password)
         let result = await repo.login(req)
@@ -38,7 +42,7 @@ final class AuthViewModel: ObservableObject {
             guard let data = apiResp.data else {
                 print("데이터 없음: \(apiResp.message)")
                 message = apiResp.message
-                return
+                return false
             }
             TokenStore.shared.save(
                 access: data.accessToken,
@@ -48,18 +52,22 @@ final class AuthViewModel: ObservableObject {
             message = "로그인 성공"
             authState = .authenticated
             print("authState 변경됨 → authenticated")
+            return true
 
         case .failure(let err):
             print("로그인 실패: \(err.message)")
             message = err.message
+            return false
         }
     }
 
+    // MARK: - 로그아웃
     func logout() {
         TokenStore.shared.clear()
         authState = .unauthenticated
     }
     
+    // MARK: - 화면 상태 전환
     func goToLogin() {
         authState = .unauthenticated
     }
@@ -76,20 +84,8 @@ final class AuthViewModel: ObservableObject {
         address: String,
         storeName: String,
         bizNo: String
-    ) async {
-
-        print(
-            """
-            [회원가입 시도]
-            email: \(email)
-            password: \(password)
-            owner: \(owner)
-            address: \(address)
-            storeName: \(storeName)
-            businessNumber: \(bizNo)
-            """
-        )
-
+    ) async -> Bool {
+        
         let req = RegisterRequest(
             email: email,
             password: password,
@@ -105,8 +101,10 @@ final class AuthViewModel: ObservableObject {
         case .success(let apiResp):
             message = apiResp.message
             authState = .unauthenticated
+            return true
         case .failure(let err):
             message = err.message
+            return false
         }
     }
 

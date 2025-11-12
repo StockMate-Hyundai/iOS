@@ -12,8 +12,20 @@ struct CustomSecureField: View {
     var placeholder: String
     @Binding var text: String
     var errorMessage: String? = nil
+    
     @FocusState private var isFocused: Bool
     @State private var showPassword = false
+    
+    // 테두리 색상 계산 로직 (CustomTextField와 동일)
+    private var borderColor: Color {
+        if let error = errorMessage, !error.isEmpty {
+            return .red
+        } else if isFocused {
+            return .Primary
+        } else {
+            return .LightBlue04
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -25,11 +37,7 @@ struct CustomSecureField: View {
             // 텍스트 입력 박스
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(
-                        isFocused ? Color.Primary :
-                        (errorMessage == nil ? Color.LightBlue04 : .red),
-                        lineWidth: 1
-                    )
+                    .strokeBorder(borderColor, lineWidth: 1)
                     .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
                     // 포커스일 때만 그림자 표시
                     .shadow(

@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct OrderListView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var orderViewModel = OrderViewModel()
 
     var body: some View {
-//        NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 
                 if orderViewModel.isLoading {
@@ -54,10 +54,23 @@ struct OrderListView: View {
             }
             .background(Color.Light)
             .navigationTitle("주문 내역")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
             .task {
                 await orderViewModel.loadOrders()
             }
-//        }
     }
 
     func formatDate(_ dateString: String) -> String {
@@ -103,9 +116,10 @@ struct OrderListCardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     if let first = order.orderItems.first {
                         Text(first.partDetail.korName)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(.black)
-                            .lineLimit(1)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
 
                         if order.orderItems.count > 1 {
                             Text("외 \(order.orderItems.count - 1)개")
@@ -128,7 +142,7 @@ struct OrderListCardView: View {
             }
 
             // 주문취소 버튼 (필요 시)
-            if order.orderStatus == "ORDER_COMPLETED" {
+            if order.orderStatus == "PAY_COMPLETED" {
                 Button(action: {
                     // 주문취소 처리
                     Task {

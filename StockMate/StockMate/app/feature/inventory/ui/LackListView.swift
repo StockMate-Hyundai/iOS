@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct LackListView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var inventoryViewModel = InventoryViewModel()
     @State private var isFirstAppear = true
     
@@ -17,23 +18,42 @@ struct LackListView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // 상단 카테고리 탭
-            HStack(spacing: 8) {
-                ForEach(categories, id: \.self) { category in
-                    CategoryButton(
-                        title: category,
-                        isSelected: selectedCategory == category
-                    ) {
-                        Task {
-                            selectedCategory = category
-                            inventoryViewModel.selectedCategories = [category]
-                            await inventoryViewModel.loadUnderLimitList(reset: true)
+            // 상단 카테고리 탭 (가로 스크롤 가능)
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(categories, id: \.self) { category in
+                                CategoryButton(
+                                    title: category,
+                                    isSelected: selectedCategory == category
+                                ) {
+                                    Task {
+                                        selectedCategory = category
+                                        inventoryViewModel.selectedCategories = [category]
+                                        await inventoryViewModel.loadUnderLimitList(reset: true)
+                                        
+                                        // 버튼 클릭 시 해당 카테고리로 스크롤 이동
+                                        withAnimation {
+                                            proxy.scrollTo(category, anchor: .center)
+                                        }
+                                    }
+                                }
+                                .id(category) // ScrollViewReader용 id
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 10)
+                    }
+                    .onAppear {
+                        // 진입 시 선택된 카테고리 위치로 자동 스크롤
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation {
+                                proxy.scrollTo(selectedCategory, anchor: .center)
+                            }
                         }
                     }
                 }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 10)
+
             
             // 리스트
             ScrollView {
@@ -63,6 +83,20 @@ struct LackListView: View {
         .background(Color.Light)
         .navigationTitle("부족 재고")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .task {
             if isFirstAppear {
                 isFirstAppear = false
@@ -73,26 +107,3 @@ struct LackListView: View {
     }
 }
 
-struct CategoryButton: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(isSelected ? .Primary : .black)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.Light)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(isSelected ? Color.Primary : Color.GrayStroke, lineWidth: 1)
-                )
-        }
-    }
-}

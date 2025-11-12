@@ -12,11 +12,10 @@ struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var userViewModel = UserViewModel()
     @StateObject private var inventoryViewModel = InventoryViewModel()
-//    @EnvironmentObject var dashboardViewModel: DashboardViewModel   //preview 용
     @StateObject private var dashboardViewModel = DashboardViewModel()
-    @StateObject private var notificationViewModel = NotificationViewModel() // 🔴 추가
+    @StateObject private var notificationViewModel = NotificationViewModel()
     
-    @State private var selectedMonth: String? = nil  // ✅ 추가
+    @State private var selectedMonth: String? = nil
 
 
     var body: some View {
@@ -41,7 +40,7 @@ struct HomeView: View {
                      
                      Spacer()
                     
-                     NavigationLink(destination: NotificationListView()) { // 🔴 전달
+                     NavigationLink(destination: NotificationListView()) {
                             ZStack(alignment: .topTrailing) {
                                 Image("notification")
                                     .resizable()
@@ -56,7 +55,7 @@ struct HomeView: View {
                                         .padding(5)
                                         .background(Color.red)
                                         .clipShape(Circle())
-                                        .offset(x: 5, y: -5)
+                                        .offset(x: 2, y: -9)
                                 }
                             }
                         }
@@ -66,7 +65,7 @@ struct HomeView: View {
                  }
                  .padding(.horizontal)
                  
-                 // 🔍 검색창
+                 // 검색창
                  NavigationLink(destination: InventorySearchView()) {
                      HStack {
                          Image(systemName: "magnifyingglass")
@@ -94,7 +93,7 @@ struct HomeView: View {
                      Text("지난달 카테고리 별 지출")
                          .font(.system(size: 15, weight: .semibold))
                          .padding(4)
-                         .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬
+                         .frame(maxWidth: .infinity, alignment: .leading)
                      
                      HStack {
                          if dashboardViewModel.isLoading {
@@ -126,31 +125,22 @@ struct HomeView: View {
                      Text("월간 지출 현황")
                          .font(.system(size: 15, weight: .semibold))
                          .padding(4)
-                         .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬
+                         .frame(maxWidth: .infinity, alignment: .leading)
                      
-                     ZStack { // ✅ 크기 고정용 컨테이너
-                         RoundedRectangle(cornerRadius: 16)
-                             .fill(Color.white)
-                             .frame(height: 220) // ✅ 일정 높이 고정
                          if dashboardViewModel.isLoading {
                              ProgressView("데이터 불러오는 중...")
-                                 .frame(height: 220)
+                                 .frame(height: 163)
                          } else if dashboardViewModel.monthlySpendings.isEmpty {
                              Text("최근 지출 내역이 없습니다.")
                                  .foregroundColor(.gray)
-                                 .frame(height: 220)
+                                 .frame(height: 163)
                          } else {
                              BarChartView(
                                  values: dashboardViewModel.spendingRatios,
                                  labels: dashboardViewModel.monthLabels,
                                  amounts: dashboardViewModel.monthlySpendings.map { $0.totalAmount }, selectedMonth: $selectedMonth
                              )
-                             .padding()
-    //                         .frame(height: 220)
-    //                         .background(Color.white)
-    //                         .cornerRadius(16)
                          }
-                     }
                  }
                  .padding()
                  .background(Color.white)
@@ -163,31 +153,31 @@ struct HomeView: View {
         .task {
             // 카테고리 데이터 로드
             await inventoryViewModel.loadLackCountByCategory()
-            await dashboardViewModel.fetchMonthlySpending() // ✅ 추가
-            await dashboardViewModel.fetchCategorySpending() // ✅ 추가
-            await notificationViewModel.fetchUnreadCount() // 🔴 추가
+            await dashboardViewModel.fetchMonthlySpending()
+            await dashboardViewModel.fetchCategorySpending()
+            await notificationViewModel.fetchUnreadCount()
         }
         .onAppear {
             Task { await userViewModel.loadUserInfo() }
         }
         // 화면 디자인 시 잠시 주석처리
-        // ✅ 세션 만료 시 자동으로 로그인 뷰로 이동
-//        .onChange(of: userViewModel.shouldGoToLogin) { shouldGo in
-//            if shouldGo {
-//                print("세션 만료됨 → 로그인 화면으로 이동")
-//                authViewModel.logout()
-//            }
-//        }
+        // 세션 만료 시 자동으로 로그인 뷰로 이동
+        .onChange(of: userViewModel.shouldGoToLogin) { shouldGo in
+            if shouldGo {
+                print("세션 만료됨 → 로그인 화면으로 이동")
+                authViewModel.logout()
+            }
+        }
      }
     
     private var lackStockSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("재고 부족 조회")
                 .font(.system(size: 15, weight: .semibold))
-                .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬 유지
+                .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 13) {
                 if inventoryViewModel.lackCounts.isEmpty {
-                    // ✅ 데이터가 없을 때도 공간 확보
+                    // 데이터가 없을 때도 공간 확보
                     ForEach(0..<5) { _ in
                         StatusItem(
                             title: "-",
@@ -220,8 +210,6 @@ struct HomeView: View {
         .cornerRadius(16)
         .padding(.horizontal)
     }
-    
-
 }
 
 
@@ -277,20 +265,4 @@ struct StatusItem: View {
                 .foregroundColor(.textGray1)
         }.frame(maxWidth: .infinity, minHeight: 70)
     }
-}
-
-
-#Preview {
-    let dashboardVM = DashboardViewModel()
-    dashboardVM.categorySpendings = [
-        CategorySpending(categoryName: "전기/램프", totalAmount: 450000),
-        CategorySpending(categoryName: "엔진/미션", totalAmount: 300000),
-        CategorySpending(categoryName: "하체/바디", totalAmount: 150000),
-        CategorySpending(categoryName: "내장/외장", totalAmount: 100000),
-        CategorySpending(categoryName: "기타소모품", totalAmount: 50000)
-    ]
-    
-    return HomeView()
-        .environmentObject(AuthViewModel())
-        .environmentObject(dashboardVM) // ✅ 이제 진짜 연결됨!
 }

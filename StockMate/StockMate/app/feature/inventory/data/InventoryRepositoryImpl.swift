@@ -8,7 +8,10 @@
 import Foundation
 import Alamofire
 
+// MARK: - 재고 관련 Repository 구현체
 final class InventoryRepositoryImpl: InventoryRepositoryProtocol {
+    
+    // MARK: 재고 리스트 조회
     func getInventoryList(
         page: Int,
         size: Int,
@@ -25,7 +28,8 @@ final class InventoryRepositoryImpl: InventoryRepositoryProtocol {
         )
         return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
     }
-    // 부족 재고 리스트 호출
+    
+    // MARK: 부족 재고 목록 조회
     func getUnderLimitList(
         categoryName: String?,
         page: Int,
@@ -35,7 +39,7 @@ final class InventoryRepositoryImpl: InventoryRepositoryProtocol {
         return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
     }
     
-    // ✅ 이름 검색
+    // MARK: 부품명 검색
     func findByName(
         name: String,
         page: Int,
@@ -45,10 +49,9 @@ final class InventoryRepositoryImpl: InventoryRepositoryProtocol {
         return await safeApi(dataReq, decodeTo: ApiResponse<InventoryPageData>.self)
     }
     
-    // 카테고리별 부족 재고 개수 조회
+    // MARK: 카테고리별 부족 재고 개수 조회
     func getLackCountByCategory() async -> AppResult<ApiResponse<[LackCountItem]>> {
         let dataReq = InventoryApi.getLackCountByCategory()
         return await safeApi(dataReq, decodeTo: ApiResponse<[LackCountItem]>.self)
     }
-
 }

@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct InventorySearchView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var inventoryViewModel = InventoryViewModel()
     @State private var searchText = ""
     
@@ -36,7 +37,7 @@ struct InventorySearchView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // 🔍 검색창
+                // 검색창
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
@@ -47,7 +48,6 @@ struct InventorySearchView: View {
                             let term = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
                             guard !term.isEmpty else { return }
                             Task {
-//                                await inventoryViewModel.searchByName(name: searchText, reset: true)
                                 await inventoryViewModel.searchByName(name: term, reset: true)
                             }
                         }
@@ -97,17 +97,21 @@ struct InventorySearchView: View {
                         onTap: { inventoryViewModel.toggleModel($0) }
                     )
                         
-                    // 🔄 초기화 버튼
+                    // 초기화 버튼
                     Button(action: {
                         inventoryViewModel.resetFilters(with: searchText)
                     }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.counterclockwise")
-                            Text("초기화")
-                        }
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.blue)
-                        .padding(.trailing, 8)
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(
+                                inventoryViewModel.selectedCategories.isEmpty &&
+                                inventoryViewModel.selectedTrims.isEmpty &&
+                                inventoryViewModel.selectedModels.isEmpty
+                                ? .black
+                                : .Primary
+                            )
+                            .padding(.trailing, 8)
+                            .rotationEffect(.degrees(35))
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                      
@@ -115,7 +119,7 @@ struct InventorySearchView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 16)
 
-                // 📋 재고 리스트
+                // 재고 리스트
                 ScrollView {
                     LazyVStack(spacing: 10) {
 
@@ -152,6 +156,23 @@ struct InventorySearchView: View {
             }
             .background(Color.Light)
             .navigationTitle("재고 조회")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
+            .onTapGesture {
+                UIApplication.shared.hideKeyboard()
+            }
             .task {
                 await inventoryViewModel.loadInventoryList(reset: true)
             }
@@ -169,23 +190,12 @@ struct FilterMenu: View {
     var displayTitle: String {
         if selectedItems.isEmpty {
             return title
-        } else if selectedItems.count == 1 {
-            return selectedItems.first ?? title
         } else {
             return "\(title) (\(selectedItems.count))"
         }
     }
     
     var isActive: Bool { !selectedItems.isEmpty }
-    
-    var truncatedTitle: String {
-        // 글자 6자까지만 표시, 이후 "..." 처리
-        if displayTitle.count > 8 {
-            let prefix = displayTitle.prefix(8)
-            return "\(prefix)…"
-        }
-        return displayTitle
-    }
     
     var body: some View {
         Menu {
@@ -198,7 +208,7 @@ struct FilterMenu: View {
                         if selectedItems.contains(item) {
                             Spacer()
                             Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
+                                .foregroundColor(.Primary)
                         }
                     }
                 }
@@ -207,19 +217,21 @@ struct FilterMenu: View {
             HStack(spacing: 6) {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(isActive ? .blue : .gray)
+                    .foregroundColor(isActive ? .Primary : .gray)
                 
-                Text(truncatedTitle)
+                Text(displayTitle)
                     .font(.system(size: 13))
-                    .foregroundColor(isActive ? .blue : .black)
+                    .foregroundColor(isActive ? .Primary : .black)
                     .lineLimit(1)
-                    .truncationMode(.tail) // 안전하게 "..." 처리
-                    .multilineTextAlignment(.center)
+                    .truncationMode(.tail)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 10) // 높이 늘림
-            .background(
-                isActive ? Color.blue.opacity(0.2) : Color(.systemGray6)
+            .padding(.vertical, 9)
+            .fixedSize(horizontal: true, vertical: false)
+            .background(isActive ? Color(hex: "DBEAFE") : Color.Light)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
             )
             .cornerRadius(8)
         }

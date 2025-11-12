@@ -56,14 +56,14 @@ final class PartViewModel: ObservableObject {
         case .success(let apiResp):
             if apiResp.success, let data = apiResp.data {
                 partDetails = data
-                print("✅ 부품 상세 조회 성공:", data)
+                print("부품 상세 조회 성공:", data)
             } else {
                 message = apiResp.message
-                print("⚠️ 서버 응답 실패:", apiResp.message)
+                print("서버 응답 실패:", apiResp.message)
             }
         case .failure(let err):
             message = err.message
-            print("❌ 네트워크 오류:", err)
+            print("네트워크 오류:", err)
         }
     }
     

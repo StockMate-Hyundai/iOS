@@ -33,8 +33,8 @@ final class UserViewModel: ObservableObject {
         case .failure(let err):
             message = err.message
             print("유저 정보 불러오기 실패:", err.message)
-            // ✅ 세션 만료나 인증 문제면 로그인화면으로 유도
-            if err.code == 401 || err.code == 403 {
+            
+            if err.code == 401 || err.code == 403 {     // 세션 만료나 인증 문제면 로그인 화면으로 유도
                 shouldGoToLogin = true
             }
                

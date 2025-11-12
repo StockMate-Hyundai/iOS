@@ -26,8 +26,6 @@ struct InventoryView: View {
                             GeometryReader { geo in
                                 Color.clear
                                     .onChange(of: geo.frame(in: .global).minY) { newValue in
-                                        // 👇 스크롤 시 값이 변함
-                                        //print("📏 Scroll offsetY:", newValue)   // 테스트용, 화면 안정화 후 제거
                                         withAnimation(.easeInOut(duration: 0.25)) {
                                             showScrollToTopButton = newValue < -150
                                         }
@@ -47,7 +45,7 @@ struct InventoryView: View {
                             GridMenuView()
 
                             Text("얼마 남지 않았어요!")
-                                .font(.system(size: 22, weight: .semibold))
+                                .font(.system(size: 20, weight: .semibold))
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 25)
                                 .padding(.top)
@@ -91,15 +89,15 @@ struct InventoryView: View {
                                         Circle()
                                             .fill(Color.Primary) // 배경색
                                             .frame(width: 50, height: 50)
-                                        Image(systemName: "arrow.up")
+                                        Image(systemName: "chevron.up")
                                             .font(
-                                                .system(size: 24, weight: .bold)
+                                                .system(size: 14, weight: .semibold)
                                             )
                                             .foregroundColor(.white) // 화살표 색
                                     }
                                 }
                                 .padding(.trailing, 20)
-                                .padding(.bottom, 20)
+                                .padding(.bottom, 15)
                             }
                         }
                         .transition(.opacity)
@@ -145,34 +143,36 @@ struct GridMenuView: View {
                                 Spacer()
                                 ZStack {
                                     // 타원 배경
-                                    Rectangle()
-                                        .fill(item.1 ? Color.white.opacity(0.2) : Color.Primary)
-                                        .frame(width: 35, height: 26)
-                                        .cornerRadius(80)
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(item.1 ? Color.white.opacity(0.28) : Color.Primary.opacity(0.15))
+                                        .frame(width: 32, height: 32)
                                     
                                     // 아이콘
                                     Image(item.2)
                                         .renderingMode(.template)
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 14, height: 14)
-                                        .foregroundColor(.white)
+                                        .frame(width: 19, height: 19)
+                                        .foregroundColor(item.1 ? .white : .Primary)
                                 }
                             }
+                            .padding(.top, 34)
+                            
                             
                             Text(item.0)
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(item.1 ? .white : Color.Primary)
+                                .padding(.leading, 5)
+                                .padding(.top, 5)
+                                .padding(.bottom, 40)
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 20)
+                        .padding(12)
                         .frame(height: 99)
                         .frame(maxWidth: .infinity)
                         .background(
                             RoundedRectangle(cornerRadius: 24)
                                 .fill(item.1 ? Color.Primary : Color.white)
-                                // 카드 그림자 (Figma 스펙: y=4, blur=4, opacity=25%, black)
-                                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 4)
+                                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 4) // 카드 그림자 (Figma 스펙: y=4, blur=4, opacity=25%, black)
                         )
                     }
                     .buttonStyle(.plain)

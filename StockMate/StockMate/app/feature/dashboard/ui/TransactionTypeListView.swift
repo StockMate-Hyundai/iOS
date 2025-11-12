@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TransactionTypeListView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = HistoryViewModel()
 
     var body: some View {
@@ -29,6 +30,20 @@ struct TransactionTypeListView: View {
             .background(Color.Light.ignoresSafeArea())
             .navigationTitle("예치금 히스토리")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
             .overlay {
                 if viewModel.isTransactionLoading && viewModel.transactions.isEmpty {
                     ProgressView("불러오는 중...")
@@ -52,8 +67,13 @@ struct TransactionCard: View {
             HStack(alignment: .center, spacing: 12) {
                 
                 // PAY일 때만 부품 이미지 표시
-                 if item.transactionType == "PAY" {
-                     // 대표 이미지
+                 if item.transactionType == "CHARGE" {
+                     Image("exchange")
+                         .foregroundColor(Color.Primary)
+                         .frame(width: 64, height: 64)
+                         .cornerRadius(10)
+                 }else {
+                     // 부품 대표 이미지
                      AsyncImage(url: URL(string: item.orderItems?.first?.image ?? "")) { image in
                          image.resizable().scaledToFit()
                      } placeholder: {
@@ -61,13 +81,7 @@ struct TransactionCard: View {
                      }
                      .frame(width: 64, height: 64)
                      .cornerRadius(10)
-                 } else {
-                     Image("exchange")
-                         .foregroundColor(Color.Primary)
-                         .frame(width: 64, height: 64)
-                         .cornerRadius(10)
                  }
-                
                
 
                 VStack(alignment: .leading, spacing: 5) {
@@ -87,7 +101,24 @@ struct TransactionCard: View {
                             Text("예치금 충전")
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.black)
+                    } else {
+                        HStack {
+                              Text("주문 취소:")
+                                  .font(.system(size: 14, weight: .bold))
+                                  .foregroundColor(.black)
+                              if let orderItems = item.orderItems, !orderItems.isEmpty {
+                                  let firstName = orderItems.first?.korName ?? "-"
+                                  let extraCount = orderItems.count - 1
+                                  let displayText = extraCount > 0
+                                      ? "\(firstName) 외 \(extraCount)개"
+                                      : firstName
+                                  Text(displayText)
+                                      .font(.system(size: 14, weight: .bold))
+                                      .foregroundColor(.black)
+                              }
+                          }
                     }
+                    
                     // 날짜
                     Text(
                         item.transactionTime != nil ? formattedDate(
@@ -97,19 +128,19 @@ struct TransactionCard: View {
                     .font(.system(size: 13, weight: .regular))
                     .foregroundColor(.textGray1)
                    
-                    // ✅ 금액 표시 (PAY/CHARGE 구분)
+                    // 금액 표시 (PAY/CHARGE 구분)
                     let isPay = item.transactionType == "PAY"
                     let sign = isPay ? "-" : "+"
                     let color: Color = isPay ? .Danger : .Primary
 
-                    Text("\(sign) \(formatPrice(item.totalAmount))")
+                    Text("\(sign) \(formatPrice(item.totalAmount))원")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(color)
                     
                 }
                 .frame(height: 60, alignment: .top)
                 Spacer()
-                // ✅ PAY일 때만 꺾새 표시
+                // PAY일 때만 상세 페이지 연결
                  if item.transactionType == "PAY" {
                      NavigationLink(destination: ReceiptView(orderId: item.orderId ?? 1)) {
                          Image(systemName: "chevron.right")
@@ -122,7 +153,7 @@ struct TransactionCard: View {
         }
         .padding()
         .background(Color.white)
-        .cornerRadius(10)
+        .cornerRadius(13)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 4)
     }
 }

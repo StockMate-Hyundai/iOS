@@ -13,7 +13,6 @@ struct OrderRequestCardView: View {
     let onIncrease: () -> Void
     let onDecrease: () -> Void
     let onAddToCart: () -> Void
-    let onRemoveFromCart: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -52,7 +51,6 @@ struct OrderRequestCardView: View {
                 Spacer()
 
                 // 수량 컨트롤러
-                // 🪄 수량에 따른 3단계 분기
                 if quantity == 0 {
                     Button(action: onAddToCart) {
                         Image("add_shopping_cart")
@@ -63,72 +61,13 @@ struct OrderRequestCardView: View {
                             .background(Color.white)
                             .clipShape(Circle())
                             .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
-
                     }
-
-                } else if quantity == 1 {
-                    HStack(spacing: 10) {
-                        Button(action: onRemoveFromCart) {
-                            Image(systemName: "trash")
-                                .font(.system(size: 14, weight: .regular))
-                                .frame(width: 13,height: 13)
-                                .foregroundColor(.black)
-                        }
-                        
-                        Text("1")
-                            .font(.system(size: 15, weight: .medium))
-                            .frame(width: 20)
-
-                        Button(action: onIncrease) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 14, weight: .regular))
-                                .frame(width: 13,height: 13)
-                                .foregroundColor(.black)
-                        }
-                    }
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 10)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .overlay(   // ✅ 테두리 추가
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke( Color.LightBlue03, lineWidth: 2)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
-
-
                 } else {
-                    HStack(spacing: 10) {
-                        Button(action: onDecrease) {
-                            Image(systemName: "minus")
-                                .font(.system(size: 14, weight: .regular))
-                                .frame(width: 13,height: 13)
-                                .foregroundColor(.black)
-                        }
-
-                        Text("\(quantity)")
-                            .font(.system(size: 15, weight: .medium))
-                            .frame(width: 20)
-
-                        Button(action: onIncrease) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 14, weight: .regular))
-                                .frame(width: 13,height: 13)
-                                .foregroundColor(.black)
-                        }
-                    }
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 10)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .overlay(   // ✅ 테두리 추가
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke( Color.LightBlue03, lineWidth: 2)
+                    QuantityControlView(
+                        quantity: quantity,
+                        onIncrease: onIncrease,
+                        onDecrease: onDecrease
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
-
                 }
             }
         }
@@ -164,8 +103,7 @@ struct OrderRequestCardView: View {
             quantity: 0,
             onIncrease: {},
             onDecrease: {},
-            onAddToCart: {},
-            onRemoveFromCart: {}
+            onAddToCart: {}
         )
 
         // 수량 1 (카트에 하나 있음)
@@ -174,8 +112,7 @@ struct OrderRequestCardView: View {
             quantity: 1,
             onIncrease: {},
             onDecrease: {},
-            onAddToCart: {},
-            onRemoveFromCart: {}
+            onAddToCart: {}
         )
 
         // 수량 3 (여러 개 담긴 상태)
@@ -184,8 +121,7 @@ struct OrderRequestCardView: View {
             quantity: 3,
             onIncrease: {},
             onDecrease: {},
-            onAddToCart: {},
-            onRemoveFromCart: {}
+            onAddToCart: {}
         )
     }
     .padding()

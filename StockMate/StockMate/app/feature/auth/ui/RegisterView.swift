@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RegisterView: View {
     @EnvironmentObject private var viewModel: AuthViewModel
-
+    // MARK: - 사용자 입력값
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
@@ -18,7 +18,7 @@ struct RegisterView: View {
     @State private var address = ""
     @State private var bizNo = ""
 
-    // 에러 메시지 상태
+    // MARK: - 에러 메시지 상태값
     @State private var emailError: String? = nil
     @State private var pwError: String? = nil
     @State private var confirmPasswordError: String? = nil
@@ -27,239 +27,230 @@ struct RegisterView: View {
     @State private var addressError: String? = nil
     @State private var bizNoError: String? = nil
 
+    // MARK: - UI 상태 관리
     @State private var isLoading = false
     @State private var showToast = false
-
     @State private var showAddressSearch = false
-
+    @State private var showSuccessToast = false
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                Spacer().frame(height: 70)
-
-                // MARK: - Logo
-                Image("stockmate_logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 216, height: 44)
-
-                Spacer().frame(height: 4)
-
-                // MARK: - Title
-                Text("회원가입")
-                    .font(.system(size: 28, weight: .bold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 24)
-                    .foregroundColor(Color.DarkBlue01)
-
-                // MARK: - Text Fields
-                VStack {
-                    CustomTextField(
-                        title: "이메일",
-                        placeholder: "stockmate@gmail.com",
-                        text: $email,
-                        errorMessage: emailError
-                    )
-                    .keyboardType(.emailAddress)
-                    CustomSecureField(
-                        title: "비밀번호",
-                        placeholder: "비밀번호를 입력하세요",
-                        text: $password,
-                        errorMessage: pwError
-                    )
-                    CustomSecureField(
-                        title: "비밀번호 확인",
-                        placeholder: "비밀번호를 다시 입력하세요",
-                        text: $confirmPassword,
-                        errorMessage: confirmPasswordError
-                    )
-                    CustomTextField(
-                        title: "대표자 이름",
-                        placeholder: "홍길동",
-                        text: $owner,
-                        errorMessage: ownerError
-                    )
-                    CustomTextField(
-                        title: "지점 이름",
-                        placeholder: "서울 1호점",
-                        text: $storeName,
-                        errorMessage: storeNameError
-                    )
-                    // ✅ 주소 입력 필드 + 버튼 추가 부분
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
+        ZStack {
+            // MARK: - 메인 스크롤 영역
+            ScrollView {
+                VStack(spacing: 16) {
+                    Spacer().frame(height: 70)
+                    
+                    // MARK: - 로고
+                    Image("stockmate_logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 216, height: 44)
+                    
+                    Spacer().frame(height: 4)
+                    
+                    // MARK: - 화면 제목
+                    Text("회원가입")
+                        .font(.system(size: 28, weight: .bold))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 24)
+                        .foregroundColor(Color.DarkBlue01)
+                    
+                    // MARK: - 입력 폼
+                    VStack {
+                        // 이메일
+                        CustomTextField(
+                            title: "이메일",
+                            placeholder: "stockmate@gmail.com",
+                            text: $email,
+                            errorMessage: emailError
+                        )
+                        .keyboardType(.emailAddress)
+                        .onChange(of: email) { newValue in
+                            emailError = isValidEmail(newValue) ? nil : "이메일 형식을 확인해주세요"
+                        }
+                        
+                        // 비밀번호
+                        CustomSecureField(
+                            title: "비밀번호",
+                            placeholder: "비밀번호를 입력하세요",
+                            text: $password,
+                            errorMessage: pwError
+                        )
+                        .onChange(of: password) { newValue in
+                            pwError = isValidPassword(newValue) ? nil : "8자 이상, 영문+숫자 조합입니다."
+                            // confirm도 재검증
+                            confirmPasswordError = (confirmPassword.isEmpty || confirmPassword == newValue) ? nil : "비밀번호가 일치하지 않습니다"
+                        }
+                        
+                        // 비밀번호 확인
+                        CustomSecureField(
+                            title: "비밀번호 확인",
+                            placeholder: "비밀번호를 다시 입력하세요",
+                            text: $confirmPassword,
+                            errorMessage: confirmPasswordError
+                        )
+                        .onChange(of: confirmPassword) { newValue in
+                            confirmPasswordError = (password == newValue) ? nil : "비밀번호가 일치하지 않습니다"
+                        }
+                        // 대표자 이름
+                        CustomTextField(
+                            title: "대표자 이름",
+                            placeholder: "홍길동",
+                            text: $owner,
+                            errorMessage: nil
+                        )
+                        // 지점 이름
+                        CustomTextField(
+                            title: "지점 이름",
+                            placeholder: "강남점",
+                            text: $storeName,
+                            errorMessage: nil
+                        )
+                        // 주소 입력 필드
+                        VStack(alignment: .leading, spacing: 4) {
                             CustomTextField(
                                 title: "주소",
-                                placeholder: "서울특별시 강남구 ...",
+                                placeholder: "도로명 주소를 검색하세요",
                                 text: $address,
                                 errorMessage: addressError,
-                                isReadOnly: true // ✅ 추가
+                                isReadOnly: true
                             )
                             .disabled(true) // 사용자가 직접 입력 못하게
                             .onTapGesture {
                                 // 탭해도 검색창 열 수 있게 (선택사항)
                                 showAddressSearch.toggle()
                             }
-
-                            Button(action: {
-                                showAddressSearch.toggle()
-                            }) {
-                                Text("주소 검색")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .frame(height: 43)
-                                    .padding(.horizontal, 12)
-                                    .background(Color.Primary)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(8)
-                            }
                             .sheet(isPresented: $showAddressSearch) {
                                 KakaoZipCodeView(address: $address)
                             }
                         }
-                    }
-                    CustomTextField(
-                        title: "사업자등록번호",
-                        placeholder: "123-45-67890",
-                        text: $bizNo,
-                        errorMessage: bizNoError
-                    )
-                    .keyboardType(.numberPad)
-                    .onChange(of: bizNo) { newValue in
-                        formatBizNoInput(newValue)
-                    }
-                }
-                .padding(.horizontal, 24)
-                
-
-                // MARK: - Register Button
-                if isLoading {
-                    ProgressView("회원가입 중...")
-                        .progressViewStyle(CircularProgressViewStyle())
-                } else {
-                    Button(action: {
-                        handleRegister()
-                    }) {
-                        Text("회원가입")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 48)
-                            .background(Color(hex: "#1D4ED8"))
-                            .cornerRadius(8)
+                        
+                        CustomTextField(
+                            title: "사업자등록번호",
+                            placeholder: "000-00-00000",
+                            text: $bizNo,
+                            errorMessage: bizNoError
+                        )
+                        .keyboardType(.numberPad)
+                        .onChange(of: bizNo) { newValue in
+                            formatBizNoInput(newValue)
+                            bizNoError = isValidBizNo(newValue) ? nil : "형식: 000-00-00000"
+                        }
                     }
                     .padding(.horizontal, 24)
-                }
-
-                TopToast(message: viewModel.message, isVisible: $showToast)
-
-                Spacer().frame(height: 5)
-                // MARK: - Login Link
-                HStack(spacing: 4) {
-                    Text("이미 계정이 있으신가요?")
-                        .foregroundColor(Color.Secondary)
-                        .font(.system(size: 13))
-                    Button(action: {
-                        viewModel.goToLogin()
-                        print("로그인으로 이동")
-                    }) {
-                        Text("로그인")
-                            .fontWeight(.semibold)
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color.Secondary)
+                    
+                    
+                    // MARK: - 회원가입 버튼
+                    if isLoading {
+                        ProgressView("회원가입 중...")
+                            .progressViewStyle(CircularProgressViewStyle())
+                    } else {
+                        Button(action: {
+                            validateAndSetErrors()
+                            guard isFormValid else { return }
+                            Task {
+                                isLoading = true
+                                let success = await viewModel.register(
+                                    email: email,
+                                    password: password,
+                                    owner: owner,
+                                    address: address,
+                                    storeName: storeName,
+                                    bizNo: bizNo.filter { $0.isNumber }
+                                )
+                                isLoading = false
+                            }
+                        }) {
+                            Text("회원가입")
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 48)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(isFormValid ? Color.Primary : Color.gray.opacity(0.45))
+                                )
+                                .cornerRadius(8)
+                        }
+                        .disabled(!isFormValid)
+                        .padding(.horizontal, 24)
                     }
+                    
+                    // 상단 토스트 (오류/알림용)
+                    TopToast(message: viewModel.message, isVisible: $showToast)
+                    
+                    Spacer().frame(height: 5)
+                    
+                    // MARK: - 로그인 페이지로 이동 링크
+                    HStack(spacing: 4) {
+                        Text("이미 계정이 있으신가요?")
+                            .foregroundColor(Color.gray)
+                            .font(.system(size: 13))
+                        Button(action: {
+                            viewModel.goToLogin()
+                            print("로그인으로 이동")
+                        }) {
+                            Text("로그인")
+                                .fontWeight(.semibold)
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(Color.Primary)
+                        }
+                    }
+                    .padding(.bottom, 40)
+                    
+                    // 키보드 가림 방지용 여백
+                    Spacer().frame(height: 300)
                 }
-                .padding(.bottom, 40)
-                
-                // ✅ 키보드 가림 방지용 여백
-                Spacer().frame(height: 300)
             }
-        }
-        .background(Color.Light)
-        .ignoresSafeArea()
-        .scrollDismissesKeyboard(.interactively) // ✅ 손가락으로 스크롤하면 키보드 자동 내려감
-
-    }
-
-    // MARK: - 유효성 검사 함수
-    private func isValidForm() -> Bool {
-        emailError = isValidEmail(email) ? nil : "이메일 형식을 확인해주세요"
-        pwError = isValidPassword(password) ? nil : "영문과 숫자를 포함한 8자 이상 비밀번호를 입력해주세요"
-        confirmPasswordError = (password == confirmPassword) ? nil : "비밀번호가 일치하지 않습니다."
-        bizNoError = isValidBizNo(bizNo) ? nil : "사업자등록번호 형식이 올바르지 않습니다. (예: 123-45-67890)"
-
-        return emailError == nil && pwError == nil
-            && confirmPasswordError == nil && bizNoError == nil
-    }
-
-    // MARK: - Register Handler
-    private func handleRegister() {
-        // 초기화
-        emailError = nil
-        pwError = nil
-        confirmPasswordError = nil
-        ownerError = nil
-        storeNameError = nil
-        addressError = nil
-        bizNoError = nil
-
-        var hasEmptyField = false
-
-        // 필수 필드 체크
-        if email.isEmpty {
-            emailError = "이메일을 입력해주세요."
-            hasEmptyField = true
-        }
-        if password.isEmpty {
-            pwError = "비밀번호를 입력해주세요."
-            hasEmptyField = true
-        }
-        if confirmPassword.isEmpty {
-            confirmPasswordError = "비밀번호를 다시 입력해주세요."
-            hasEmptyField = true
-        }
-        if owner.isEmpty {
-            ownerError = "대표자 이름을 입력해주세요."
-            showToast = true
-        }
-        if storeName.isEmpty {
-            storeNameError = "지점 이름을 입력해주세요."
-            showToast = true
-        }
-        if address.isEmpty {
-            addressError = "주소를 입력해주세요."
-            showToast = true
-        }
-        if bizNo.isEmpty {
-            bizNoError = "사업자등록번호를 입력해주세요."
-            hasEmptyField = true
-        }
-
-        // 빈 칸이 하나라도 있으면 종료
-        guard !hasEmptyField else { return }
-        // 유효성 검사 함수 실행
-        guard isValidForm() else { return }
-
-        // 통과 → 회원가입 진행
-        Task {
-            isLoading = true
-            await viewModel.register(
-                email: email,
-                password: password,
-                owner: owner,
-                address: address,
-                storeName: storeName,
-                bizNo: bizNo.filter { $0.isNumber } // ← 여기서 숫자만 추출해서 전송
+            .background(Color.Light)
+            .ignoresSafeArea()
+            .onTapGesture {
+                UIApplication.shared.hideKeyboard()
+            }
+            .scrollDismissesKeyboard(.interactively) // 손가락으로 스크롤하면 키보드 자동 내려감
+            .onChange(of: viewModel.message) { newMsg in
+                guard !newMsg.isEmpty else { return }
+                showToast = true
+            }
+            
+            // 회원가입 성공 토스트
+            BottomToast(
+                message: "회원가입 성공",
+                isVisible: $showSuccessToast,
+                iconName: "toastlogo",
+                backgroundColor: Color(hex: "EEEDF5") // 초록색
             )
-            isLoading = false
+            .zIndex(1) // 다른 뷰 위로
         }
+       
     }
     
+    // MARK: - 전체 폼 유효성 검사
+      private var isFormValid: Bool {
+          return isValidEmail(email)
+              && isValidPassword(password)
+              && password == confirmPassword
+              && !owner.trimmingCharacters(in: .whitespaces).isEmpty
+              && !storeName.trimmingCharacters(in: .whitespaces).isEmpty
+              && !address.trimmingCharacters(in: .whitespaces).isEmpty
+              && isValidBizNo(bizNo)
+      }
+    
+    // MARK: - 입력값 검증 및 에러 설정
+    private func validateAndSetErrors() {
+        emailError = isValidEmail(email) ? nil : "이메일 형식을 확인해주세요"
+        pwError = isValidPassword(password) ? nil : "8자 이상, 영문+숫자 조합입니다."
+        confirmPasswordError = (password == confirmPassword) ? nil : "비밀번호가 일치하지 않습니다"
+        addressError = address.isEmpty ? "주소를 입력해주세요." : nil
+        bizNoError = isValidBizNo(bizNo) ? nil : "형식: 000-00-00000"
+    }
+    
+    // MARK: - 사업자등록번호 자동 포맷팅
     private func formatBizNoInput(_ input: String) {
-        // 1️⃣ 숫자만 남기기
+        // 숫자만 남기기
         let digitsOnly = input.filter { $0.isNumber }
 
-        // 2️⃣ 하이픈 자동 삽입
+        // 하이픈 자동 삽입
         var formatted = ""
         let length = digitsOnly.count
 
@@ -276,12 +267,12 @@ struct RegisterView: View {
             formatted = "\(first)-\(middle)-\(last)"
         }
 
-        // 3️⃣ 10자리 이상은 자르기
+        // 10자리 이상은 자르기
         if digitsOnly.count > 10 {
             formatted = String(formatted.prefix(12)) // 하이픈 포함
         }
 
-        // 4️⃣ 상태 업데이트
+        // 상태 업데이트
         if formatted != bizNo {
             bizNo = formatted
         }

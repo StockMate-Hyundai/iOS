@@ -16,7 +16,7 @@ struct OutgoingScanView: View {
     
     // 전역 부품 저장소
     @EnvironmentObject var partStore: PartStore
-    @StateObject private var partViewModel = PartViewModel() // ✅ ViewModel 추가
+    @StateObject private var partViewModel = PartViewModel()
     
     @State private var showBottomSheet = false
     
@@ -27,14 +27,12 @@ struct OutgoingScanView: View {
 
     var body: some View {
         ZStack {
-            // ✅ 카메라 미리보기 (QR 스캐너)
-//            QRScannerView(scannedCode: $scannedCode)
-//                .ignoresSafeArea()
+            // 카메라 미리보기 (QR 스캐너)
             QRScannerView(scannedCode: $scannedCode, isActive: !showBottomSheet)
                 .ignoresSafeArea()
 
             
-            // ✅ 스캔 가이드 및 UI 오버레이
+            // 스캔 가이드 및 UI 오버레이
             VStack {
                 Text("사용할 부품의 QR을 스캔해주세요")
                     .font(.headline)
@@ -44,38 +42,23 @@ struct OutgoingScanView: View {
                 
                 Spacer()
                 
-                // 📷 스캔 박스
+                // 스캔 박스
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.clear)
                         .frame(width: 250, height: 250)
                     
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.green, lineWidth: 3)
+                        .stroke(Color.Primary, lineWidth: 3)
                         .frame(width: 220, height: 220)
                 }
                 .padding(.bottom, 180)
                 
                 Spacer()
                 
-                // 📦 직접 입력 버튼
-                Button(action: {
-                    dismiss()
-                }) {
-                    Text("직접 입력 하기")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
-                }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 40)
             }
             
-            // ✅ 로딩 인디케이터
+            // 로딩 인디케이터
             if partViewModel.isLoading {
                 Color.black.opacity(0.3).ignoresSafeArea()
                 ProgressView("부품 조회 중...") //ProgressView("부품 사용 처리 중...")
@@ -97,12 +80,12 @@ struct OutgoingScanView: View {
             UsedPartListSheetView(
                 onUseParts: {
                     Task {
-                        // ✅ payload 생성
+                        // payload 생성
                         let payload = partStore.parts.map {
                             ReleaseItemRequest(partId: $0.id, quantity: $0.quantity)
                         }
 
-                        // ✅ API 호출
+                        // API 호출
                         let result = await partViewModel.releaseParts(items: payload)
 
                         await MainActor.run {
@@ -111,7 +94,7 @@ struct OutgoingScanView: View {
                                 alertMessage = message
                                 showAlert = true
 
-                                // ✅ 성공 시: 전역 부품 초기화 + 바텀시트 닫기 + 화면 복귀
+                                // 성공 시: 전역 부품 초기화 + 바텀시트 닫기 + 화면 복귀
                                 partStore.clear()
                                 showBottomSheet = false
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -126,20 +109,34 @@ struct OutgoingScanView: View {
                     }
                 },
                 onRescan: {
-                    // ✅ 다시 스캔 버튼 눌렀을 때
+                    // 다시 스캔 버튼 눌렀을 때
                     showBottomSheet = false
                     resetScanState() // QR 다시 활성화
                 }
             )
             .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
-            .presentationCornerRadius(28)           // ✅ 모서리 곡률
+            .presentationCornerRadius(28)
             .environmentObject(partStore)
         }
            .navigationTitle("부품 사용 처리")
            .navigationBarTitleDisplayMode(.inline)
+           .navigationBarBackButtonHidden(true)
+           .toolbar {
+               ToolbarItem(placement: .navigationBarLeading) {
+                   Button {
+                       dismiss()
+                   } label: {
+                       HStack(spacing: 4) {
+                           Image(systemName: "arrow.left")
+                               .font(.system(size: 15, weight: .medium))
+                       }
+                       .foregroundColor(.black)
+                   }
+               }
+           }
     }
     
-    // ✅ 스캔된 코드로 부품 상세 조회만 수행 (출고 X)
+    // 스캔된 코드로 부품 상세 조회만 수행 (출고 X)
     private func handleScannedCode(_ code: String) async {
         await MainActor.run { partViewModel.isLoading = true }
 
@@ -153,10 +150,10 @@ struct OutgoingScanView: View {
             return
         }
 
-        // ✅ 부품 상세 조회 API 호출
+        // 부품 상세 조회 API 호출
         await partViewModel.fetchPartDetail(partIds: partId)
 
-        // ✅ 결과 출력
+        // 결과 출력
         await MainActor.run {
             partViewModel.isLoading = false
 
@@ -166,7 +163,7 @@ struct OutgoingScanView: View {
                return
            }
             
-            // ✅ 응답을 PartDetail로 변환 후 저장
+            // 응답을 PartDetail로 변환 후 저장
             let newPart = PartDetail(
                 id: response.id,
                 price: response.price,
@@ -180,17 +177,17 @@ struct OutgoingScanView: View {
             
             partStore.addPart(newPart)
             
-            // ✅ 자동으로 바텀시트 열기
+            // 자동으로 바텀시트 열기
            showBottomSheet = true
 
-           // ✅ 스캔 상태 초기화 (다시 스캔 가능하도록)
+           // 스캔 상태 초기화 (다시 스캔 가능하도록)
            resetScanState()
             
-            print("✅ \(newPart.korName) 부품이 전역 Store에 추가됨")
+            print("\(newPart.korName) 부품이 전역 Store에 추가됨")
         }
     }
     
-    // ✅ 상태 초기화 (QR 다시 활성화)
+    // 상태 초기화 (QR 다시 활성화)
     private func resetScanState() {
         scannedCode = nil
         scannerRestartTrigger.toggle()

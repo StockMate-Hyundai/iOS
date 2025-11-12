@@ -8,6 +8,7 @@
 import Foundation
 import Alamofire
 
+// API 요청 시 Access Token을 자동으로 헤더에 추가하는 인터셉터
 final class AuthInterceptor: RequestInterceptor, @unchecked Sendable {
     private let tokenStore = TokenStore.shared
 
@@ -19,5 +20,5 @@ final class AuthInterceptor: RequestInterceptor, @unchecked Sendable {
         completion(.success(req))
     }
 
-    // 필요 시 retry(_:for:dueTo:completion:) 구현해서 401 -> refresh token 흐름 처리 가능
+    // TODO: 401 Unauthorized 응답 시 Refresh Token을 사용해 토큰 재발급 로직 추가
 }

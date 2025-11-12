@@ -5,24 +5,16 @@
 //  Created by Admin on 11/4/25.
 //
 
-
-//
-//  UsedPartListSheetView.swift
-//  StockMate
-//
-//  Created by Admin on 11/4/25.
-//
-
 import SwiftUI
 
 struct UsedPartListSheetView: View {
     @EnvironmentObject var partStore: PartStore
-    var onUseParts: (() -> Void)? // ‘사용 처리’ 버튼 액션 콜백
-    var onRescan: (() -> Void)? // ✅ 다시 스캔 콜백 추가
+    var onUseParts: (() -> Void)?   // ‘사용 처리’ 버튼 액션 콜백
+    var onRescan: (() -> Void)?     // 다시 스캔 콜백 추가
 
     var body: some View {
             VStack (alignment: .center){
-                // ✅ 상단 헤더
+                // 상단 헤더
                 ZStack {
                     Text("사용할 부품")
                         .font(.system(size: 18, weight: .bold))
@@ -40,7 +32,7 @@ struct UsedPartListSheetView: View {
                 .background(Color.white)
                
                 
-                // ✅ 내용 영역
+                // 내용 영역
                 ScrollView {
                     if partStore.parts.isEmpty {
                         // 부품 목록 전체 삭제의 경우
@@ -56,7 +48,7 @@ struct UsedPartListSheetView: View {
                         .frame(maxWidth: .infinity, minHeight: 200)
                     } else {
                         LazyVStack {
-                            ForEach($partStore.parts) { $part in  // ✅ 바인딩으로 변경 ($ 붙임)
+                            ForEach($partStore.parts) { $part in  // 바인딩으로 변경 ($ 붙임)
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(part.categoryName)
                                         .font(.system(size: 12, weight: .semibold))
@@ -95,7 +87,7 @@ struct UsedPartListSheetView: View {
                                         
                                         Spacer()
                                         
-                                        // ✅ 수량 조절 버튼 (디자인 개선)
+                                        // 수량 조절 버튼 (디자인 개선)
                                         HStack(spacing: 10) {
                                             Button {
                                                 partStore.decreaseQuantityOrRemove(for: part)
@@ -121,7 +113,7 @@ struct UsedPartListSheetView: View {
                                         .padding(.horizontal, 8)
                                         .background(Color.white)
                                         .cornerRadius(10)
-                                        .overlay(   // ✅ 테두리 추가
+                                        .overlay(
                                             RoundedRectangle(cornerRadius: 10)
                                                 .stroke( Color.LightBlue03, lineWidth: 1)
                                         )
@@ -146,7 +138,7 @@ struct UsedPartListSheetView: View {
                 .frame(maxHeight: .infinity)
             
                 HStack{
-                    // 🔹 다시 스캔 버튼
+                    // 다시 스캔 버튼
                     Button {
                         onRescan?()
                     } label: {
@@ -164,7 +156,7 @@ struct UsedPartListSheetView: View {
                     }
                     .padding(.bottom, 16)
                 
-                    // ✅ 사용 처리 버튼
+                    // 사용 처리 버튼
                     Button {
                         onUseParts?()
                     } label: {
@@ -182,12 +174,11 @@ struct UsedPartListSheetView: View {
                     .padding(.bottom, 16)
                 }
                 .padding(.horizontal)
-            
             }
     }
 }
 
-// MARK: - 프리뷰 (안전 버전)
+// MARK: - 프리뷰
 @MainActor
 struct UsedPartListSheetView_Previews: PreviewProvider {
     static var previewStore: PartStore = {
@@ -220,8 +211,8 @@ struct UsedPartListSheetView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
             UsedPartListSheetView(
-                onUseParts: { print("✅ 사용 처리 버튼 눌림") },
-                onRescan: { print("🔄 다시 스캔 버튼 눌림") }
+                onUseParts: { print("사용 처리 버튼 눌림") },
+                onRescan: { print("다시 스캔 버튼 눌림") }
             )
             .environmentObject(previewStore)
         }

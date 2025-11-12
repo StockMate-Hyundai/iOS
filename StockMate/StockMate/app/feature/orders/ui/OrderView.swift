@@ -15,7 +15,7 @@ struct OrderView: View {
         ZStack{
             ScrollView {
                 // 타이틀
-                Text("재고 관리")
+                Text("발주 요청")
                     .font(.title2)
                     .bold()
                     .padding(.top, 13)
@@ -29,12 +29,9 @@ struct OrderView: View {
                     .padding(.leading, 25)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                // 🔍 검색창
+                // 검색창
                 NavigationLink(destination:
-                    OrderRequestSearchView(
-                        cartViewModel: cartViewModel
-                        //inventoryViewModel: inventoryViewModel
-                    )
+                    OrderRequestSearchView(cartViewModel: cartViewModel)
                 ) {
                     HStack {
                         Image(systemName: "magnifyingglass")
@@ -71,26 +68,9 @@ struct OrderView: View {
                         OrderRequestCardView(
                             item: item,
                             quantity: qty,
-                            onIncrease: {
-                                Task {
-                                    await cartViewModel.increaseQuantity(for: item.id)
-                                }
-                            },
-                            onDecrease: {
-                                Task {
-                                    await cartViewModel.decreaseQuantity(for: item.id)
-                                }
-                            },
-                            onAddToCart: {
-                                Task {
-                                    await cartViewModel.addToCart(partId: item.id, amount: 1)
-                                }
-                            },
-                            onRemoveFromCart: {
-                                Task {
-                                    await cartViewModel.decreaseQuantity(for: item.id)
-                                }
-                            }
+                            onIncrease: { Task { await cartViewModel.increaseQuantity(for: item.id) } },
+                            onDecrease: { Task { await cartViewModel.decreaseQuantity(for: item.id) } },
+                            onAddToCart: { Task { await cartViewModel.addToCart(partId: item.id, amount: 1) } }
                         )
                         .onAppear {
                             if item.id == inventoryViewModel.underLimitItems.last?.id {

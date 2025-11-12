@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct UserProfileView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var userViewModel = UserViewModel()
     
     var body: some View {
@@ -36,6 +37,20 @@ struct UserProfileView: View {
         .navigationTitle("프로필 확인")
         .background(Color.Light)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .onAppear {
             Task { await userViewModel.loadUserInfo() }
         }

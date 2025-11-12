@@ -8,6 +8,7 @@
 import Foundation
 import Alamofire
 
+// MARK: - 사용자 정보 응답 모델
 struct UserInfoResponse: Decodable {
     let status: Int
     let success: Bool
@@ -15,6 +16,7 @@ struct UserInfoResponse: Decodable {
     let data: UserInfo?
 }
 
+// MARK: - 사용자 정보 모델
 struct UserInfo: Decodable {
     let createdAt: String
     let updatedAt: String
@@ -31,6 +33,7 @@ struct UserInfo: Decodable {
     let verified: String
 }
 
+// MARK: - 사용자 API 요청 정의
 enum UserApi {
     static func getUserInfo() -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/user/my"

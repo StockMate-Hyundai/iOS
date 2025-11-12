@@ -59,7 +59,6 @@ struct CartInfoCard: View {
         .padding()
         .background(Color.white)
         .cornerRadius(14)
-//        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 4)
     }
 }
 

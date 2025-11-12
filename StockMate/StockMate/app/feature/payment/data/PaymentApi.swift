@@ -16,7 +16,7 @@ struct PaymentAmount: Decodable {
     let userId: Int
 }
 
-// ✅ 월별 소비 내역 구조체
+// 월별 소비 내역 구조체
 struct MonthlySpending: Decodable, Identifiable {
     var id: String { month } // 리스트에서 사용하기 편하게
     let month: String
@@ -51,14 +51,14 @@ enum PaymentApi {
         )
     }
     
-    // ✅ 최근 5개월 소비 내역 조회
+    // 최근 5개월 소비 내역 조회
     static func getMonthlySpending() -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/payment/monthly-spending"
         return ApiClient.shared.request(url, method: .get)
     }
     
     
-    // ✅ 지난달 카테고리별 지출금액 조회
+    // 지난달 카테고리별 지출금액 조회
     static func getCategorySpending() -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/order/category-spend"
         return ApiClient.shared.request(url, method: .get)

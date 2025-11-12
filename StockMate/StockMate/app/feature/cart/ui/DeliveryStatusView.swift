@@ -26,7 +26,7 @@ struct DeliveryStatusView: View {
 
     var body: some View {
         GeometryReader { geo in
-            HStack(alignment: .center, spacing: 0) {
+            HStack(alignment: .center, spacing: 4) {
                 ForEach(0..<steps.count, id: \.self) { index in
                     let step = steps[index]
                     let isAllGray = currentStep == 6
@@ -37,11 +37,7 @@ struct DeliveryStatusView: View {
                             Spacer(minLength: 0) // 위쪽 여백 확보
                             ZStack {
                                 RoundedRectangle(cornerRadius: 8)
-                                    .strokeBorder(isCompleted ? .clear : Color.gray.opacity(0.4), lineWidth: 1.5)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(isCompleted ? Color.Primary : .white)
-                                    )
+                                    .fill(isCompleted ? Color.Primary : Color.gray.opacity(0.2))
                                     .frame(width: 40, height: 40)
                                 
                                 Image(step.iconName)
@@ -49,7 +45,7 @@ struct DeliveryStatusView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 20, height: 20)
-                                    .foregroundColor(isCompleted ? .white : (isAllGray ? .gray : .gray))
+                                    .foregroundColor(isCompleted ? .white : (isAllGray ? .gray.opacity(0.6) : .gray.opacity(0.6)))
                             }
                             Text(step.title)
                                 .font(.system(size: 11))
@@ -62,28 +58,35 @@ struct DeliveryStatusView: View {
                             HStack(spacing: 0) {
                                 Spacer()
                                 if isAllGray {
-                                    Image("dottedline")
+                                    Image("dline")
                                         .renderingMode(.template)
-                                        .foregroundColor(.gray)
-                                        .frame(width: 42, height: 4)
-                                        .offset(x: 21)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(.gray.opacity(0.2))
+                                        .frame(width: 32, height: 3)
+                                        .offset(x: 18)
+
                                 } else if index < currentStep {
                                     Rectangle()
                                         .fill(Color.Primary)
-                                        .frame(width: 42, height: 4)
+                                        .frame(width: 42, height: 3)
                                         .offset(x: 22)
                                 } else if index == currentStep {
-                                    Image("dottedline")
+                                    Image("dline")
                                         .renderingMode(.template)
+                                        .resizable()
+                                        .scaledToFit()
                                         .foregroundColor(Color.Primary)
-                                        .frame(width: 42, height: 4)
-                                        .offset(x: 21)
+                                        .frame(width: 32, height: 3)
+                                        .offset(x: 18)
                                 } else {
-                                    Image("dottedline")
+                                    Image("dline")
                                         .renderingMode(.template)
-                                        .foregroundColor(.gray)
-                                        .frame(width: 42, height: 4)
-                                        .offset(x: 21)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(.gray.opacity(0.2))
+                                        .frame(width: 32, height: 3)
+                                        .offset(x: 18)
                                 }
                             }
                             .offset(y: -10) // 선이 정확히 중앙에 오도록 조정
@@ -93,14 +96,11 @@ struct DeliveryStatusView: View {
                 }
             }
         }
-        .frame(height: 90)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16)) // 박스 모서리 잘림 방지
-        .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
+        .frame(height: 80)
     }
 }
 
 
 #Preview {
-    DeliveryStatusView(currentStep: deliveryStep(for: "REFUND_REJECTED"))
+    DeliveryStatusView(currentStep: deliveryStep(for: "APPROVAL_ORDER"))
 }

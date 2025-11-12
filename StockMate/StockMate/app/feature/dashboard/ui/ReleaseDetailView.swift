@@ -8,18 +8,19 @@
 import SwiftUI
 
 struct ReleaseDetailView: View {
+    @Environment(\.dismiss) private var dismiss
     let history: HistoryItem
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // ✅ 부품 리스트
+                // 부품 리스트
                 VStack(alignment: .leading, spacing: 7) {
                     Text("출고 품목 (\(history.items.count)개)")
                         .font(.system(size: 17, weight: .semibold))
                         .padding(.leading)
                     
-                    // ✅ 처리일자 포맷팅
+                    // 처리일자 포맷팅
                     Text("처리일자: \(formattedDate3(history.createdAt))")
                         .font(.system(size: 15))
                         .foregroundColor(Color.textGray1)
@@ -35,6 +36,20 @@ struct ReleaseDetailView: View {
         .background(Color.Light)
         .navigationTitle("출고 상세")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
     }
 }
 
@@ -118,7 +133,7 @@ func formattedDate3(_ timestamp: String) -> String {
     let trimmed = timestamp.trimmingCharacters(in: .whitespacesAndNewlines)
     let parser = DateFormatter()
     parser.locale = Locale(identifier: "en_US_POSIX")
-    parser.timeZone = TimeZone(identifier: "Asia/Seoul") // ✅ 서버 시간 기준으로 맞춤
+    parser.timeZone = TimeZone(identifier: "Asia/Seoul") // 서버 시간 기준으로 맞춤
 
     var date: Date? = nil
     for format in inputFormats {

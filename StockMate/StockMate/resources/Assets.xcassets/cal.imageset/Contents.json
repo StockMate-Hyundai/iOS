@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "profile_sample.png",
+      "filename" : "cal@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "cal@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "cal@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

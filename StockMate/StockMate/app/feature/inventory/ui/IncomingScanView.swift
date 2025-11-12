@@ -13,15 +13,15 @@ struct IncomingScanView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     
-    @StateObject private var orderViewModel = OrderViewModel() // ✅ 뷰모델 추가
+    @StateObject private var orderViewModel = OrderViewModel() // 뷰모델 추가
 
     var body: some View {
         ZStack {
-            // ✅ 1. 카메라 화면 (QR 스캐너)
+            // 1. 카메라 화면 (QR 스캐너)
             QRScannerView(scannedCode: $scannedCode)
                 .ignoresSafeArea()
 
-            // ✅ 2. 스캔 영역 가이드 박스
+            // 2. 스캔 영역 가이드 박스
             VStack {
                 Text("입고 부품의 QR을 스캔해주세요")
                     .font(.headline)
@@ -43,25 +43,9 @@ struct IncomingScanView: View {
                 .padding(.bottom, 180)
 
                 Spacer()
-
-                // ✅ 직접 등록 버튼
-                Button(action: {
-                    dismiss()
-                }) {
-                    Text("직접 등록 하기")
-                        .fontWeight(.semibold)
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(color: .gray.opacity(0.3), radius: 2, x: 0, y: 2)
-                }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 40)
             }
 
-            // ✅ 로딩 표시
+            // 로딩 표시
             if orderViewModel.isLoading {
                 Color.black.opacity(0.3).ignoresSafeArea()
                 ProgressView("입고 처리 중...")
@@ -85,6 +69,20 @@ struct IncomingScanView: View {
         }
         .navigationTitle("입고 부품 등록")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
     }
     
     private func handleScannedCode(_ code: String) async {

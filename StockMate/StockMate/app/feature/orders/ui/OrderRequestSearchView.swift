@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct OrderRequestSearchView: View {
-    @ObservedObject var cartViewModel: CartViewModel
+    @Environment(\.dismiss) private var dismiss
     
+    @ObservedObject var cartViewModel: CartViewModel
     @StateObject var inventoryViewModel = InventoryViewModel()
     @State private var searchText = ""
     
@@ -37,7 +38,7 @@ struct OrderRequestSearchView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                // 🔍 검색창
+                // 검색창
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
@@ -100,17 +101,21 @@ struct OrderRequestSearchView: View {
                         onTap: { inventoryViewModel.toggleModel($0) }
                     )
                             
-                    // 🔄 초기화 버튼
+                    // 초기화 버튼
                     Button(action: {
                         inventoryViewModel.resetFilters(with: searchText)
                     }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.counterclockwise")
-                            Text("초기화")
-                        }
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.blue)
-                        .padding(.trailing, 8)
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(
+                                inventoryViewModel.selectedCategories.isEmpty &&
+                                inventoryViewModel.selectedTrims.isEmpty &&
+                                inventoryViewModel.selectedModels.isEmpty
+                                ? .black
+                                : .Primary
+                            )
+                            .padding(.trailing, 8)
+                            .rotationEffect(.degrees(35))
                     }
                     .frame(maxWidth: .infinity, alignment: .trailing)
                          
@@ -118,7 +123,7 @@ struct OrderRequestSearchView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 16)
 
-                // 📋 재고 리스트
+                // 재고 리스트
                 ScrollView {
                     LazyVStack(spacing: 10) {
 
@@ -134,8 +139,7 @@ struct OrderRequestSearchView: View {
                                       quantity: qty,
                                       onIncrease: { Task { await cartViewModel.increaseQuantity(for: item.id) } },
                                       onDecrease: { Task { await cartViewModel.decreaseQuantity(for: item.id) }},
-                                      onAddToCart: { Task { await cartViewModel.addToCart(partId: item.id, amount: 1) }},
-                                      onRemoveFromCart: { Task { await cartViewModel.decreaseQuantity(for: item.id) }}
+                                      onAddToCart: { Task { await cartViewModel.addToCart(partId: item.id, amount: 1) }}
                                   )
                                 .padding(.horizontal)
                                 .onAppear {
@@ -166,6 +170,20 @@ struct OrderRequestSearchView: View {
             }
             .background(Color.Light)
             .navigationTitle("직접 발주")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 15, weight: .medium))
+                        }
+                        .foregroundColor(.black)
+                    }
+                }
+            }
             .task {
                 await inventoryViewModel.loadInventoryList(reset: true)
                 await cartViewModel.fetchCart()
@@ -177,6 +195,9 @@ struct OrderRequestSearchView: View {
             }
             .ignoresSafeArea(edges: .bottom)
             
+        }
+        .onTapGesture {
+            UIApplication.shared.hideKeyboard()
         }
     }
 }

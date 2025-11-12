@@ -5,10 +5,11 @@
 //  Created by Admin on 10/15/25.
 //
 
-
 import Foundation
 import Alamofire
 
+
+// MARK: - 재고 조회 응답 구조
 struct InventoryResponse: Decodable {
     let status: Int
     let success: Bool
@@ -16,6 +17,7 @@ struct InventoryResponse: Decodable {
     let data: InventoryPageData?
 }
 
+// MARK: - 페이징 데이터
 struct InventoryPageData: Decodable {
     let content: [InventoryItem]
     let page: Int
@@ -24,6 +26,7 @@ struct InventoryPageData: Decodable {
     let totalPages: Int
 }
 
+// MARK: - 개별 재고 아이템
 struct InventoryItem: Decodable, Identifiable {
     let id: Int
     let name: String
@@ -41,6 +44,7 @@ struct InventoryItem: Decodable, Identifiable {
     let isLack: Bool
 }
 
+// MARK: - 카테고리별 부족 재고 개수
 struct LackCountItem: Decodable, Identifiable {
     var id: String { categoryName } // SwiftUI ForEach에서 식별자 사용
     let categoryName: String
@@ -48,6 +52,7 @@ struct LackCountItem: Decodable, Identifiable {
 }
 
 
+// MARK: 재고 목록 조회
 enum InventoryApi {
     static func getInventoryList(
         page: Int,
@@ -71,7 +76,7 @@ enum InventoryApi {
         return ApiClient.shared.request(url, method: .get)
     }
     
-    // ✅ 부족 재고 조회 API 추가
+    // MARK: 부족 재고 목록 조회
     static func getUnderLimitList(categoryName: String? = nil, page: Int = 0, size: Int = 10) -> DataRequest {
         var url = ApiClient.baseURL + "api/v1/store/under-limit?page=\(page)&size=\(size)"
         if let categoryName = categoryName, !categoryName.isEmpty {
@@ -80,14 +85,14 @@ enum InventoryApi {
         return ApiClient.shared.request(url, method: .get)
     }
     
-    // ✅ 부품 이름으로 검색
+    // MARK: 부품명 검색
     static func findByName(name: String, page: Int, size: Int) -> DataRequest {
         let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let url = ApiClient.baseURL + "api/v1/store/find-name?name=\(encodedName)&page=\(page)&size=\(size)"
         return ApiClient.shared.request(url, method: .get)
     }
 
-    // ✅ 카테고리별 부족 재고 개수 조회
+    // MARK: 카테고리별 부족 재고 개수 조회
     static func getLackCountByCategory() -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/store/lack-count"
         return ApiClient.shared.request(url, method: .get)

@@ -14,20 +14,27 @@ enum PaymentType: String {
 enum ShippingDateOption {
     case today
     case tomorrow
-    case specific(Date)
+    case specific(Date?)
 }
 
 struct OrderInfoView: View {
+    @Environment(\.dismiss) private var dismiss
     @ObservedObject var cartViewModel: CartViewModel
     @StateObject var orderViewModel = OrderViewModel()
     @StateObject private var depositViewModel = DepositViewModel()
+    @StateObject private var userViewModel = UserViewModel()
     
     @State private var paymentType: PaymentType = .deposit
     @State private var shippingDateOption: ShippingDateOption = .today
-    @State private var specificDate = Date()
+    @State private var specificDate: Date? = nil
     @State private var requestMessage: String = ""
     
-    // ✅ 모달 관련 상태
+    // 토스트 메세지 관련
+    @State private var showDepositToast = false      // 예치금 부족
+    @State private var showChargeToast = false       // 충전 완료
+
+
+    // 모달 관련 상태
     @State private var showOrderSuccessModal = false
     @State private var navigateToOrderDetail = false
     @State private var navigateToHome = false
@@ -55,9 +62,8 @@ struct OrderInfoView: View {
         case .tomorrow:
             let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
             return formatter.string(from: tomorrow)
-//            return formatter.string(from: Calendar.current.date(byAdding: .day, value: 1, to: Date())!)
         case .specific(let date):
-            return formatter.string(from: date)
+            return formatter.string(from: date ?? Date())       // nil이면 오늘 날짜로 fallback
         }
     }
     
@@ -72,17 +78,49 @@ struct OrderInfoView: View {
             ScrollView {
                 contentView
             }
+            .onTapGesture {
+                UIApplication.shared.hideKeyboard() // 화면 아무데나 탭하면 키보드 내려감
+            }
             .padding(.horizontal)
             .padding(.top)
             
             bottomOrderButton
         }
+        .toast(
+            isPresented: $showChargeToast,
+            message: "충전이 완료되었습니다.",
+            iconName: "checkmark",
+            iconColor: .green
+        )
+        // 예치금 부족 토스트
+       .toast(
+           isPresented: $showDepositToast,
+           message: "예치금이 부족합니다. (부족: \(formatPrice((cartViewModel.cart?.totalPrice ?? 0) - depositViewModel.balance))원)",
+           iconName: "info.circle",
+           iconColor: .LightBlue04
+       )
         .background(Color.Light)
         .navigationTitle("주문/결제")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .task {
             await cartViewModel.fetchCart()
             await depositViewModel.fetchDepositAmount()
+            await userViewModel.loadUserInfo()
+            
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
         }
         .edgesIgnoringSafeArea(.bottom)
         .onChange(of: orderViewModel.isOrderSuccess) { success in
@@ -96,11 +134,16 @@ struct OrderInfoView: View {
                 }
             }
         }
-        // ✅ 충전 bottom sheet 연결
-       .sheet(isPresented: $depositViewModel.showChargeSheet) {
-           DepositChargeView(viewModel: depositViewModel)
-               .presentationDetents([.fraction(0.80)]) // 시트 높이 80%
-       }
+        .sheet(isPresented: $depositViewModel.showChargeSheet) {
+            DepositChargeView(viewModel: depositViewModel) {
+                // 충전 성공 시 토스트 표시
+                withAnimation {
+                    showChargeToast = true
+                }
+            }
+            .presentationDetents([.fraction(0.58)]) // 시트 높이 80%
+            .presentationCornerRadius(20)
+        }
         // 모달 오버레이 (body 안)
         .overlay {
             if showOrderSuccessModal {
@@ -175,6 +218,8 @@ extension OrderInfoView {
             paymentSection
             shippingDateSection
             totalPriceSection
+            
+            Spacer().frame(height: 10)
         }
     }
     
@@ -183,41 +228,47 @@ extension OrderInfoView {
             Text("배송 정보")
                 .font(.headline)
             
-            VStack(alignment: .leading, spacing: 8) {
-                Text("홍길동").font(.system(size: 15, weight: .medium))
-                Text("서울특별시 강남구 테헤란로114길")
+            VStack(alignment: .leading, spacing: 4) {
+                Text(userViewModel.userInfo?.owner ?? "이름 없음")
+                    .font(.system(size: 15, weight: .medium))
+                    .padding(.bottom, 4)
+                Text(userViewModel.userInfo?.address ?? "주소 없음")
                     .font(.system(size: 14))
-                    .foregroundColor(.textGray1)
-                Text("010-1111-2222")
-                    .font(.system(size: 14))
+                    .padding(.bottom, 4)
                     .foregroundColor(.textGray1)
                 
                 Text("요청사항")
                     .font(.system(size: 14, weight: .medium))
                     .padding(.top, 5)
-                
-                ZStack(alignment: .topLeading) {
-                    if requestMessage.isEmpty {
-                        Text("요청사항을 입력하세요")
-                            .foregroundColor(.gray)
-                            .font(.system(size: 14))
-                            .padding(.top, 12)
-                            .padding(.leading, 10)
+         
+                TextEditor(text: $requestMessage)
+                    .font(.system(size: 14))
+                    .padding(10)
+                    .onChange(of: requestMessage) { newValue in
+                        if newValue.count > 50 { // 50자 제한
+                            requestMessage = String(newValue.prefix(50))
+                        }
                     }
-                    
-                    TextEditor(text: $requestMessage)
-                        .font(.system(size: 14))
-                        .padding(.top, 4)
-                        .padding(.leading, 6)
-                        .scrollContentBackground(.hidden)
-                        .background(Color.clear)
+                    .scrollContentBackground(.hidden)
+                    .background(Color.white)
+                    .frame(height: 93)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(requestMessage.isEmpty ? Color(.systemGray4) : Color.Primary, lineWidth: 1)
+                    )
+
+                
+                HStack {
+                    Spacer()
+                    Text("\(requestMessage.count)/50")
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                        .padding(.trailing, 2)
                 }
-                .frame(height: 70)
-                .background(Color.white)
-                .overlay(RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color(.systemGray4), lineWidth: 1))
+                .padding(.bottom, -8)
             }
             .padding()
+            .padding(.bottom,7)
             .background(Color.white)
             .cornerRadius(16)
         }
@@ -226,7 +277,7 @@ extension OrderInfoView {
     
     private var orderListSection: some View {
         VStack(alignment: .leading) {
-            Text("주문 목록")
+            Text("주문 목록 (\(cartViewModel.items.count))")
                 .font(.headline)
                 .padding(.leading, 5)
             
@@ -248,7 +299,7 @@ extension OrderInfoView {
             Image("deposit_background") // ← 에셋에 넣은 이미지 이름
                 .resizable()
                 .scaledToFill()
-                .frame(height: 185)
+                .frame(height: 190)
                 .clipped()
                 .cornerRadius(16.39)
             
@@ -284,8 +335,8 @@ extension OrderInfoView {
                     } label: {
                         Text("충전")
                             .foregroundColor(Color.Primary)
-                            .font(.system(size: 14, weight: .bold))
-                            .padding(.vertical, 6)
+                            .font(.system(size: 14, weight: .semibold))
+                            .padding(.vertical, 8)
                             .padding(.horizontal, 14)
                             .background(Color.white)
                             .cornerRadius(20)
@@ -333,17 +384,18 @@ extension OrderInfoView {
                         if case .specific(_) = shippingDateOption { return true }
                         return false
                     }()) {
-                        shippingDateOption = .specific(specificDate)
+                        shippingDateOption = .specific(nil)
                     }
                     .padding(.trailing, 5)
                     
-                    if case .specific(_) = shippingDateOption {
-                        CustomDatePickerField(date: Binding {
-                            specificDate
-                        } set: { newValue in
-                            specificDate = newValue
-                            shippingDateOption = .specific(newValue)
-                        })
+                    if case .specific(let selectedDate) = shippingDateOption {
+                        CustomDatePickerField(date: Binding(
+                            get: { selectedDate ?? Date() },
+                            set: { newValue in
+                                specificDate = newValue
+                                shippingDateOption = .specific(newValue)
+                            }
+                        ), isDateSelected: selectedDate != nil)
                     }
                 }
                 .frame(height: 35)
@@ -372,22 +424,38 @@ extension OrderInfoView {
     private var bottomOrderButton: some View {
         VStack {
             Button {
-                Task {
-                    let orderRequest = OrderRequest(
-                        orderItems: makeOrderItems(),
-                        requestedShippingDate: formattedShippingDate(),
-                        paymentType: paymentType.rawValue,
-                        etc: requestMessage
-                    )
-                    await orderViewModel.createOrder(request: orderRequest)
+               let totalPrice = cartViewModel.cart?.totalPrice ?? 0
+               let deposit = depositViewModel.balance
+                           
+               if totalPrice > deposit {
+                   // 예치금 부족
+                   withAnimation {
+                       showDepositToast = true
+                   }
+               } else {
+                    Task {
+                        let orderRequest = OrderRequest(
+                            orderItems: makeOrderItems(),
+                            requestedShippingDate: formattedShippingDate(),
+                            paymentType: paymentType.rawValue,
+                            etc: requestMessage
+                        )
+                        await orderViewModel.createOrder(request: orderRequest)
+                    }
                 }
+               
             } label: {
-                Text("결제하기")
+                Text("\(cartViewModel.cart?.totalPrice ?? 0)원 결제하기")
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 70)
-                    .background(Color.Primary)
+                    .frame(height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(cartViewModel.items.isEmpty ? Color.gray.opacity(0.3) : Color.Primary)
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 30)
             }
         }
     }
@@ -408,31 +476,32 @@ struct RadioButtonRow: View {
     }
 }
 
-
 struct CustomDatePickerField: View {
     @Binding var date: Date
+    var isDateSelected: Bool
     @State private var showPicker: Bool = false
-    
-    // 날짜 포맷 변환용 Formatter
+
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }
-    
+
     var body: some View {
         Button {
             showPicker.toggle()
         } label: {
             HStack {
-                Text(dateFormatter.string(from: date))
+                Text(isDateSelected ? dateFormatter.string(from: date) : "선택하세요")
                     .font(.system(size: 14))
-                    .foregroundColor(.black)
-                
+                    .foregroundColor(isDateSelected ? .black : .gray)
+
                 Spacer()
-                
-                Image(systemName: "calendar")
-                    .foregroundColor(.gray)
+
+                Image("cal")
+                    .resizable()
+                    .frame(width: 15, height: 15)
+                    .scaledToFit()
             }
             .padding(10)
             .frame(width: 140, height: 30)
@@ -451,7 +520,7 @@ struct CustomDatePickerField: View {
                 )
                 .datePickerStyle(.graphical)
                 .padding()
-                
+
                 Button("완료") {
                     showPicker = false
                 }
@@ -463,4 +532,3 @@ struct CustomDatePickerField: View {
         }
     }
 }
-

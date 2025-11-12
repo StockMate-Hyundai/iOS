@@ -7,12 +7,14 @@
 
 import Foundation
 
+// 알림 데이터를 관리하고, API 요청을 통해 상태를 갱신하는 ViewModel
 @MainActor
 final class NotificationViewModel: ObservableObject {
     @Published var notifications: [NotificationItem] = []
-    @Published var unreadCount: Int = 0   // 🔴 추가
+    @Published var unreadCount: Int = 0
     @Published var isLoading = false
     
+    // 알림 데이터 요청용 Repository
     private let repository: NotificationRepositoryProtocol = NotificationRepositoryImpl()
     
     // 전체 알림 조회
@@ -29,7 +31,7 @@ final class NotificationViewModel: ObservableObject {
         }
     }
     
-    // 🔴 읽지 않은 개수 조회
+    // 읽지 않은 개수 조회
     func fetchUnreadCount() async {
         let result = await repository.getUnreadCount()
         switch result {
@@ -55,7 +57,7 @@ final class NotificationViewModel: ObservableObject {
                     read: true
                 )
             }
-            unreadCount = max(0, unreadCount - 1) // 🔴 카운트 즉시 반영
+            unreadCount = max(0, unreadCount - 1) // 카운트 즉시 반영
         case .failure(let error):
             print("❌ 알림 읽음 처리 실패:", error.localizedDescription)
         }
@@ -76,7 +78,7 @@ final class NotificationViewModel: ObservableObject {
                     read: true
                 )
             }
-            unreadCount = 0 // 🔴 전체 읽음 시 0으로 초기화
+            unreadCount = 0 // 전체 읽음 시 0으로 초기화
         case .failure(let error):
             print("❌ 전체 읽음 실패:", error.localizedDescription)
         }

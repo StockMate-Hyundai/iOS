@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InOutHistoryView: View {
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = HistoryViewModel()
 
     var body: some View {
@@ -25,7 +26,7 @@ struct InOutHistoryView: View {
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                // ✅ 날짜별로 그룹화 (최신순)
+                // 날짜별로 그룹화 (최신순)
                 let groupedHistories = Dictionary(grouping: viewModel.histories) { history in
                     history.createdAt.split(separator: "T").first.map(String.init) ?? ""
                 }
@@ -35,13 +36,13 @@ struct InOutHistoryView: View {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(groupedHistories, id: \.key) { date, histories in
                             VStack(alignment: .leading, spacing: 12) {
-                                // ✅ 날짜 헤더
+                                // 날짜 헤더
                                 Text(formatDate(String(date)))
                                     .font(.headline)
                                     .padding(.leading, 25)
-                                    .padding(.top)
+                                    .padding(.top, 8)
 
-                                // ✅ 해당 날짜의 히스토리 카드들
+                                // 해당 날짜의 히스토리 카드들
                                 ForEach(histories) { history in
                                     InOutHistoryCard(history: history)
                                 }
@@ -54,7 +55,21 @@ struct InOutHistoryView: View {
             }
         }
         .background(Color.Light)
-        .navigationTitle("입출고 내역")
+        .navigationTitle("입출고 히스토리")
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundColor(.black)
+                }
+            }
+        }
         .task {
             await viewModel.fetchInOutHistory()
         }
@@ -81,7 +96,7 @@ struct InOutHistoryCard: View {
                     } placeholder: {
                         Color.gray.opacity(0.2)
                     }
-                    .frame(width: 64, height: 64)
+                    .frame(width: 60, height: 60)
                     .cornerRadius(10)
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -89,7 +104,7 @@ struct InOutHistoryCard: View {
                             .font(.system(size: 15))
                             .lineLimit(1)
                         if history.items.count > 1 {
-                            Text("외 \(history.items.count - 1)개 품목")
+                            Text("외 \(history.items.count - 1)개")
                                 .font(.caption)
                                 .foregroundColor(.gray)
                         }
@@ -106,7 +121,7 @@ struct InOutHistoryCard: View {
                 .padding(.vertical, 4)
                 .background(statusBgColor(history.status))
                 .foregroundColor(statusTextColor(history.status))
-                .cornerRadius(8)
+                .cornerRadius(12)
             
             if history.status == "RECEIVED", let orderId = history.orderId {
                 NavigationLink(
@@ -128,9 +143,9 @@ struct InOutHistoryCard: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding()
+        .padding(9)
         .background(Color.white)
-        .cornerRadius(12)
+        .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .padding(.horizontal)
     }
@@ -141,8 +156,8 @@ struct InOutHistoryCard: View {
 
     func statusText(_ status: String) -> String {
         switch status {
-        case "RECEIVED": return "입고 완료"
-        case "RELEASED": return "출고 완료"
+        case "RECEIVED": return "입고"
+        case "RELEASED": return "출고"
         default: return status
         }
     }
