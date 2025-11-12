@@ -14,3 +14,7 @@ Pods/
 
 # Swift Package Manager
 Packages/
+
+# Xcode user state files
+*.xcuserstate
+*.xcuserdata/

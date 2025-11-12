@@ -1,0 +1,45 @@
+name: Auto Close Issues on dev merge
+
+permissions:
+  issues: write
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  close-issues:
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'dev'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Close linked issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prBody = context.payload.pull_request.body;
+            const issueLines = prBody.split('\n');
+
+            // 클로징 키워드가 있는 줄에서만 이슈 번호 추출
+            const closingKeywords = ['close', 'closes', 'closed', 'fix', 'fixes', 'fixed', 'resolve', 'resolves', 'resolved'];
+            const issuePattern = /#(\d+)/g;
+            
+            for (const line of issueLines) {
+              const lower = line.toLowerCase();
+              if (closingKeywords.some(k => lower.includes(k))) {
+                let match;
+                while ((match = issuePattern.exec(line)) !== null) {
+                  const issue_number = parseInt(match[1]);
+                  await github.rest.issues.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number,
+                    state: 'closed'
+                  });
+                  console.log(`✅ Closed issue #${issue_number}`);
+                }
+              }
+            }
