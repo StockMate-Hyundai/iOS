@@ -97,7 +97,6 @@ final class InventoryViewModel: ObservableObject {
     
     // MARK: - 부족 재고 로드
     func loadUnderLimitList(reset: Bool = false, size: Int = 10) async {
-//        guard !isLoading, underLimitHasMore else { return }
         guard !isLoading, (underLimitHasMore || reset) else { return }
         isLoading = true
         
@@ -195,15 +194,12 @@ final class InventoryViewModel: ObservableObject {
         } else {
             selectedCategories.append(name)
         }
-        // ✅ 검색 중일 때는 로컬 필터링만 다시 계산
+        // 검색 중일 때는 로컬 필터링만 다시 계산
          if isSearching {
              objectWillChange.send()
          } else {
              Task { await resetAndLoad() }
          }
-        
-//        isSearching = false
-//        Task { await resetAndLoad() }
     }
 
     func toggleTrim(_ trim: String) {
@@ -217,8 +213,6 @@ final class InventoryViewModel: ObservableObject {
         } else {
             Task { await resetAndLoad() }
         }
-//        isSearching = false
-//        Task { await resetAndLoad() }
     }
 
     func toggleModel(_ model: String) {
@@ -232,8 +226,6 @@ final class InventoryViewModel: ObservableObject {
           } else {
               Task { await resetAndLoad() }
           }
-//        isSearching = false
-//        Task { await resetAndLoad() }
     }
     
     // MARK: - 필터 초기화
@@ -253,9 +245,7 @@ final class InventoryViewModel: ObservableObject {
         // 3. 검색어가 있는 경우 → 해당 검색어로 전체 결과 다시 검색
         else {
             isSearching = true
-            //searchPage = 0
             searchResults.removeAll()
-//            Task { await searchByName(name: searchText, reset: true) }
             Task {
                 await searchByName(
                     name: searchText.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -265,7 +255,7 @@ final class InventoryViewModel: ObservableObject {
         }
     }
     
-    // MARK: - ✅ 무한 스크롤 로드
+    // MARK: - 무한 스크롤 로드
     func loadMore(searchText: String) async {
         if isSearching {
             guard !searchText.trimmingCharacters(in: .whitespaces).isEmpty else { return }

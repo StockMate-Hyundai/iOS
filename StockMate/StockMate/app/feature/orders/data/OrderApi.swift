@@ -10,6 +10,7 @@ import Alamofire
 
 // MARK: - Response Models
 
+// 주문 목록 응답 모델
 struct OrderListResponse: Decodable {
     let status: Int
     let success: Bool
@@ -17,6 +18,7 @@ struct OrderListResponse: Decodable {
     let data: OrderPageData?
 }
 
+// 주문 상세 응답 모델
 struct OrderDetailResponse: Decodable {
     let status: Int
     let success: Bool
@@ -24,7 +26,7 @@ struct OrderDetailResponse: Decodable {
     let data: OrderResponseItem?
 }
 
-
+// 주문 페이지 데이터
 struct OrderPageData: Decodable {
     let totalElements: Int
     let totalPages: Int
@@ -34,6 +36,7 @@ struct OrderPageData: Decodable {
     let last: Bool
 }
 
+// 주문 항목 정보
 struct OrderResponseItem: Decodable, Identifiable {
     var id: Int { orderId }
 
@@ -55,6 +58,7 @@ struct OrderResponseItem: Decodable, Identifiable {
     let updatedAt: String
 }
 
+// 주문자 정보
 struct OrderUserInfo: Decodable {
     let id: Int
     let memberId: Int
@@ -69,12 +73,14 @@ struct OrderUserInfo: Decodable {
     let longitude: Double
 }
 
+// 주문된 부품 항목
 struct OrderItem: Decodable {
     let partId: Int
     let amount: Int
     let partDetail: OrderPartDetail
 }
 
+// 주문 부품 상세 정보
 struct OrderPartDetail: Decodable {
     let id: Int
     let name: String
@@ -90,7 +96,9 @@ struct OrderPartDetail: Decodable {
 }
 
 
-// MARK: - 주문 생성 Request
+// MARK: - Request Models
+
+// 주문 생성 요청 모델
 struct OrderRequest: Encodable {
     let orderItems: [OrderItems]
     let requestedShippingDate: String
@@ -98,28 +106,29 @@ struct OrderRequest: Encodable {
     let etc: String
 }
 
+// 개별 주문 품목 요청 모델
 struct OrderItems: Encodable {
     let partId: Int
     let amount: Int
 }
 
+// 주문 생성 응답 데이터
 struct OrderCreateResponseData: Decodable {
     let orderId: Int
     let orderNumber: String
     let totalPrice: Int
-    let paymentType: String // ✅ 서버 필드와 맞춤
+    let paymentType: String
 }
 
-// ✅ 입고 처리 요청 API
+// 입고 처리 요청 모델
 struct ReceiveOrderRequest: Encodable {
     let orderNumber: String
 }
 
 
-// MARK: - API Call
-
+// MARK: - API
 enum OrderApi {
-    // ✅ 내 주문 리스트 조회 API
+    // 내 주문 리스트 조회 API
     static func getMyOrderList(
         status: String? = nil,
         startDate: String? = nil,
@@ -143,14 +152,14 @@ enum OrderApi {
     }
     
     
-    // ✅ 주문 상세 조회 API
+    // 주문 상세 조회 API
     static func getOrderDetail(orderId: Int) -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/order/detail?orderId=\(orderId)"
         return ApiClient.shared.request(url, method: .get)
     }
     
     
-    // ✅ 주문 생성 API
+    // 주문 생성 API
     static func createOrder(_ requestBody: OrderRequest) -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/order"
         return ApiClient.shared.request(
@@ -161,15 +170,15 @@ enum OrderApi {
         )
     }
  
-    // ✅ 주문 취소 API
+    // 주문 취소 API
     static func cancelOrder(orderId: Int) -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/order/\(orderId)/cancel"
-        print("🚀 CancelOrder URL:", url)
+        print("CancelOrder URL:", url)
         return ApiClient.shared.request(url, method: .put)
-            .validate() // ✅ 서버 상태코드 확인
+            .validate()
     }
     
-    // ✅ 입고 처리 API
+    // 입고 처리 API
     static func receiveOrder(_ requestBody: ReceiveOrderRequest) -> DataRequest {
         let url = ApiClient.baseURL + "api/v1/order/receive"
         return ApiClient.shared.request(

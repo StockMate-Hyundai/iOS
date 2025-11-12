@@ -118,9 +118,8 @@ struct OrderListCardView: View {
                         Text(first.partDetail.korName)
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundColor(.black)
-                            .lineLimit(nil) // ✅ 줄 제한 해제
+                            .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
-//                            .lineLimit(2)
 
                         if order.orderItems.count > 1 {
                             Text("외 \(order.orderItems.count - 1)개")
@@ -143,7 +142,7 @@ struct OrderListCardView: View {
             }
 
             // 주문취소 버튼 (필요 시)
-            if order.orderStatus == "ORDER_COMPLETED" {
+            if order.orderStatus == "PAY_COMPLETED" {
                 Button(action: {
                     // 주문취소 처리
                     Task {

@@ -19,18 +19,12 @@ struct MainTabView: View {
             ZStack {
                 switch selectedTab {
                 case 0: HomeView()
-                case 1: NavigationStack{ OrderView(cartViewModel: cartVM) } //, inventoryViewModel: inventoryVM) }
-//                case 1: NavigationStack{ OrderView() }
+                case 1: NavigationStack{ OrderView(cartViewModel: cartVM) }
                 case 2:
                     InventoryView(
                          selectedTab: $selectedTab,
                          tabTappedTrigger: $tabTappedTrigger
                      )
-                     
-//                NavigationStack { InventoryView(selectedTab: $selectedTab, tabTappedTrigger: $tabTappedTrigger) }
-//                case 3: NavigationStack{ ContentView() }
-//                case 3: NavigationStack{ ReceiptView() }
-//                case 3: NavigationStack{ NotificationListView() }
                 case 3: ProfileView()
                 default: NavigationStack{ ContentView() }
                 }
@@ -44,9 +38,9 @@ struct MainTabView: View {
                 tabButton(index: 2, icon: "tabInventory", text: "재고관리")
                 tabButton(index: 3, icon: "tabProfile", text: "사용자")
             }
-            .padding(.vertical, 24)  // 탭 높이 조절
+            .padding(.vertical, 24)
             .padding(.horizontal, 20)
-            .background(Color.White) // 탭바 배경색
+            .background(Color.White)
         }
         .edgesIgnoringSafeArea(.bottom)
     }
@@ -56,16 +50,13 @@ struct MainTabView: View {
         let isSelected = selectedTab == index
         return Button {
             if selectedTab == index {
-            // ✅ 같은 탭 다시 누르면 트리거 토글
+            // 같은 탭 다시 누르면 트리거 토글
                 tabTappedTrigger.toggle()
             } else {
                 withAnimation(.easeInOut) {
                     selectedTab = index
                 }
             }
-//            withAnimation(.easeInOut) { // 탭 전환 애니메이션. 없애도 됨
-//                selectedTab = index
-//            }
         } label: {
             VStack(spacing: 6) {
                 Image(icon)

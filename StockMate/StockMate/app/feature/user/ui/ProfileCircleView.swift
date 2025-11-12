@@ -21,7 +21,7 @@ struct ProfileCircleView: View {
         GeometryReader { geometry in
             let minSide = min(geometry.size.width, geometry.size.height)
             Text(initials)
-                .font(.system(size: minSide * 0.35, weight: .regular)) // ✅ 내부 크기 비례
+                .font(.system(size: minSide * 0.35, weight: .regular))
                 .foregroundColor(Color(hex: "#374EAF"))
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .background(Color(hex: "#DCE0F1"))

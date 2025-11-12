@@ -26,8 +26,6 @@ struct InventoryView: View {
                             GeometryReader { geo in
                                 Color.clear
                                     .onChange(of: geo.frame(in: .global).minY) { newValue in
-                                        // 👇 스크롤 시 값이 변함
-                                        //print("📏 Scroll offsetY:", newValue)   // 테스트용, 화면 안정화 후 제거
                                         withAnimation(.easeInOut(duration: 0.25)) {
                                             showScrollToTopButton = newValue < -150
                                         }

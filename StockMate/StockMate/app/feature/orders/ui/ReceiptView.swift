@@ -21,7 +21,7 @@ struct ReceiptView: View {
     @StateObject private var detailViewModel = OrderDetailViewModel()
     
     @State var sellerName = "홍길동"
-    @State var businessNumber = "215-87-12345"  // 형식만 맞춘 랜덤번호
+    @State var businessNumber = "215-87-12345"
     @State var phone = "02-567-8901"
     @State var address = "서울특별시 금천구 가산동 459-9"
 
@@ -45,7 +45,7 @@ struct ReceiptView: View {
                     generatePDF(type: .receipt80mm, order: order)
                 } label: {
                     Text("PDF 저장")
-                        .font(.system(size: 13, weight: .semibold)) // ✅ 글씨 약간 작게
+                        .font(.system(size: 13, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                         .padding(.horizontal, 8)
@@ -168,7 +168,7 @@ struct ReceiptView: View {
     }
 
     private func generatePDF(type: PDFType, order: OrderResponseItem) {
-        // ✅ 아이폰 화면 비율로 렌더링 (디바이스 폭 고정)
+        // 아이폰 화면 비율로 렌더링 (디바이스 폭 고정)
         let screenWidth = UIScreen.main.bounds.width
         let view = receiptContent(order: order)
             .frame(width: screenWidth) // 폭 고정 (문장 길이에 따라 늘어나지 않음)
@@ -184,7 +184,7 @@ struct ReceiptView: View {
                 pdfDoc.insert(pdfPage, at: 0)
             }
 
-            // ✅ 파일명: 주문번호 기반
+            // 파일명: 주문번호 기반
             let fileName = "receipt_\(order.orderNumber).pdf"
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
 
@@ -204,7 +204,7 @@ struct ReceiptView: View {
 func formattedDate(_ timestamp: String) -> String {
     let inputFormatter = DateFormatter()
     inputFormatter.locale = Locale(identifier: "ko_KR")
-    inputFormatter.timeZone = TimeZone.current // ✅ 실제 한국 시간 기준
+    inputFormatter.timeZone = TimeZone.current
     inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
 
     guard let date = inputFormatter.date(from: timestamp) else {
@@ -233,7 +233,7 @@ func formattedApprovalNumber(_ timestamp: String) -> String {
     let outputFormatter = DateFormatter()
     outputFormatter.locale = Locale(identifier: "ko_KR")
     outputFormatter.timeZone = TimeZone.current
-    outputFormatter.dateFormat = "yyyyMMddHHmm" // ✅ 승인번호 포맷
+    outputFormatter.dateFormat = "yyyyMMddHHmm"
 
     return outputFormatter.string(from: date)
 }

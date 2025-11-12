@@ -15,7 +15,7 @@ struct DonutChartView: View {
         Double(data.map { $0.totalAmount }.reduce(0, +))
     }
     
-    // ✅ 각 항목별 비율 계산
+    // 각 항목별 비율 계산
     var percentages: [Double] {
         data.map { total == 0 ? 0 : (Double($0.totalAmount) / total * 100) }
     }
@@ -39,7 +39,7 @@ struct DonutChartView: View {
     
     var body: some View {
         HStack(alignment: .center, spacing: 24) {
-            // ✅ 도넛 차트
+            // 도넛 차트
             if total == 0 {
                 Text("데이터 없음")
                     .foregroundColor(.gray)
@@ -61,9 +61,8 @@ struct DonutChartView: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-//                        .foregroundStyle(colors[index % colors.count])
                         .cornerRadius(8.0)
-                        // ✅ 도넛 안쪽에 비율 표시
+                        // 도넛 안쪽에 비율 표시
                         .annotation(position: .overlay) {
                             let percentage = percentages[index]
                             Text("\(percentage, specifier: "%.1f")%")
@@ -77,7 +76,7 @@ struct DonutChartView: View {
                 .chartLegend(.hidden) // 기본 범례 숨김
             }
             
-            // ✅ 오른쪽 커스텀 범례
+            // 오른쪽 커스텀 범례
             VStack(alignment: .leading, spacing: 18) {
                 ForEach(Array(data.enumerated()), id: \.offset) { index, item in
                     let percentage = percentages[index]

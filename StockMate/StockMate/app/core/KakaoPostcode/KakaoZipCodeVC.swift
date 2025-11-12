@@ -14,7 +14,7 @@ class KakaoZipCodeVC: UIViewController {
     // MARK: - Properties
     var webView: WKWebView?
     let indicator = UIActivityIndicatorView(style: .medium)
-    var onAddressSelected: ((String) -> Void)? // ✅ SwiftUI로 결과 전달용 콜백
+    var onAddressSelected: ((String) -> Void)? // SwiftUI로 결과 전달용 콜백
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,7 +64,7 @@ extension KakaoZipCodeVC: WKScriptMessageHandler {
                                didReceive message: WKScriptMessage) {
         guard let data = message.body as? [String: Any] else { return }
         let address = data["roadAddress"] as? String ?? ""
-        onAddressSelected?(address)   // ✅ SwiftUI로 전달
+        onAddressSelected?(address)   // SwiftUI로 전달
         dismiss(animated: true)
     }
 }

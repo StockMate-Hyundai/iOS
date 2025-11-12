@@ -26,7 +26,7 @@ struct InOutHistoryView: View {
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                // ✅ 날짜별로 그룹화 (최신순)
+                // 날짜별로 그룹화 (최신순)
                 let groupedHistories = Dictionary(grouping: viewModel.histories) { history in
                     history.createdAt.split(separator: "T").first.map(String.init) ?? ""
                 }
@@ -36,13 +36,13 @@ struct InOutHistoryView: View {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(groupedHistories, id: \.key) { date, histories in
                             VStack(alignment: .leading, spacing: 12) {
-                                // ✅ 날짜 헤더
+                                // 날짜 헤더
                                 Text(formatDate(String(date)))
                                     .font(.headline)
                                     .padding(.leading, 25)
                                     .padding(.top, 8)
 
-                                // ✅ 해당 날짜의 히스토리 카드들
+                                // 해당 날짜의 히스토리 카드들
                                 ForEach(histories) { history in
                                     InOutHistoryCard(history: history)
                                 }

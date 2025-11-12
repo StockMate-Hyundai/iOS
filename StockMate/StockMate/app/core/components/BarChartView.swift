@@ -46,20 +46,20 @@ struct BarChartView: View {
                         VStack {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(activeMonth == displayLabels[i] ? Color.Primary : Color.LightBlue04)
-                                .frame(width: barWidth, height: max(chartHeight * reversedValues[i], 8)) // ✅ 최소 높이 보장
+                                .frame(width: barWidth, height: max(chartHeight * reversedValues[i], 8)) // 최소 높이 보장
                                 .onTapGesture {
                                     selectedMonth = (selectedMonth == displayLabels[i]) ? nil : displayLabels[i]
                                 }
 
                             Text(displayLabels[i])
-                                .font(.system(size: 13, weight: activeMonth == displayLabels[i] ? .semibold : .light)) // ✅ 선택된 막대는 bold
+                                .font(.system(size: 13, weight: activeMonth == displayLabels[i] ? .semibold : .light)) // 선택된 막대는 글씨 bold
                                 .padding(.top, 3)
                         }
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             }
-            .frame(height: 163) // ← 전체 그래프 영역 높이 확장
+            .frame(height: 163) // 전체 그래프 영역 높이 확장
             .padding(.bottom, 7)
 
             Rectangle()
@@ -68,7 +68,7 @@ struct BarChartView: View {
                 .padding(.horizontal, 4)
 
 
-            // ✅ 하단 "n월 지출금액 ooo원" 표시
+            // 하단 "n월 지출금액 ooo원" 표시
             if let index = displayLabels.firstIndex(of: activeMonth) {
                 HStack {
                     Text("\(displayLabels[index]) 지출 현황")
@@ -83,7 +83,7 @@ struct BarChartView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        // ✅ 초기 로드 시 최신월 자동 선택
+        // 초기 로드 시 최신월 자동 선택
         .onAppear {
             if selectedMonth == nil {
                 selectedMonth = defaultMonth

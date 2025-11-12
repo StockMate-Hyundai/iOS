@@ -16,7 +16,7 @@ struct CustomSecureField: View {
     @FocusState private var isFocused: Bool
     @State private var showPassword = false
     
-    // ✅ 테두리 색상 계산 로직 (CustomTextField와 동일)
+    // 테두리 색상 계산 로직 (CustomTextField와 동일)
     private var borderColor: Color {
         if let error = errorMessage, !error.isEmpty {
             return .red

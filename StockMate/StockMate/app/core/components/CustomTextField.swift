@@ -13,11 +13,11 @@ struct CustomTextField: View {
     @Binding var text: String
     var isEmail: Bool = false
     var errorMessage: String? = nil
-    var isReadOnly: Bool = false   // ✅ 추가
+    var isReadOnly: Bool = false
     
     @FocusState private var isFocused: Bool
     
-    // ✅ 테두리 색상 계산 로직
+    // 테두리 색상 계산 로직
     private var borderColor: Color {
         if let error = errorMessage, !error.isEmpty {
             return .red
@@ -37,13 +37,6 @@ struct CustomTextField: View {
             
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
-//                    .strokeBorder(
-//                        isFocused
-//                            ? Color.Primary
-//                            : (errorMessage == nil ? Color.LightBlue04 : .red),
-//                        lineWidth: 1
-//                    )
-                
                     .strokeBorder(borderColor, lineWidth: 1)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
@@ -60,7 +53,7 @@ struct CustomTextField: View {
                     )
                
                 if isReadOnly {
-                    // ✅ 가로 스크롤 가능한 읽기 전용 텍스트
+                    // 가로 스크롤 가능한 읽기 전용 텍스트
                     ScrollView(.horizontal, showsIndicators: false) {
                         Text(text.isEmpty ? placeholder : text)
                             .font(.system(size: 15))
@@ -88,11 +81,6 @@ struct CustomTextField: View {
                 .foregroundColor(.red)
                 .frame(height: 14) // 고정 높이 확보
                 .opacity(errorMessage == nil ? 0 : 1) // 없을 땐 투명
-//            if let errorMessage = errorMessage {
-//                Text(errorMessage)
-//                    .font(.caption)
-//                    .foregroundColor(.red)
-//            }
         }
     }
 }

@@ -53,13 +53,9 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
 
         
         startScanning()
-        // ⚠️ 백그라운드에서 실행
-//        DispatchQueue.global(qos: .userInitiated).async {
-//            self.captureSession.startRunning()
-//        }
     }
     
-    // ✅ 스캔 재시작/중단 함수 추가
+    // 스캔 재시작/중단 함수 추가
     func startScanning() {
         guard captureSession != nil else { return }
         if !captureSession.isRunning {
@@ -89,7 +85,7 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
     }
     
     
-    // ✅ QR 감지 시 호출
+    // QR 감지 시 호출
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
            let stringValue = metadataObject.stringValue {

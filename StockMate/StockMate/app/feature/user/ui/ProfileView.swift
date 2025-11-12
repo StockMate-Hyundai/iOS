@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var userViewModel = UserViewModel()
-    @EnvironmentObject var authViewModel: AuthViewModel  // 🔹 전역 Auth 상태 참조
-    @State private var showLogoutModal = false           // 🔹 로그아웃 모달 상태
+    @EnvironmentObject var authViewModel: AuthViewModel  // 전역 Auth 상태 참조
+    @State private var showLogoutModal = false           // 로그아웃 모달 상태
      
      var body: some View {
          ZStack{
@@ -40,12 +40,9 @@ struct ProfileView: View {
                      VStack(spacing: 10) {
                          SettingNavigationRow(icon: "user", title: "프로필 확인", destination: UserProfileView())
                          SettingNavigationRow(icon: "notification", title: "알림", destination: NotificationListView())
-//                         SettingRow(icon: "notification", title: "알림")
                          SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: TransactionTypeListView())
-//                         SettingNavigationRow(icon: "receipt", title: "예치금 히스토리", destination: PaymentTransactionView())
                          SettingNavigationRow(icon: "bag", title: "주문 내역", destination: OrderListView())
-                         //                         SettingRow(icon: "logout", title: "로그아웃")
-                         // 🔹 로그아웃 버튼
+                         // 로그아웃 버튼
                          Button {
                              showLogoutModal = true
                          } label: {
@@ -66,7 +63,7 @@ struct ProfileView: View {
                  Task { await userViewModel.loadUserInfo() }
              }
              
-             // 🔹 AlertModal (ZStack 위에 오버레이로 표시)
+             // AlertModal (ZStack 위에 오버레이로 표시)
              if showLogoutModal {
                  Color.black.opacity(0.3)
                      .ignoresSafeArea()

@@ -17,7 +17,7 @@ struct StockMateApp: App {
             
             Group {
                 if isLoading {
-                    IntroView() // ✅ 로고만 보여주는 화면
+                    IntroView()             // 로고만 보여주는 화면
                 } else {
                     AppNavHost()
                         .environmentObject(authViewModel)

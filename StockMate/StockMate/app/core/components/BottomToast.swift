@@ -5,56 +5,9 @@
 //  Created by Admin on 11/10/25.
 //
 
-//import SwiftUI
-//
-//struct BottomToast: View {
-//    let message: String
-//    @Binding var isVisible: Bool
-//    var iconName: String = "toastlogo"
-//    var backgroundColor: Color = Color(hex: "4CAF50") // 초록색 계열
-//    var duration: Double = 2.3
-//
-//    var body: some View {
-//        VStack {
-//            Spacer()
-//            
-//            if isVisible {
-//                HStack(spacing: 10) {
-//                    Image(iconName)
-//                        .resizable()
-//                        .scaledToFit()
-//                        .foregroundColor(.white)
-//                        .font(.system(size: 18, weight: .semibold))
-//                    
-//                    Text(message)
-//                        .font(.system(size: 14, weight: .semibold))
-//                        .foregroundColor(.white)
-//                        .multilineTextAlignment(.center)
-//                        .lineLimit(2)
-//                }
-//                .padding(.horizontal, 18)
-//                .padding(.vertical, 12)
-//                .background(
-//                    RoundedRectangle(cornerRadius: 14)
-//                        .fill(backgroundColor.opacity(0.95))
-//                )
-//                .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
-//                .padding(.bottom, 60)
-//                .transition(.move(edge: .bottom).combined(with: .opacity))
-//                .onAppear {
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-//                        withAnimation(.easeInOut(duration: 0.3)) {
-//                            isVisible = false
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        .animation(.easeInOut(duration: 0.3), value: isVisible)
-//    }
-//}
 import SwiftUI
 
+// 화면 하단에 토스트 알림 뷰
 struct BottomToast: View {
     let message: String
     @Binding var isVisible: Bool
@@ -66,7 +19,8 @@ struct BottomToast: View {
     var body: some View {
         VStack {
             Spacer()
-
+            
+            // 토스트가 표시될 때만 렌더링
             if isVisible {
                 HStack(spacing: 10) {
                     Image(iconName)
@@ -89,7 +43,7 @@ struct BottomToast: View {
                 .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 4)
                 .padding(.bottom, 60)
                 .padding(.horizontal, 50)
-                .onAppear {
+                .onAppear {                         // 토스트가 나타날 때 타이머 시작
                     DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             isVisible = false

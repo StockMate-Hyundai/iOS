@@ -29,7 +29,7 @@ struct OrderView: View {
                     .padding(.leading, 25)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                // 🔍 검색창
+                // 검색창
                 NavigationLink(destination:
                     OrderRequestSearchView(cartViewModel: cartViewModel)
                 ) {

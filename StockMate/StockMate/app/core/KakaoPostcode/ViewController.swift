@@ -5,9 +5,10 @@
 //  Created by Admin on 11/5/25.
 //
 
-
 import UIKit
 
+// 기본 테스트용 ViewController
+// 버튼을 눌러 Kakao 우편번호 검색 화면(KakaoZipCodeVC)을 표시함
 class ViewController: UIViewController {
 
     // MARK: - UI Components

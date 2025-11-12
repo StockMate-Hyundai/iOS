@@ -106,8 +106,8 @@ struct DepositChargeView: View {
             }
             .background(
                 (Int(amountText) ?? 0) > 0 && !isCharging
-                    ? Color.Primary     // ✅ 활성 상태
-                    : Color.gray.opacity(0.3)  // ✅ 비활성(회색)
+                    ? Color.Primary
+                    : Color.gray.opacity(0.3)
             )
             .cornerRadius(18)
             .padding(.bottom, 25)

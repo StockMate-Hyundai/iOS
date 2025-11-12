@@ -23,7 +23,7 @@ final class OrderViewModel: ObservableObject {
     init(repository: OrderRepositoryProtocol = OrderRepositoryImpl()) {
         self.repository = repository
     }
-
+    // MARK: - 주문 목록 조회
     func loadOrders(
         status: String? = nil,
         startDate: String? = nil,
@@ -50,7 +50,7 @@ final class OrderViewModel: ObservableObject {
         }
     }
     
-    // 주문 생성
+    // MARK: - 주문 생성
     func createOrder(request: OrderRequest) async {
         let result = await repository.createOrder(request: request)
 
@@ -60,25 +60,27 @@ final class OrderViewModel: ObservableObject {
             self.isOrderSuccess = true
 
         case .failure(let error):
-            print("❌ 주문 실패:", error.message)
+            print("주문 실패:", error.message)
             self.errorMessage = error.message
         }
     }
 
 
+    // MARK: - 주문 취소
     func cancelOrder(orderId: Int) async {
         isLoading = true
         let result = await repository.cancelOrder(orderId: orderId)
         
         switch result {
         case .success:
-            await loadOrders()      // ✅ 취소 후 즉시 UI 새로고침
+            await loadOrders()      // 취소 후 즉시 UI 새로고침
         case .failure(let error):
             errorMessage = error.message
         }
         isLoading = false
     }
     
+    // MARK: - 입고 처리 (주문 수령)
     func receiveOrder(orderNumber: String) async -> AppResult<String> {
         isLoading = true
         defer { isLoading = false }
@@ -86,7 +88,7 @@ final class OrderViewModel: ObservableObject {
         let result = await repository.receiveOrder(orderNumber: orderNumber)
         switch result {
         case .success(let message):
-            print("✅ 입고 처리 성공:", message)
+            print("입고 처리 성공:", message)
             await loadOrders()
             return .success(message)
         case .failure(let error):
@@ -94,19 +96,4 @@ final class OrderViewModel: ObservableObject {
             return .failure(error)
         }
     }
-
-
-//    func receiveOrder(orderNumber: String) async {
-//        isLoading = true
-//        defer { isLoading = false }
-//        
-//        let result = await repository.receiveOrder(orderNumber: orderNumber)
-//        switch result {
-//        case .success(let message):
-//            print("✅ 입고 처리 성공:", message)
-//            await loadOrders() // 리스트 갱신
-//        case .failure(let error):
-//            errorMessage = error.message
-//        }
-//    }
 }

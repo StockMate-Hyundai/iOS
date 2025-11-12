@@ -18,7 +18,7 @@ final class DepositViewModel: ObservableObject {
     @Published var depositAmount: Int = 0
     @Published var isChargeSuccess: Bool = false
     
-    /// ✅ 예치금 조회
+    //  예치금 조회
     func fetchDepositAmount() async {
         isLoading = true
         
@@ -34,7 +34,7 @@ final class DepositViewModel: ObservableObject {
         }
     }
     
-    /// ✅ 예치금 충전
+    //  예치금 충전
     func chargeDeposit(amount: Int) async -> Bool {
          let result = await repository.chargeDeposit(amount: amount)
          switch result {

@@ -41,6 +41,7 @@ struct ToastView: View {
     }
 }
 
+// ViewModifier를 사용해 기존 View 위에 토스트를 표시
 struct ToastModifier: ViewModifier {
     @Binding var isPresented: Bool
     let message: String
@@ -74,6 +75,7 @@ struct ToastModifier: ViewModifier {
     }
 }
 
+// View 확장을 통해 modifier를 간편하게 사용할 수 있도록 함
 extension View {
     func toast(
         isPresented: Binding<Bool>,

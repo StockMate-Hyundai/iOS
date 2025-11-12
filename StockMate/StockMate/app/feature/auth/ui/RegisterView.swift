@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RegisterView: View {
     @EnvironmentObject private var viewModel: AuthViewModel
-
+    // MARK: - 사용자 입력값
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
@@ -18,7 +18,7 @@ struct RegisterView: View {
     @State private var address = ""
     @State private var bizNo = ""
 
-    // 에러 메시지 상태
+    // MARK: - 에러 메시지 상태값
     @State private var emailError: String? = nil
     @State private var pwError: String? = nil
     @State private var confirmPasswordError: String? = nil
@@ -27,21 +27,20 @@ struct RegisterView: View {
     @State private var addressError: String? = nil
     @State private var bizNoError: String? = nil
 
+    // MARK: - UI 상태 관리
     @State private var isLoading = false
     @State private var showToast = false
-
     @State private var showAddressSearch = false
     @State private var showSuccessToast = false
     
     var body: some View {
         ZStack {
-            
-            
+            // MARK: - 메인 스크롤 영역
             ScrollView {
                 VStack(spacing: 16) {
                     Spacer().frame(height: 70)
                     
-                    // MARK: - Logo
+                    // MARK: - 로고
                     Image("stockmate_logo")
                         .resizable()
                         .scaledToFit()
@@ -49,15 +48,16 @@ struct RegisterView: View {
                     
                     Spacer().frame(height: 4)
                     
-                    // MARK: - Title
+                    // MARK: - 화면 제목
                     Text("회원가입")
                         .font(.system(size: 28, weight: .bold))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
                         .foregroundColor(Color.DarkBlue01)
                     
-                    // MARK: - Text Fields
+                    // MARK: - 입력 폼
                     VStack {
+                        // 이메일
                         CustomTextField(
                             title: "이메일",
                             placeholder: "stockmate@gmail.com",
@@ -68,6 +68,8 @@ struct RegisterView: View {
                         .onChange(of: email) { newValue in
                             emailError = isValidEmail(newValue) ? nil : "이메일 형식을 확인해주세요"
                         }
+                        
+                        // 비밀번호
                         CustomSecureField(
                             title: "비밀번호",
                             placeholder: "비밀번호를 입력하세요",
@@ -80,6 +82,7 @@ struct RegisterView: View {
                             confirmPasswordError = (confirmPassword.isEmpty || confirmPassword == newValue) ? nil : "비밀번호가 일치하지 않습니다"
                         }
                         
+                        // 비밀번호 확인
                         CustomSecureField(
                             title: "비밀번호 확인",
                             placeholder: "비밀번호를 다시 입력하세요",
@@ -89,26 +92,28 @@ struct RegisterView: View {
                         .onChange(of: confirmPassword) { newValue in
                             confirmPasswordError = (password == newValue) ? nil : "비밀번호가 일치하지 않습니다"
                         }
+                        // 대표자 이름
                         CustomTextField(
                             title: "대표자 이름",
                             placeholder: "홍길동",
                             text: $owner,
                             errorMessage: nil
                         )
+                        // 지점 이름
                         CustomTextField(
                             title: "지점 이름",
                             placeholder: "강남점",
                             text: $storeName,
                             errorMessage: nil
                         )
-                        // ✅ 주소 입력 필드 + 버튼 추가 부분
+                        // 주소 입력 필드
                         VStack(alignment: .leading, spacing: 4) {
                             CustomTextField(
                                 title: "주소",
                                 placeholder: "도로명 주소를 검색하세요",
                                 text: $address,
                                 errorMessage: addressError,
-                                isReadOnly: true // ✅ 추가
+                                isReadOnly: true
                             )
                             .disabled(true) // 사용자가 직접 입력 못하게
                             .onTapGesture {
@@ -135,7 +140,7 @@ struct RegisterView: View {
                     .padding(.horizontal, 24)
                     
                     
-                    // MARK: - Register Button
+                    // MARK: - 회원가입 버튼
                     if isLoading {
                         ProgressView("회원가입 중...")
                             .progressViewStyle(CircularProgressViewStyle())
@@ -154,13 +159,6 @@ struct RegisterView: View {
                                     bizNo: bizNo.filter { $0.isNumber }
                                 )
                                 isLoading = false
-                                
-                                // ✅ 회원가입 성공 시 토스트 표시
-//                                if success {
-//                                    withAnimation {
-//                                        showSuccessToast = true
-//                                    }
-//                                }
                             }
                         }) {
                             Text("회원가입")
@@ -178,10 +176,12 @@ struct RegisterView: View {
                         .padding(.horizontal, 24)
                     }
                     
+                    // 상단 토스트 (오류/알림용)
                     TopToast(message: viewModel.message, isVisible: $showToast)
                     
                     Spacer().frame(height: 5)
-                    // MARK: - Login Link
+                    
+                    // MARK: - 로그인 페이지로 이동 링크
                     HStack(spacing: 4) {
                         Text("이미 계정이 있으신가요?")
                             .foregroundColor(Color.gray)
@@ -198,7 +198,7 @@ struct RegisterView: View {
                     }
                     .padding(.bottom, 40)
                     
-                    // ✅ 키보드 가림 방지용 여백
+                    // 키보드 가림 방지용 여백
                     Spacer().frame(height: 300)
                 }
             }
@@ -207,14 +207,13 @@ struct RegisterView: View {
             .onTapGesture {
                 UIApplication.shared.hideKeyboard()
             }
-            .scrollDismissesKeyboard(.interactively) // ✅ 손가락으로 스크롤하면 키보드 자동 내려감
-            // showToast 자동으로 트리거: viewModel.message 변경 시 토스트 보여주기
+            .scrollDismissesKeyboard(.interactively) // 손가락으로 스크롤하면 키보드 자동 내려감
             .onChange(of: viewModel.message) { newMsg in
                 guard !newMsg.isEmpty else { return }
                 showToast = true
             }
             
-            // ✅ 회원가입 성공 토스트
+            // 회원가입 성공 토스트
             BottomToast(
                 message: "회원가입 성공",
                 isVisible: $showSuccessToast,
@@ -225,11 +224,8 @@ struct RegisterView: View {
         }
        
     }
-
-    // MARK: - 유효성 검사 함수
- 
     
-    // MARK: - computed form valid (부작용 없음)
+    // MARK: - 전체 폼 유효성 검사
       private var isFormValid: Bool {
           return isValidEmail(email)
               && isValidPassword(password)
@@ -240,7 +236,7 @@ struct RegisterView: View {
               && isValidBizNo(bizNo)
       }
     
-    // MARK: - validate & helpers
+    // MARK: - 입력값 검증 및 에러 설정
     private func validateAndSetErrors() {
         emailError = isValidEmail(email) ? nil : "이메일 형식을 확인해주세요"
         pwError = isValidPassword(password) ? nil : "8자 이상, 영문+숫자 조합입니다."
@@ -249,11 +245,12 @@ struct RegisterView: View {
         bizNoError = isValidBizNo(bizNo) ? nil : "형식: 000-00-00000"
     }
     
+    // MARK: - 사업자등록번호 자동 포맷팅
     private func formatBizNoInput(_ input: String) {
-        // 1️⃣ 숫자만 남기기
+        // 숫자만 남기기
         let digitsOnly = input.filter { $0.isNumber }
 
-        // 2️⃣ 하이픈 자동 삽입
+        // 하이픈 자동 삽입
         var formatted = ""
         let length = digitsOnly.count
 
@@ -270,12 +267,12 @@ struct RegisterView: View {
             formatted = "\(first)-\(middle)-\(last)"
         }
 
-        // 3️⃣ 10자리 이상은 자르기
+        // 10자리 이상은 자르기
         if digitsOnly.count > 10 {
             formatted = String(formatted.prefix(12)) // 하이픈 포함
         }
 
-        // 4️⃣ 상태 업데이트
+        // 상태 업데이트
         if formatted != bizNo {
             bizNo = formatted
         }

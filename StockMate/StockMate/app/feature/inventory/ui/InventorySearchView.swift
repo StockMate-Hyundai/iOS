@@ -37,7 +37,7 @@ struct InventorySearchView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // 🔍 검색창
+                // 검색창
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)
@@ -119,7 +119,7 @@ struct InventorySearchView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 16)
 
-                // 📋 재고 리스트
+                // 재고 리스트
                 ScrollView {
                     LazyVStack(spacing: 10) {
 
@@ -227,7 +227,6 @@ struct FilterMenu: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 9)
-            // ✅ 텍스트 길이에 맞게 자동 확장
             .fixedSize(horizontal: true, vertical: false)
             .background(isActive ? Color(hex: "DBEAFE") : Color.Light)
             .overlay(

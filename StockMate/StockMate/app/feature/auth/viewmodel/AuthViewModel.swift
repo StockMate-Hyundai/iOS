@@ -7,12 +7,14 @@
 
 import SwiftUI
 
+// 인증 상태를 나타내는 enum
 enum AuthState {
     case unauthenticated
     case registering
     case authenticated
 }
 
+// 인증 관련 로직(ViewModel)
 @MainActor
 final class AuthViewModel: ObservableObject {
     @Published var email = ""
@@ -20,8 +22,10 @@ final class AuthViewModel: ObservableObject {
     @Published var message: String = ""
     @Published var authState: AuthState = .unauthenticated
 
+    // MARK: - Dependencies
     private let repo: AuthRepositoryProtocol
 
+    // MARK: - Init
     init(repo: AuthRepositoryProtocol = AuthRepositoryImpl()) {
         self.repo = repo
     }
@@ -57,11 +61,13 @@ final class AuthViewModel: ObservableObject {
         }
     }
 
+    // MARK: - 로그아웃
     func logout() {
         TokenStore.shared.clear()
         authState = .unauthenticated
     }
     
+    // MARK: - 화면 상태 전환
     func goToLogin() {
         authState = .unauthenticated
     }
@@ -79,19 +85,7 @@ final class AuthViewModel: ObservableObject {
         storeName: String,
         bizNo: String
     ) async -> Bool {
-
-        print(
-            """
-            [회원가입 시도]
-            email: \(email)
-            password: \(password)
-            owner: \(owner)
-            address: \(address)
-            storeName: \(storeName)
-            businessNumber: \(bizNo)
-            """
-        )
-
+        
         let req = RegisterRequest(
             email: email,
             password: password,

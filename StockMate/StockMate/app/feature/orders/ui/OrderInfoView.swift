@@ -34,7 +34,7 @@ struct OrderInfoView: View {
     @State private var showChargeToast = false       // 충전 완료
 
 
-    // ✅ 모달 관련 상태
+    // 모달 관련 상태
     @State private var showOrderSuccessModal = false
     @State private var navigateToOrderDetail = false
     @State private var navigateToHome = false
@@ -92,7 +92,7 @@ struct OrderInfoView: View {
             iconName: "checkmark",
             iconColor: .green
         )
-        // ✅ 예치금 부족 토스트
+        // 예치금 부족 토스트
        .toast(
            isPresented: $showDepositToast,
            message: "예치금이 부족합니다. (부족: \(formatPrice((cartViewModel.cart?.totalPrice ?? 0) - depositViewModel.balance))원)",
@@ -136,7 +136,7 @@ struct OrderInfoView: View {
         }
         .sheet(isPresented: $depositViewModel.showChargeSheet) {
             DepositChargeView(viewModel: depositViewModel) {
-                // ✅ 충전 성공 시 토스트 표시
+                // 충전 성공 시 토스트 표시
                 withAnimation {
                     showChargeToast = true
                 }
@@ -251,7 +251,7 @@ extension OrderInfoView {
                     }
                     .scrollContentBackground(.hidden)
                     .background(Color.white)
-                    .frame(height: 93) // ✅ 높이 기존 70 → 110 으로 확대
+                    .frame(height: 93)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(requestMessage.isEmpty ? Color(.systemGray4) : Color.Primary, lineWidth: 1)
@@ -428,7 +428,7 @@ extension OrderInfoView {
                let deposit = depositViewModel.balance
                            
                if totalPrice > deposit {
-                   // ✅ 예치금 부족
+                   // 예치금 부족
                    withAnimation {
                        showDepositToast = true
                    }

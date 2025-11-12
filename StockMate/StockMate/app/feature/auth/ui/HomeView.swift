@@ -12,7 +12,6 @@ struct HomeView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @StateObject private var userViewModel = UserViewModel()
     @StateObject private var inventoryViewModel = InventoryViewModel()
-//    @EnvironmentObject var dashboardViewModel: DashboardViewModel   //preview 용
     @StateObject private var dashboardViewModel = DashboardViewModel()
     @StateObject private var notificationViewModel = NotificationViewModel()
     
@@ -41,7 +40,7 @@ struct HomeView: View {
                      
                      Spacer()
                     
-                     NavigationLink(destination: NotificationListView()) { // 🔴 전달
+                     NavigationLink(destination: NotificationListView()) {
                             ZStack(alignment: .topTrailing) {
                                 Image("notification")
                                     .resizable()
@@ -66,7 +65,7 @@ struct HomeView: View {
                  }
                  .padding(.horizontal)
                  
-                 // 🔍 검색창
+                 // 검색창
                  NavigationLink(destination: InventorySearchView()) {
                      HStack {
                          Image(systemName: "magnifyingglass")
@@ -94,7 +93,7 @@ struct HomeView: View {
                      Text("지난달 카테고리 별 지출")
                          .font(.system(size: 15, weight: .semibold))
                          .padding(4)
-                         .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬
+                         .frame(maxWidth: .infinity, alignment: .leading)
                      
                      HStack {
                          if dashboardViewModel.isLoading {
@@ -126,7 +125,7 @@ struct HomeView: View {
                      Text("월간 지출 현황")
                          .font(.system(size: 15, weight: .semibold))
                          .padding(4)
-                         .frame(maxWidth: .infinity, alignment: .leading) // ✅ 항상 왼쪽 정렬
+                         .frame(maxWidth: .infinity, alignment: .leading)
                      
                          if dashboardViewModel.isLoading {
                              ProgressView("데이터 불러오는 중...")
@@ -154,21 +153,21 @@ struct HomeView: View {
         .task {
             // 카테고리 데이터 로드
             await inventoryViewModel.loadLackCountByCategory()
-            await dashboardViewModel.fetchMonthlySpending() // ✅ 추가
-            await dashboardViewModel.fetchCategorySpending() // ✅ 추가
-            await notificationViewModel.fetchUnreadCount() // 🔴 추가
+            await dashboardViewModel.fetchMonthlySpending()
+            await dashboardViewModel.fetchCategorySpending()
+            await notificationViewModel.fetchUnreadCount()
         }
         .onAppear {
             Task { await userViewModel.loadUserInfo() }
         }
         // 화면 디자인 시 잠시 주석처리
-        // ✅ 세션 만료 시 자동으로 로그인 뷰로 이동
-//        .onChange(of: userViewModel.shouldGoToLogin) { shouldGo in
-//            if shouldGo {
-//                print("세션 만료됨 → 로그인 화면으로 이동")
-//                authViewModel.logout()
-//            }
-//        }
+        // 세션 만료 시 자동으로 로그인 뷰로 이동
+        .onChange(of: userViewModel.shouldGoToLogin) { shouldGo in
+            if shouldGo {
+                print("세션 만료됨 → 로그인 화면으로 이동")
+                authViewModel.logout()
+            }
+        }
      }
     
     private var lackStockSection: some View {
@@ -178,7 +177,7 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             HStack(spacing: 13) {
                 if inventoryViewModel.lackCounts.isEmpty {
-                    // ✅ 데이터가 없을 때도 공간 확보
+                    // 데이터가 없을 때도 공간 확보
                     ForEach(0..<5) { _ in
                         StatusItem(
                             title: "-",
@@ -266,20 +265,4 @@ struct StatusItem: View {
                 .foregroundColor(.textGray1)
         }.frame(maxWidth: .infinity, minHeight: 70)
     }
-}
-
-
-#Preview {
-    let dashboardVM = DashboardViewModel()
-    dashboardVM.categorySpendings = [
-        CategorySpending(categoryName: "전기/램프", totalAmount: 450000),
-        CategorySpending(categoryName: "엔진/미션", totalAmount: 300000),
-        CategorySpending(categoryName: "하체/바디", totalAmount: 150000),
-        CategorySpending(categoryName: "내장/외장", totalAmount: 100000),
-        CategorySpending(categoryName: "기타소모품", totalAmount: 50000)
-    ]
-    
-    return HomeView()
-        .environmentObject(AuthViewModel())
-        .environmentObject(dashboardVM) // ✅ 이제 진짜 연결됨!
 }

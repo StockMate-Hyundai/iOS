@@ -16,7 +16,7 @@ protocol OrderRepositoryProtocol {
         size: Int
     ) async -> AppResult<OrderPageData>
     
-    /// 주문 상세 조회
+    // 주문 상세 조회
     func fetchOrderDetail(
         orderId: Int
     ) async -> AppResult<OrderResponseItem>

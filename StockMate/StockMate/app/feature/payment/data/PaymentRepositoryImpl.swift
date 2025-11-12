@@ -10,8 +10,10 @@ import Foundation
 import Alamofire
 
 
+// 결제 및 예치금 관련 Repository 구현체
 final class PaymentRepositoryImpl: PaymentRepositoryProtocol {
     
+    // 예치금 잔액 조회
     func fetchDepositAmount() async -> AppResult<PaymentAmount> {
         let request = PaymentApi.getPaymentAmount()
         let result = await safeApi(request, decodeTo: ApiResponse<PaymentAmount>.self)
@@ -33,6 +35,7 @@ final class PaymentRepositoryImpl: PaymentRepositoryProtocol {
         }
     }
     
+    // 예치금 충전
     func chargeDeposit(amount: Int) async -> AppResult<String> {
         let request = PaymentApi.chargeDeposit(amount: amount)
         let result = await safeApi(request, decodeTo: ApiResponse<String>.self)
@@ -46,7 +49,7 @@ final class PaymentRepositoryImpl: PaymentRepositoryProtocol {
         }
     }
     
-    // ✅ 최근 5개월 소비 내역 조회
+    // 최근 5개월 소비 내역 조회
     func fetchMonthlySpending() async -> AppResult<[MonthlySpending]> {
         let request = PaymentApi.getMonthlySpending()
         let result = await safeApi(request, decodeTo: ApiResponse<[MonthlySpending]>.self)
@@ -62,7 +65,7 @@ final class PaymentRepositoryImpl: PaymentRepositoryProtocol {
         }
     }
     
-    // ✅ 지난달 카테고리별 지출
+    // 지난달 카테고리별 지출
     func fetchCategorySpending() async -> AppResult<[CategorySpending]> {
         let request = PaymentApi.getCategorySpending()
         let result = await safeApi(request, decodeTo: ApiResponse<[CategorySpending]>.self)

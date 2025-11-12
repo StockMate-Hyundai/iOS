@@ -15,14 +15,14 @@ struct OrderResultView: View {
             
             Spacer()
             
-            // ✅ 결제 완료 아이콘
+            // 결제 완료 아이콘
             Image(systemName: "checkmark.circle.fill")
                 .resizable()
                 .frame(width: 80, height: 80)
                 .foregroundColor(.blue)
                 .padding(.bottom, 8)
             
-            // ✅ 완료 문구
+            // 완료 문구
             Text("결제가 완료되었습니다")
                 .font(.title3)
                 .bold()
@@ -32,7 +32,7 @@ struct OrderResultView: View {
             
             Spacer()
             
-            // ✅ 하단 버튼
+            // 하단 버튼
             VStack(spacing: 12) {
                 Button {
                     dismiss() // 이전 화면으로 돌아가기

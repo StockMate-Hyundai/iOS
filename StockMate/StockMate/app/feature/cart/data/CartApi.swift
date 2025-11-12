@@ -34,7 +34,6 @@ struct CartItem: Decodable, Identifiable {
     let stock: Int?
     let image: String?
 
-//    var id: Int { cartItemId }
     var id: Int { partId }
 
 }

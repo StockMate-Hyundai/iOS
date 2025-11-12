@@ -13,7 +13,7 @@ struct OrderDetailView: View {
     @ObservedObject var orderViewModel: OrderViewModel
     @StateObject private var viewModel = OrderDetailViewModel()
     
-    // ✅ 입고처리 버튼 + 모달 + 리프레시
+    // 입고처리 버튼 + 모달 + 리프레시
     @State private var showSuccessModal = false // 모달 표시용 상태
     @State private var refreshTrigger = UUID()  // 화면 리프레시 트리거
     
@@ -32,7 +32,7 @@ struct OrderDetailView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
 
                     
-                    // ✅ 주문 정보
+                    // 주문 정보
                     VStack(alignment: .leading, spacing: 6) {
                         Text(formatDate(order.createdAt))
                             .font(.system(size: 15, weight: .semibold))
@@ -56,7 +56,7 @@ struct OrderDetailView: View {
                         }
                         
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ 이거 추가
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.all, 20)
                     .background(Color.white)
                     .cornerRadius(16)
@@ -72,14 +72,14 @@ struct OrderDetailView: View {
                                 .font(.system(size: 14))
                             
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.all, 20)
                         .background(Color.white)
                         .cornerRadius(16)
                         .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
                     }
                     
-                    // ✅ 배송 정보
+                    // 배송 정보
                     VStack(alignment: .leading, spacing: 6) {
                         Text("배송정보")
                             .font(.system(size: 15, weight: .semibold))
@@ -87,7 +87,7 @@ struct OrderDetailView: View {
                         
                         infoRow("주문자명", order.userInfo?.owner ?? "-")
                         infoRow("주소", order.userInfo?.address ?? "-")
-                        // ✅ 운송장정보 안전 처리
+                        // 운송장정보 안전 처리
                         let trackingText: String = {
                             if let carrier = order.carrier,
                                let trackingNo = order.trackingNumber,
@@ -99,7 +99,7 @@ struct OrderDetailView: View {
                         }()
                         infoRow("운송장번호", trackingText)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ 여기도 추가
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.all, 20)
                     .background(Color.white)
                     .cornerRadius(16)
@@ -123,7 +123,7 @@ struct OrderDetailView: View {
                         .shadow(color: .black.opacity(0.05), radius: 3, y: 2)
                     }
                     
-                    // ✅ 주문 상품
+                    // 주문 상품
                     OrderSectionCard {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("주문 상품 \(order.orderItems.count)개")
@@ -154,16 +154,16 @@ struct OrderDetailView: View {
                                                 .font(.system(size: 14, weight: .bold))
                                         }
                                     }
-                                    .frame(maxWidth: .infinity, alignment: .leading) // ✅ 왼쪽 정렬 강제
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                             }
                             .padding(.top, 8) // 위 여백만 살짝
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading) // ✅ 섹션 전체도 왼쪽으로 정렬
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
 
-                    // ✅ 결제 정보
+                    // 결제 정보
                     OrderSectionCard {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("결제 정보")
@@ -236,7 +236,7 @@ struct OrderDetailView: View {
                                         let result = await orderViewModel.receiveOrder(orderNumber: order.orderNumber)
                                         switch result {
                                         case .success(let message):
-                                            showSuccessModal = true         // ✅ 입고 처리 성공 시 모달 표시
+                                            showSuccessModal = true         // 입고 처리 성공 시 모달 표시
                                             print("입고 처리 성공: \(message)")
                                         case .failure(let error):
                                             print("입고 처리 실패: \(error.message)")
@@ -258,7 +258,7 @@ struct OrderDetailView: View {
                         }
                         .padding(.top, 5)
                     } else{
-                        // 👉 나머지 상태: 영수증 확인 버튼만 하나
+                        // 나머지 상태: 영수증 확인 버튼만 하나
                           NavigationLink(destination: ReceiptView(orderId: order.id)) {
                               Text("영수증 확인")
                                   .font(.system(size: 15, weight: .semibold))
@@ -276,7 +276,7 @@ struct OrderDetailView: View {
                     }
 
                 }
-                .padding(.horizontal, 20) // ✅ 전체 섹션 동일 여백
+                .padding(.horizontal, 20) // 전체 섹션 동일 여백
                 .padding(.vertical, 16)
 
             } else if let error = viewModel.errorMessage {
@@ -298,7 +298,7 @@ struct OrderDetailView: View {
                                 primaryButtonTitle: "확인",
                                 primaryAction: {
                                     showSuccessModal = false
-                                    // ✅ 화면 리프레시 트리거
+                                    // 화면 리프레시 트리거
                                     refreshTrigger = UUID()
                                     Task {
                                         await viewModel.fetchOrderDetail(orderId: orderId)
@@ -347,7 +347,7 @@ struct OrderDetailView: View {
  
 }
 
-// ✅ 카드 레이아웃 통일용
+// 카드 레이아웃 통일용
 struct OrderSectionCard<Content: View>: View {
     let content: Content
     init(@ViewBuilder content: () -> Content) {

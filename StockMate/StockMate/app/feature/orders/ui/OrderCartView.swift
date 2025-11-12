@@ -15,7 +15,7 @@ struct OrderCartView: View {
         VStack(spacing: 0) {
             
             if cartViewModel.items.isEmpty {
-              // 🛒 장바구니 비어있을 때
+              // 장바구니 비어있을 때
               VStack(spacing: 8) {
                   Text("장바구니가 비어있어요.")
                       .font(.system(size: 15, weight: .regular))

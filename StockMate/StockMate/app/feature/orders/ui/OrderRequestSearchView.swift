@@ -38,7 +38,7 @@ struct OrderRequestSearchView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                // 🔍 검색창
+                // 검색창
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)

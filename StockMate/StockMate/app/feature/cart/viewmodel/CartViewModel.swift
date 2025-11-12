@@ -50,7 +50,7 @@ final class CartViewModel: ObservableObject {
 
     // MARK: - Update Quantity (전체 덮어쓰기)
     func updateCart() async {
-        // ✅ items가 비면 clearCart 호출하고 return
+        // items가 비면 clearCart 호출하고 return
           if items.isEmpty {
               await clearCart()
               return
@@ -158,7 +158,7 @@ final class CartViewModel: ObservableObject {
     
     private func syncCart() async {
         if items.isEmpty {
-            // ✅ 장바구니가 빈 경우는 clearCart 호출
+            // 장바구니가 빈 경우는 clearCart 호출
             await clearCart()
             return
         }

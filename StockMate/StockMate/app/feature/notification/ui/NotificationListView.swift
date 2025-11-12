@@ -86,7 +86,7 @@ struct NotificationCardView: View {
                 }
                 Spacer()
                 
-                // 🔴 안 읽은 알림 표시 점
+                // 안 읽은 알림 표시 삘간 점
                  if !item.read {
                      Circle()
                          .fill(Color.red)

@@ -18,7 +18,7 @@ struct LoginView: View {
     @State private var emailError: String? = nil
     @State private var pwError: String? = nil
     
-    // ✅ 토스트 관련 상태 추가
+    // 토스트 관련 상태 추가
     @State private var showTopToast = false
     @State private var topToastMessage = ""
     
@@ -60,7 +60,7 @@ struct LoginView: View {
                 .keyboardType(.emailAddress)
                 .padding(.horizontal, 24)
                 .onChange(of: authViewModel.email) { newValue in
-                    // 입력 중 실시간 validation (뷰 업데이트 중이 아니므로 안전)
+                    // 입력 중 실시간 validation
                     emailError = isValidEmail(newValue) ? nil : "이메일 형식을 확인해주세요"
                 }
                 
@@ -125,24 +125,8 @@ struct LoginView: View {
                     }
                 }
                 
-                // 승인 아이디 받기 전
-                // 홈화면으로 이동
-                HStack {
-                    Button(action: {
-                        authViewModel.authState = .authenticated
-                    }) {
-                        Text("홈화면으로 이동")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(Color.Secondary)
-                    }
-                }
-                .padding(.top, 5)
-                
                 Spacer()
                 
-                
-                // ✅ 상단 토스트 표시
-                //TopToast(message: topToastMessage, isVisible: $showTopToast)
             }
             .background(Color.Light)
             .onTapGesture {
@@ -150,9 +134,6 @@ struct LoginView: View {
             }
             .ignoresSafeArea()
             
-            // ✅ 오버레이로 위에 띄움 (맨 위에 고정)
-//                      TopToast(message: topToastMessage, isVisible: $showTopToast)
-//                          .zIndex(1) // 다른 뷰 위로
             TopToast(message: topToastMessage,
                      isVisible: $showTopToast,
                      iconName: "exclamationmark.circle",
@@ -164,12 +145,6 @@ struct LoginView: View {
     }
     
     // MARK: - 유효성 검사 함수
-//    private func isValidForm() -> Bool {
-//        emailError = isValidEmail(authViewModel.email) ? nil : "이메일 형식을 확인해주세요"
-//        pwError = authViewModel.password.count >= 8 ? nil : "8자 이상 비밀번호를 입력해주세요"
-//        return emailError == nil && pwError == nil
-////        return true
-//    }
     // 1) 뷰 내부(바디 바깥) — 부작용 없는 computed property
     private var isFormValid: Bool {
         return isValidEmail(authViewModel.email) && authViewModel.password.count >= 8
@@ -182,10 +157,7 @@ struct LoginView: View {
         pwError = authViewModel.password.count >= 8 ? nil : "8자 이상 비밀번호를 입력해주세요"
     }
 
-    // 기존의 isValidForm 함수는 이제 뷰에 호출되는 순수 검사로 대체하거나 삭제
-    // private func isValidForm() -> Bool { ... }  대신 위 isFormValid 사용
-
-    // ✅ 상단 토스트 표시 함수
+    // 상단 토스트 표시 함수
        private func showToast(_ message: String) {
            topToastMessage = message
            withAnimation {
